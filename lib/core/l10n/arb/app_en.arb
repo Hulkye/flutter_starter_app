@@ -1,0 +1,12 @@
+{
+  "@@locale": "en",
+  "appTitle": "Flutter Starter",
+  "homeTitle": "Home",
+  "profileTitle": "Profile",
+  "goToProfile": "Go to profile",
+  "requestDemo": "Request demo API",
+  "requesting": "Requesting...",
+  "switchThemeMode": "Switch theme mode",
+  "currentThemeMode": "Current theme mode",
+  "currentLogoAsset": "Current logo asset"
+}

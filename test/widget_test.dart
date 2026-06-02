@@ -1,0 +1,19 @@
+import 'package:flutter_starter_app/app/app.dart';
+import 'package:flutter_starter_app/app/env.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
+void main() {
+  testWidgets('App renders home page smoke test', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({'app_locale_code': 'zh'});
+    appConfig = const EnvConfig();
+
+    await tester.pumpWidget(const ProviderScope(child: App()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('首页'), findsOneWidget);
+    expect(find.text('前往我的页面'), findsOneWidget);
+  });
+}

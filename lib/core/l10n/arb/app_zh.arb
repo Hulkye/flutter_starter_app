@@ -1,0 +1,12 @@
+{
+  "@@locale": "zh",
+  "appTitle": "Flutter Starter",
+  "homeTitle": "首页",
+  "profileTitle": "我的",
+  "goToProfile": "前往我的页面",
+  "requestDemo": "请求示例接口",
+  "requesting": "请求中...",
+  "switchThemeMode": "切换主题模式",
+  "currentThemeMode": "当前主题模式",
+  "currentLogoAsset": "当前Logo资源"
+}
