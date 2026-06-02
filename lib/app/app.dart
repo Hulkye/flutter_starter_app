@@ -11,12 +11,6 @@ import '../core/theme/theme.dart';
 class App extends ConsumerWidget {
   const App({super.key});
 
-  List<NavigatorObserver> createNavigatorObservers() {
-    List<NavigatorObserver> navigatorObservers = [];
-    navigatorObservers.add(ToastUtil.navigatorObserver);
-    return navigatorObservers;
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocale = ref.watch(appLocaleValueProvider);

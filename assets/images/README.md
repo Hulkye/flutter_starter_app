@@ -2,7 +2,7 @@
 
 Use these directories for theme-based images:
 
-- `assets/images/light/`
+- `assets/images/`
 - `assets/images/dark/`
 
 Suggested filenames:

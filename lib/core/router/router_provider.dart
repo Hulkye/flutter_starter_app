@@ -6,9 +6,11 @@ import '../../features/auth/presentation/auth_routes.dart';
 import '../../features/home/presentation/home_routes.dart';
 import '../../features/profile/presentation/profile_routes.dart';
 import '../../shared/services/auth/auth.dart';
+import '../../shared/widgets/toast/toast_util.dart';
 import 'app_route_define.dart';
 import 'app_router_transfor.dart';
 import 'base_navigator.dart';
+import 'router_guard.dart';
 import 'router_navigator.dart';
 
 // =============================================================================
@@ -37,26 +39,19 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 ///
 /// 依赖 [authSessionProvider] —— 登录态变化时自动重新评估 redirect。
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final session = ref.watch(authSessionProvider);
+  ref.watch(authSessionProvider);
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: const HomeRoute().location,
-    redirect: (BuildContext context, GoRouterState state) {
-      final currentPath = state.uri.path;
-
-      // 公开路径直接放行
-      final isPublic = _allRoutes.any(
-        (r) => r.public && r.path == currentPath,
-      );
-      if (isPublic) return null;
-
-      // 已登录放行
-      if (session?.isValid == true) return null;
-
-      // 未登录 → 重定向到登录页
-      return const LoginRoute().location;
-    },
+    observers: [ToastUtil.navigatorObserver],
+    redirect: createAuthGuard(
+      loginPath: const LoginRoute().location,
+      publicPaths: _allRoutes
+          .where((route) => route.public)
+          .map((route) => route.path)
+          .toList(),
+    ),
     routes: _allRoutes.map(toGoRoute).toList(),
   );
 });
