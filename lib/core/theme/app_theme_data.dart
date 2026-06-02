@@ -15,7 +15,7 @@ abstract final class AppThemeData {
       useMaterial3: true,
       brightness: Brightness.light,
       primaryColor: appColor.brand,
-      scaffoldBackgroundColor: appColor.pageBackground,
+      scaffoldBackgroundColor: appColor.backgroundSecondary,
       splashFactory: NoSplash.splashFactory, //移除水波纹
       highlightColor: Colors.transparent, //移除水波纹
       extensions: <ThemeExtension<dynamic>>[
@@ -23,8 +23,8 @@ abstract final class AppThemeData {
         AssetExtension(assetData: appAsset),
       ],
       appBarTheme: AppBarTheme(
-        backgroundColor: appColor.pageBackground,
-        foregroundColor: appColor.textPrimary,
+        backgroundColor: appColor.backgroundSecondary,
+        foregroundColor: appColor.fontPrimary,
         elevation: 0,
       ),
     );
@@ -37,7 +37,7 @@ abstract final class AppThemeData {
       useMaterial3: true,
       brightness: Brightness.dark,
       primaryColor: appColor.brand,
-      scaffoldBackgroundColor: appColor.pageBackground,
+      scaffoldBackgroundColor: appColor.backgroundSecondary,
       splashFactory: NoSplash.splashFactory, //移除水波纹
       highlightColor: Colors.transparent, //移除水波纹
       extensions: <ThemeExtension<dynamic>>[
@@ -45,8 +45,8 @@ abstract final class AppThemeData {
         AssetExtension(assetData: appAsset),
       ],
       appBarTheme: AppBarTheme(
-        backgroundColor: appColor.pageBackground,
-        foregroundColor: appColor.textPrimary,
+        backgroundColor: appColor.backgroundSecondary,
+        foregroundColor: appColor.fontPrimary,
         elevation: 0,
       ),
     );

@@ -38,7 +38,7 @@ class ProfilePage extends BasePage<ProfileViewModel> {
     return Center(
       child: Text(
         context.i18n.profileTitle,
-        style: TextStyle(color: appColor.textPrimary),
+        style: TextStyle(color: appColor.fontPrimary),
       ),
     );
   }

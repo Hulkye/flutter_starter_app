@@ -11,17 +11,16 @@ class SwitchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
-    // return BaseSwitch(
-    //   value: value,
-    //   onChanged: onChanged,
-    //   activeColor: context.appColor.mainColor,
-    //   trackColor: context.appColor.fillSecondary,
-    //   thumbColor: context.appColor.whiteColor,
-    //   thumbShadowColor: context.appColor.overlayBg,
-    //   width: 40.w,
-    //   height: 24.w,
-    //   padding: 1.5.w,
-    // );
+    return BaseSwitch(
+      value: value,
+      onChanged: onChanged,
+      activeColor: context.appColor.brand,
+      trackColor: context.appColor.compBackgroundSecondary,
+      thumbColor: context.appColor.compBackgroundPrimary,
+      thumbShadowColor: context.appColor.compDivider,
+      width: 40.w,
+      height: 24.w,
+      padding: 1.5.w,
+    );
   }
 }

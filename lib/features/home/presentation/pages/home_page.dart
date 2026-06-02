@@ -63,7 +63,7 @@ class HomePage extends BasePage<HomeViewModel> {
         children: [
           Text(
             '${context.i18n.currentThemeMode}: $themeMode',
-            style: TextStyle(color: appColors.textPrimary),
+            style: TextStyle(color: appColors.fontPrimary),
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -76,7 +76,7 @@ class HomePage extends BasePage<HomeViewModel> {
                 return Icon(
                   Icons.image_not_supported_outlined,
                   size: 48,
-                  color: appColors.textSecondary,
+                  color: appColors.fontSecondary,
                 );
               },
             ),
@@ -84,7 +84,7 @@ class HomePage extends BasePage<HomeViewModel> {
           const SizedBox(height: 12),
           Text(
             '${context.i18n.currentLogoAsset}: ${appAssets.logo}',
-            style: TextStyle(color: appColors.textSecondary),
+            style: TextStyle(color: appColors.fontSecondary),
           ),
           const SizedBox(height: 16),
           ElevatedButton(
@@ -113,7 +113,7 @@ class HomePage extends BasePage<HomeViewModel> {
               homeState.requestResult,
               maxLines: 4,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: appColors.textSecondary),
+              style: TextStyle(color: appColors.fontSecondary),
             ),
           ),
         ],
