@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/env.dart';
 import '../../../shared/services/auth/auth_manager.dart';
 import '../../constant/duration_const.dart';
+import '../../l10n/l10n.dart';
 import 'config/http_auth_config.dart';
 import 'config/http_config.dart';
 import 'config/http_hint_config.dart';
@@ -30,6 +31,7 @@ import 'http_client.dart';
 final httpConfigProvider = Provider<HttpConfig>((ref) {
   final baseUrl = appConfig.apiBaseUrl.trim();
   final proxyHost = _resolveProxyHost();
+  final i18n = ref.watch(appLocalizationsProvider);
 
   return HttpConfig(
     baseUrl: baseUrl,
@@ -54,10 +56,12 @@ final httpConfigProvider = Provider<HttpConfig>((ref) {
       enableBusinessStatusCheck: appConfig.httpBusinessStatusCheckEnable,
     ),
     hintConfig: HttpHintConfig(
-      networkErrorHint: '网络异常，请检查连接',
-      serverErrorHint: '服务异常，请稍后重试',
-      timeoutHint: '请求超时，请稍后重试',
-      unknownHint: '请求失败，请稍后重试',
+      networkErrorHint: i18n.networkErrorHint,
+      serverErrorHint: i18n.serverErrorHint,
+      unknownHint: i18n.unknownHint,
+      timeoutHint: i18n.timeoutHint,
+      reqErrorHint: i18n.reqErrorHint,
+      dataParseHint: i18n.dataParseHint,
     ),
     authConfig: HttpAuthConfig(
       headerMapProvider: () async {

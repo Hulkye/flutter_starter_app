@@ -100,57 +100,195 @@ abstract class AppLocalizations {
 
   /// No description provided for @appTitle.
   ///
-  /// In en, this message translates to:
+  /// In zh, this message translates to:
   /// **'Flutter Starter'**
   String get appTitle;
 
   /// No description provided for @homeTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Home'**
+  /// In zh, this message translates to:
+  /// **'首页'**
   String get homeTitle;
 
   /// No description provided for @profileTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Profile'**
+  /// In zh, this message translates to:
+  /// **'我的'**
   String get profileTitle;
 
   /// No description provided for @goToProfile.
   ///
-  /// In en, this message translates to:
-  /// **'Go to profile'**
+  /// In zh, this message translates to:
+  /// **'前往我的页面'**
   String get goToProfile;
 
   /// No description provided for @requestDemo.
   ///
-  /// In en, this message translates to:
-  /// **'Request demo API'**
+  /// In zh, this message translates to:
+  /// **'请求示例接口'**
   String get requestDemo;
 
   /// No description provided for @requesting.
   ///
-  /// In en, this message translates to:
-  /// **'Requesting...'**
+  /// In zh, this message translates to:
+  /// **'请求中...'**
   String get requesting;
 
   /// No description provided for @switchThemeMode.
   ///
-  /// In en, this message translates to:
-  /// **'Switch theme mode'**
+  /// In zh, this message translates to:
+  /// **'切换主题模式'**
   String get switchThemeMode;
 
   /// No description provided for @currentThemeMode.
   ///
-  /// In en, this message translates to:
-  /// **'Current theme mode'**
+  /// In zh, this message translates to:
+  /// **'当前主题模式'**
   String get currentThemeMode;
 
   /// No description provided for @currentLogoAsset.
   ///
-  /// In en, this message translates to:
-  /// **'Current logo asset'**
+  /// In zh, this message translates to:
+  /// **'当前Logo资源'**
   String get currentLogoAsset;
+
+  /// No description provided for @confirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认'**
+  String get confirm;
+
+  /// No description provided for @cancel.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消'**
+  String get cancel;
+
+  /// No description provided for @login.
+  ///
+  /// In zh, this message translates to:
+  /// **'登录'**
+  String get login;
+
+  /// No description provided for @register.
+  ///
+  /// In zh, this message translates to:
+  /// **'注册'**
+  String get register;
+
+  /// No description provided for @search.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索'**
+  String get search;
+
+  /// No description provided for @add.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加'**
+  String get add;
+
+  /// No description provided for @delete.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get delete;
+
+  /// No description provided for @selectAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全选'**
+  String get selectAll;
+
+  /// No description provided for @save.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存'**
+  String get save;
+
+  /// No description provided for @done.
+  ///
+  /// In zh, this message translates to:
+  /// **'完成'**
+  String get done;
+
+  /// No description provided for @noData.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无数据'**
+  String get noData;
+
+  /// No description provided for @settings.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置'**
+  String get settings;
+
+  /// No description provided for @logout.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出登录'**
+  String get logout;
+
+  /// No description provided for @username.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名'**
+  String get username;
+
+  /// No description provided for @password.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码'**
+  String get password;
+
+  /// No description provided for @welcomeUser.
+  ///
+  /// In zh, this message translates to:
+  /// **'欢迎，{username}'**
+  String welcomeUser(String username);
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'登录失败'**
+  String get loginFailed;
+
+  /// No description provided for @networkErrorHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'网络异常，请检查连接'**
+  String get networkErrorHint;
+
+  /// No description provided for @serverErrorHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务异常，请稍后重试'**
+  String get serverErrorHint;
+
+  /// No description provided for @unknownHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请求失败，请稍后重试'**
+  String get unknownHint;
+
+  /// No description provided for @timeoutHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请求超时，请稍后重试'**
+  String get timeoutHint;
+
+  /// No description provided for @reqErrorHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请求构造失败，请稍后重试'**
+  String get reqErrorHint;
+
+  /// No description provided for @dataParseHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'数据解析失败，请稍后重试'**
+  String get dataParseHint;
 }
 
 class _AppLocalizationsDelegate

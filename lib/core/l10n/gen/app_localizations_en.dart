@@ -34,4 +34,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currentLogoAsset => 'Current logo asset';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get login => 'Log in';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get selectAll => 'Select all';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get noData => 'No data';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get logout => 'Log out';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String welcomeUser(String username) {
+    return 'Welcome, $username';
+  }
+
+  @override
+  String get loginFailed => 'Login failed';
+
+  @override
+  String get networkErrorHint => 'Network error. Please check your connection.';
+
+  @override
+  String get serverErrorHint => 'Server error. Please try again later.';
+
+  @override
+  String get unknownHint => 'Request failed. Please try again later.';
+
+  @override
+  String get timeoutHint => 'Request timed out. Please try again later.';
+
+  @override
+  String get reqErrorHint => 'Request setup failed. Please try again later.';
+
+  @override
+  String get dataParseHint => 'Failed to parse data. Please try again later.';
 }

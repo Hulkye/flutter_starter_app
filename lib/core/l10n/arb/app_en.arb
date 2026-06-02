@@ -8,5 +8,35 @@
   "requesting": "Requesting...",
   "switchThemeMode": "Switch theme mode",
   "currentThemeMode": "Current theme mode",
-  "currentLogoAsset": "Current logo asset"
+  "currentLogoAsset": "Current logo asset",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "login": "Log in",
+  "register": "Register",
+  "search": "Search",
+  "add": "Add",
+  "delete": "Delete",
+  "selectAll": "Select all",
+  "save": "Save",
+  "done": "Done",
+  "noData": "No data",
+  "settings": "Settings",
+  "logout": "Log out",
+  "username": "Username",
+  "password": "Password",
+  "welcomeUser": "Welcome, {username}",
+  "@welcomeUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "loginFailed": "Login failed",
+  "networkErrorHint": "Network error. Please check your connection.",
+  "serverErrorHint": "Server error. Please try again later.",
+  "unknownHint": "Request failed. Please try again later.",
+  "timeoutHint": "Request timed out. Please try again later.",
+  "reqErrorHint": "Request setup failed. Please try again later.",
+  "dataParseHint": "Failed to parse data. Please try again later."
 }

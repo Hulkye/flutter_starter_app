@@ -8,5 +8,35 @@
   "requesting": "请求中...",
   "switchThemeMode": "切换主题模式",
   "currentThemeMode": "当前主题模式",
-  "currentLogoAsset": "当前Logo资源"
+  "currentLogoAsset": "当前Logo资源",
+  "confirm": "确认",
+  "cancel": "取消",
+  "login": "登录",
+  "register": "注册",
+  "search": "搜索",
+  "add": "添加",
+  "delete": "删除",
+  "selectAll": "全选",
+  "save": "保存",
+  "done": "完成",
+  "noData": "暂无数据",
+  "settings": "设置",
+  "logout": "退出登录",
+  "username": "用户名",
+  "password": "密码",
+  "welcomeUser": "欢迎，{username}",
+  "@welcomeUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "loginFailed": "登录失败",
+  "networkErrorHint": "网络异常，请检查连接",
+  "serverErrorHint": "服务异常，请稍后重试",
+  "unknownHint": "请求失败，请稍后重试",
+  "timeoutHint": "请求超时，请稍后重试",
+  "reqErrorHint": "请求构造失败，请稍后重试",
+  "dataParseHint": "数据解析失败，请稍后重试"
 }

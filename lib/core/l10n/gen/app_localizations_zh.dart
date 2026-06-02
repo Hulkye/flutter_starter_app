@@ -34,4 +34,75 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get currentLogoAsset => '当前Logo资源';
+
+  @override
+  String get confirm => '确认';
+
+  @override
+  String get cancel => '取消';
+
+  @override
+  String get login => '登录';
+
+  @override
+  String get register => '注册';
+
+  @override
+  String get search => '搜索';
+
+  @override
+  String get add => '添加';
+
+  @override
+  String get delete => '删除';
+
+  @override
+  String get selectAll => '全选';
+
+  @override
+  String get save => '保存';
+
+  @override
+  String get done => '完成';
+
+  @override
+  String get noData => '暂无数据';
+
+  @override
+  String get settings => '设置';
+
+  @override
+  String get logout => '退出登录';
+
+  @override
+  String get username => '用户名';
+
+  @override
+  String get password => '密码';
+
+  @override
+  String welcomeUser(String username) {
+    return '欢迎，$username';
+  }
+
+  @override
+  String get loginFailed => '登录失败';
+
+  @override
+  String get networkErrorHint => '网络异常，请检查连接';
+
+  @override
+  String get serverErrorHint => '服务异常，请稍后重试';
+
+  @override
+  String get unknownHint => '请求失败，请稍后重试';
+
+  @override
+  String get timeoutHint => '请求超时，请稍后重试';
+
+  @override
+  String get reqErrorHint => '请求构造失败，请稍后重试';
+
+  @override
+  String get dataParseHint => '数据解析失败，请稍后重试';
 }

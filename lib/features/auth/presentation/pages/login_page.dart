@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/l10n.dart';
 import '../../../../shared/presentation/presentation.dart';
 import '../viewmodels/auth_viewmodel.dart';
 
@@ -28,7 +29,7 @@ class LoginPage extends BasePage<AuthViewModel> {
     WidgetRef ref,
     AuthViewModel vm,
   ) {
-    return AppBar(title: const Text('Login'));
+    return AppBar(title: Text(context.i18n.login));
   }
 
   @override
@@ -40,11 +41,11 @@ class LoginPage extends BasePage<AuthViewModel> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Welcome, ${state.username}'),
+            Text(context.i18n.welcomeUser(state.username)),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => vm.logout(),
-              child: const Text('Logout'),
+              child: Text(context.i18n.logout),
             ),
           ],
         ),
@@ -59,23 +60,23 @@ class LoginPage extends BasePage<AuthViewModel> {
           children: [
             TextField(
               controller: _usernameCtrl,
-              decoration: const InputDecoration(labelText: 'Username'),
+              decoration: InputDecoration(labelText: context.i18n.username),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _passwordCtrl,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Password'),
+              decoration: InputDecoration(labelText: context.i18n.password),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: state.isLoading
                   ? null
                   : () => vm.login(
-                        _usernameCtrl.text.trim(),
-                        _passwordCtrl.text.trim(),
-                      ),
-              child: const Text('Login'),
+                      _usernameCtrl.text.trim(),
+                      _passwordCtrl.text.trim(),
+                    ),
+              child: Text(context.i18n.login),
             ),
           ],
         ),

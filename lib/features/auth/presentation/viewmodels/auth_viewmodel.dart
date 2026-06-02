@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/l10n.dart';
 import '../../../../shared/presentation/presentation.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 
@@ -48,7 +49,15 @@ final class AuthViewModel extends BaseVM<AuthState> {
   Future<void> login(String username, String password) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      await ref.read(authRepositoryProvider).login(username, password);
+      await ref
+          .read(authRepositoryProvider)
+          .login(
+            username,
+            password,
+            fallbackErrorMessage: ref
+                .read(appLocalizationsProvider)
+                .loginFailed,
+          );
       state = state.copyWith(
         isLoading: false,
         isLoggedIn: true,
@@ -66,5 +75,6 @@ final class AuthViewModel extends BaseVM<AuthState> {
 }
 
 /// Auth ViewModel Provider。
-final authViewModelProvider =
-    NotifierProvider<AuthViewModel, AuthState>(AuthViewModel.new);
+final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
+  AuthViewModel.new,
+);

@@ -13,21 +13,23 @@ final class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _dataSource;
 
   @override
-  Future<void> login(String username, String password) async {
+  Future<void> login(
+    String username,
+    String password, {
+    required String fallbackErrorMessage,
+  }) async {
     final response = await _dataSource.login(username, password);
     if (!response.isSuccess) {
       throw ApiException(
         code: response.code,
-        message: response.message ?? '登录失败',
+        message: response.message ?? fallbackErrorMessage,
       );
     }
     final data = response.data;
     await authManager.setSession(
       AuthSession(
         token: data?['token']?.toString() ?? '',
-        payload: <String, dynamic>{
-          'username': username,
-        },
+        payload: <String, dynamic>{'username': username},
       ),
     );
   }
