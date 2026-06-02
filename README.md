@@ -71,6 +71,9 @@ flutter run -t lib/main_dev.dart
 flutter run -t lib/main_sit.dart
 
 # 运行生产环境
+flutter run -t lib/main_prod.dart
+
+# 默认入口同样指向生产环境
 flutter run -t lib/main.dart
 ```
 
@@ -82,7 +85,8 @@ flutter run -t lib/main.dart
 
 ```
 lib/
-├── main.dart / main_dev.dart / main_sit.dart    # 三环境入口
+├── main.dart                                    # 默认入口，调用 main_prod.dart
+├── main_dev.dart / main_sit.dart / main_prod.dart # 三环境入口
 ├── app/                                          # 启动编排 + 环境配置
 ├── core/                                         # 全局基础设施（不依赖业务）
 │   ├── constant/                                 #   UI 常量、动画时长

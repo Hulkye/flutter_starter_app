@@ -1,15 +1,3 @@
-import 'app/application.dart';
+import 'main_prod.dart' as prod;
 
-import 'app/env.dart';
-
-Future<void> main() async {
-  await Application.run(
-    envConfig: const EnvConfig(
-      envTag: EnvTag.prod,
-      baseUrl: 'https://api.example.com',
-      apiPathPrefix: '/api',
-      privacyPolicyUrl: '',
-      userAgreementUrl: '',
-    ),
-  );
-}
+Future<void> main() => prod.main();
