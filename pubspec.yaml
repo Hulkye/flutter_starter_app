@@ -56,9 +56,6 @@ dependencies:
   flutter_screenutil: ^5.9.3
   # 状态管理
   flutter_riverpod: ^2.6.1
-  # 不可变数据模型 + 序列化
-  freezed_annotation: ^2.4.4
-  json_annotation: ^4.9.0
   # 本地存储
   shared_preferences: ^2.5.5
   # 安全存储（token / 敏感数据）
@@ -85,12 +82,6 @@ dev_dependencies:
 
   flutter_lints: ^6.0.0
 
-  # 代码生成
-  build_runner: ^2.4.13
-
-  # 不可变数据模型 + JSON 序列化代码生成
-  freezed: ^2.5.8
-  json_serializable: ^6.9.0
   # App icon
   flutter_launcher_icons: 0.14.4
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../constant/duration_const.dart';
 import 'app_route_define.dart';
 
 /// GoRouter 适配器：把框架无关的 [AppRouteDefine] 转换为 [GoRoute]。
@@ -31,8 +32,8 @@ Page<dynamic> _slideTransition(GoRouterState state, Widget child) {
     key: state.pageKey,
     name: state.name,
     child: child,
-    transitionDuration: const Duration(milliseconds: 240),
-    reverseTransitionDuration: const Duration(milliseconds: 240),
+    transitionDuration: DurationConst.pageTransition,
+    reverseTransitionDuration: DurationConst.pageTransition,
     transitionsBuilder: (
       BuildContext context,
       Animation<double> animation,

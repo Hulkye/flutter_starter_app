@@ -21,7 +21,6 @@
   - [认证模块](#认证模块)
   - [工具类](#工具类)
 - [功能模块开发指南](#功能模块开发指南)
-- [代码生成](#代码生成)
 - [依赖清单](#依赖清单)
 
 ---
@@ -46,10 +45,7 @@
 # 1. 安装依赖
 flutter pub get
 
-# 2. 生成代码（首次运行或模型变更后）
-flutter pub run build_runner build --delete-conflicting-outputs
-
-# 3. 运行开发环境
+# 2. 运行开发环境
 flutter run -t lib/main_dev.dart
 
 # 运行 SIT 环境
@@ -511,7 +507,7 @@ lib/features/<feature_name>/
 │   ├── datasources/<feature>_datasource.dart      # 远程/本地数据源
 │   └── repositories/<feature>_repository_impl.dart # 仓库实现
 ├── domain/
-│   ├── entities/                                    # 业务实体 (freezed)
+│   ├── entities/                                    # 业务实体
 │   └── repositories/<feature>_repository.dart      # 仓库抽象接口
 └── presentation/
     ├── <feature>_routes.dart                        # 路由定义
@@ -584,29 +580,6 @@ class ExampleRoute extends AppRouteDefine {
 
 ---
 
-## 代码生成
-
-模板使用 `freezed` + `json_serializable` 进行不可变数据模型和 JSON 序列化的代码生成。
-
-```bash
-# 一次性生成
-flutter pub run build_runner build --delete-conflicting-outputs
-
-# 开发时持续监听
-flutter pub run build_runner watch --delete-conflicting-outputs
-```
-
-根据 `analysis_options.yaml`，生成的 `*.freezed.dart` / `*.g.dart` 文件需要排除 lint 检查：
-
-```yaml
-analyzer:
-  exclude:
-    - "**/*.g.dart"
-    - "**/*.freezed.dart"
-```
-
----
-
 ## 依赖清单
 
 ### 核心框架
@@ -616,7 +589,6 @@ analyzer:
 | `flutter_riverpod` | ^2.6.1 | 状态管理 + DI |
 | `go_router` | ^16.2.4 | 声明式路由 |
 | `dio` | ^5.9.0 | HTTP 网络请求 |
-| `freezed_annotation` | ^2.4.4 | 不可变数据模型 |
 
 ### 存储
 
@@ -654,10 +626,8 @@ analyzer:
 
 | 包 | 版本 | 用途 |
 |----|------|------|
-| `build_runner` | ^2.4.13 | 代码生成运行器 |
-| `freezed` | ^2.5.8 | Freezed 代码生成 |
-| `json_serializable` | ^6.9.0 | JSON 序列化生成 |
 | `flutter_lints` | ^6.0.0 | Lint 规则 |
+| `flutter_launcher_icons` | 0.14.4 | App 图标生成 |
 
 ---
 

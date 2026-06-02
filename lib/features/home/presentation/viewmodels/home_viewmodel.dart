@@ -4,10 +4,6 @@ import '../../../../shared/presentation/presentation.dart';
 import '../../data/repositories/home_repository_impl.dart';
 
 /// Home 页面状态。
-///
-/// 注意：这里没有使用 @freezed，因为 ViewModel state 通常只有 2-3 个字段，
-/// 手动 copyWith 足够简洁。对于 data 层 DTO 模型（字段多且需要 JSON 序列化），
-/// 推荐使用 @freezed + @JsonSerializable。
 class HomeState extends BaseState {
   const HomeState({
     super.isReady = true,

@@ -154,6 +154,6 @@ abstract class BaseVM<S extends BaseState> extends Notifier<S> {
 
   /// 关闭当前页面。
   void pop<T extends Object?>([T? result]) {
-    rootNavigatorKey.currentState?.pop(result);
+    ref.read(appRouterProvider).back(result);
   }
 }
