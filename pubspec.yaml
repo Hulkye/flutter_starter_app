@@ -91,6 +91,8 @@ dev_dependencies:
   # 不可变数据模型 + JSON 序列化代码生成
   freezed: ^2.5.8
   json_serializable: ^6.9.0
+  # App icon
+  flutter_launcher_icons: 0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
