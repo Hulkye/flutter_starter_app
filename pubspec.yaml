@@ -62,7 +62,7 @@ dependencies:
   # 本地存储
   shared_preferences: ^2.5.5
   # 安全存储（token / 敏感数据）
-  flutter_secure_storage: ^10.0.0
+  flutter_secure_storage: 9.2.4
   # 路由管理
   go_router: ^16.2.4
   # 异常收集捕获

@@ -152,6 +152,7 @@ class _BasePageState<V extends BaseVM> extends ConsumerState<BasePage<V>>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   bool _readyCalled = false;
   bool _paused = false;
+  V? _vm;
 
   @override
   bool get wantKeepAlive => widget.keepAlive;
@@ -163,7 +164,8 @@ class _BasePageState<V extends BaseVM> extends ConsumerState<BasePage<V>>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _readyCalled) return;
       _readyCalled = true;
-      final vm = widget.notifier(ref);
+      final vm = _vm;
+      if (vm == null) return;
       vm.onReady();
       vm.onResume();
       _paused = false;
@@ -172,19 +174,23 @@ class _BasePageState<V extends BaseVM> extends ConsumerState<BasePage<V>>
 
   @override
   void dispose() {
-    final vm = widget.notifier(ref);
-    vm.onClose();
-    if (!_paused) {
-      vm.onPause();
-      _paused = true;
+    final vm = _vm;
+    if (vm != null) {
+      vm.onClose();
+      if (!_paused) {
+        vm.onPause();
+        _paused = true;
+      }
     }
+    _vm = null;
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final vm = widget.notifier(ref);
+    final vm = _vm;
+    if (vm == null) return;
     switch (state) {
       case AppLifecycleState.resumed:
         if (_paused) {
@@ -211,6 +217,7 @@ class _BasePageState<V extends BaseVM> extends ConsumerState<BasePage<V>>
 
     final state = widget.watchState(ref);
     final vm = widget.notifier(ref);
+    _vm = vm;
 
     final body = state.isReady
         ? widget.page(context, ref, vm)
