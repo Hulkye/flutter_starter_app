@@ -328,10 +328,14 @@ lib/features/<name>/
 |------|------|
 | `./script/gen_l10n.sh` | 生成国际化代码 |
 | `./script/gen_app_icon.sh` | 从 `assets/app_icon.png` 生成 App 图标 |
+| `./script/rename_project.dart` | 工程项目重命名，替换项目名引用 |
 
 ```bash
 # 生成 App 图标
 ./script/gen_app_icon.sh
+
+# 项目重命名
+dart run script/rename_project.dart my_app
 ```
 
 ---
