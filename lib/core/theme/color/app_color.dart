@@ -152,6 +152,12 @@ class AppColor extends ColorData {
   /// 通用点击交互式颜色
   final Color interactiveClick;
 
+  /// 弹窗遮罩层背景（半透明暗色蒙版）
+  final Color overlayBackground;
+
+  /// Toast / Tips 浮层容器背景（深色近不透明）
+  final Color overlayComponentBackground;
+
   AppColor({
     this.brand = const Color(0xFF0A59F7),
     this.warning = const Color(0xFFE84026),
@@ -203,5 +209,7 @@ class AppColor extends ColorData {
     this.interactiveActive = const Color(0xFF0A59F7),
     this.interactiveSelect = const Color(0x330A59F7),
     this.interactiveClick = const Color(0x19000000),
+    this.overlayBackground = const Color(0x4D000000),
+    this.overlayComponentBackground = const Color(0xE6000000),
   });
 }
