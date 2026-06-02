@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 import 'asset/app_asset.dart';
 import 'asset/app_dark_asset.dart';
 import 'color/app_color.dart';
@@ -26,6 +26,7 @@ abstract final class AppThemeData {
         backgroundColor: appColor.backgroundSecondary,
         foregroundColor: appColor.fontPrimary,
         elevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
     );
   }
@@ -48,6 +49,7 @@ abstract final class AppThemeData {
         backgroundColor: appColor.backgroundSecondary,
         foregroundColor: appColor.fontPrimary,
         elevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
     );
   }

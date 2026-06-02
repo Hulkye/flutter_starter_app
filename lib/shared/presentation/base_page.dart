@@ -76,7 +76,7 @@ abstract class BasePage<V extends BaseVM> extends ConsumerStatefulWidget {
   SystemUiOverlayStyle? systemOverlayStyle(BuildContext context) => null;
   List<Widget> backgroundWidgets(BuildContext context) => const [];
 
-  bool get safeAreaTop => true;
+  bool get safeAreaTop => false;
   bool get safeAreaBottom => false;
   bool get maintainBottomViewPadding => false;
 
@@ -84,7 +84,8 @@ abstract class BasePage<V extends BaseVM> extends ConsumerStatefulWidget {
   // Scaffold 元素
   // ===========================================================================
 
-  Widget? floatingActionButton(BuildContext context, WidgetRef ref, V vm) => null;
+  Widget? floatingActionButton(BuildContext context, WidgetRef ref, V vm) =>
+      null;
   FloatingActionButtonLocation? get floatingActionButtonLocation => null;
   Widget? bottomNavigationBar(BuildContext context) => null;
 
@@ -121,17 +122,22 @@ abstract class BasePage<V extends BaseVM> extends ConsumerStatefulWidget {
       bottomNavigationBar: bottomNavigationBar(context),
     );
 
+    final bgWidgets = backgroundWidgets(context);
+    if (bgWidgets.isNotEmpty) {
+      child = Stack(
+        children: [
+          ...bgWidgets,
+          Positioned.fill(child: child),
+        ],
+      );
+    }
+
     final overlay = systemOverlayStyle(context);
     if (overlay != null) {
       child = AnnotatedRegion<SystemUiOverlayStyle>(
         value: overlay,
         child: child,
       );
-    }
-
-    final bgWidgets = backgroundWidgets(context);
-    if (bgWidgets.isNotEmpty) {
-      child = Stack(children: [...bgWidgets, Positioned.fill(child: child)]);
     }
 
     child = SafeArea(
