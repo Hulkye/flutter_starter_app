@@ -11,6 +11,9 @@ final class LoginRoute extends AppRouteDefine {
   String get path => '/login';
 
   @override
+  bool get public => true;
+
+  @override
   Widget buildPage(BuildContext context, RouteState state) {
     return LoginPage();
   }

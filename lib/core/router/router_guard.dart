@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../shared/services/auth/auth_manager.dart';
+import '../../shared/services/auth/auth_store.dart';
 
 /// 创建认证路由守卫。
 ///
@@ -21,7 +21,7 @@ GoRouterRedirect createAuthGuard({
     }
 
     // 已登录 → 放行
-    if (authManager.isAuthenticated) {
+    if (authStore.isAuthenticated) {
       return null;
     }
 

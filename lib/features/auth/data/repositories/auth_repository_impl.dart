@@ -1,15 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/http/response/api_response.dart';
-import '../../../../shared/services/auth/auth_manager.dart';
+import '../../../../shared/services/auth/auth_provider.dart';
 import '../../../../shared/services/auth/auth_session.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_datasource.dart';
 
 /// [AuthRepository] 的实现（数据层）。
 final class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl(this._dataSource);
+  AuthRepositoryImpl(this._ref, this._dataSource);
 
+  final Ref _ref;
   final AuthRemoteDataSource _dataSource;
 
   @override
@@ -26,7 +27,7 @@ final class AuthRepositoryImpl implements AuthRepository {
       );
     }
     final data = response.data;
-    await authManager.setSession(
+    await _ref.read(authSessionProvider.notifier).setSession(
       AuthSession(
         token: data?['token']?.toString() ?? '',
         payload: <String, dynamic>{'username': username},
@@ -36,11 +37,11 @@ final class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> logout() async {
-    await authManager.clear();
+    await _ref.read(authSessionProvider.notifier).clear();
   }
 }
 
 /// AuthRepository Provider。
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepositoryImpl(ref.watch(authDataSourceProvider));
+  return AuthRepositoryImpl(ref, ref.watch(authDataSourceProvider));
 });

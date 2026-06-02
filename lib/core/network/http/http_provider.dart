@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/env.dart';
-import '../../../shared/services/auth/auth_manager.dart';
+import '../../../shared/services/auth/auth_store.dart';
 import '../../constant/duration_const.dart';
 import '../../l10n/l10n.dart';
 import 'config/http_auth_config.dart';
@@ -69,7 +69,7 @@ final httpConfigProvider = Provider<HttpConfig>((ref) {
           'X-App-Channel': 'flutter_starter_app',
           'X-App-Env': appConfig.envTag.name,
         };
-        final token = authManager.bearerToken;
+        final token = authStore.bearerToken;
         if (token != null) {
           headers['Authorization'] = token;
         }

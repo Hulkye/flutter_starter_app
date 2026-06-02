@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/l10n.dart';
 import '../../../../shared/presentation/presentation.dart';
+import '../../../../shared/services/auth/auth_provider.dart';
 import '../viewmodels/auth_viewmodel.dart';
 
 /// 登录页（模板演示）。
@@ -35,13 +36,16 @@ class LoginPage extends BasePage<AuthViewModel> {
   @override
   Widget page(BuildContext context, WidgetRef ref, AuthViewModel vm) {
     final state = ref.watch(authViewModelProvider);
+    final session = ref.watch(authSessionProvider);
+    final isLoggedIn = session?.isValid == true;
+    final username = session?.get<String>('username') ?? '';
 
-    if (state.isLoggedIn) {
+    if (isLoggedIn) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(context.i18n.welcomeUser(state.username)),
+            Text(context.i18n.welcomeUser(username)),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => vm.logout(),

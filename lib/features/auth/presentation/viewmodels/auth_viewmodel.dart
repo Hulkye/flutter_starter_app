@@ -10,14 +10,10 @@ class AuthState extends BaseState {
     super.isReady = true,
     this.isLoading = false,
     this.errorMessage,
-    this.isLoggedIn = false,
-    this.username = '',
   });
 
   final bool isLoading;
   final String? errorMessage;
-  final bool isLoggedIn;
-  final String username;
 
   @override
   AuthState copyWithBase({bool? isReady}) {
@@ -28,15 +24,11 @@ class AuthState extends BaseState {
     bool? isReady,
     bool? isLoading,
     String? errorMessage,
-    bool? isLoggedIn,
-    String? username,
   }) {
     return AuthState(
       isReady: isReady ?? this.isReady,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
-      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
-      username: username ?? this.username,
     );
   }
 }
@@ -58,11 +50,7 @@ final class AuthViewModel extends BaseVM<AuthState> {
                 .read(appLocalizationsProvider)
                 .loginFailed,
           );
-      state = state.copyWith(
-        isLoading: false,
-        isLoggedIn: true,
-        username: username,
-      );
+      state = state.copyWith(isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
@@ -70,7 +58,7 @@ final class AuthViewModel extends BaseVM<AuthState> {
 
   Future<void> logout() async {
     await ref.read(authRepositoryProvider).logout();
-    state = state.copyWith(isLoggedIn: false, username: '');
+    state = const AuthState();
   }
 }
 

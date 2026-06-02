@@ -37,7 +37,7 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 ///
 /// 依赖 [authSessionProvider] —— 登录态变化时自动重新评估 redirect。
 final goRouterProvider = Provider<GoRouter>((ref) {
-  ref.watch(authSessionProvider);
+  final session = ref.watch(authSessionProvider);
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -52,10 +52,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       if (isPublic) return null;
 
       // 已登录放行
-      if (authManager.isAuthenticated) return null;
+      if (session?.isValid == true) return null;
 
-      // 未登录 → 重定向到首页
-      return const HomeRoute().location;
+      // 未登录 → 重定向到登录页
+      return const LoginRoute().location;
     },
     routes: _allRoutes.map(toGoRoute).toList(),
   );

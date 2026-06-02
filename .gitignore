@@ -17,7 +17,7 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
-# Keep .vscode/ available for checked-in launch/tasks configs.
+.vscode
 
 # Dart / Flutter / Pub
 .dart_tool/
@@ -29,6 +29,7 @@ migrate_working_dir/
 build/
 coverage/
 **/doc/api/
+pubspec.lock
 
 # Generated Flutter files
 **/Flutter/.last_build_id
@@ -61,6 +62,7 @@ key.properties
 *.pbxuser
 *.perspectivev3
 ServiceDefinitions.json
+Podfile.lock
 
 # Windows / Visual Studio
 *.suo
@@ -80,4 +82,5 @@ app_release_packages/
 
 # Local tool state
 .cursor/
+.claude/
 example_app/

@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/env.dart';
-import '../../shared/services/auth/auth_manager.dart';
+import '../../shared/services/auth/auth_store.dart';
 import '../storage/storage_provider.dart';
 import 'di_overrides.dart';
 
@@ -43,7 +43,7 @@ class AppBootstrap {
     await secureStorage.init();
 
     // 2. 登录会话恢复 —— 从安全存储恢复 token
-    await authManager.init();
+    await authStore.init();
 
     // ── Phase 2: 收集环境 Override ──
     final overrides = createEnvOverrides(env);

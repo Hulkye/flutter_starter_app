@@ -1,33 +1,25 @@
 import '../../../core/storage/storage_provider.dart';
 import 'auth_session.dart';
 
-/// 认证会话管理器。
+/// 认证会话存储。
 ///
 /// ## 职责
 ///
 /// - 内存中持有当前会话（供拦截器/守卫同步读取 token）
 /// - 与 SecureStorage 交互实现持久化
-/// - 通过 [authSessionProvider] 提供 Riverpod 响应式状态
+/// - 启动阶段恢复本地会话
 ///
 /// ## 使用
 ///
 /// ```dart
 /// // 启动恢复
-/// await authManager.init();
-///
-/// // UI 响应式监听
-/// ref.watch(authSessionProvider);
+/// await authStore.init();
 ///
 /// // 拦截器同步读 token
-/// authManager.bearerToken;
-///
-/// // 登录保存 / 登出清除
-/// authManager.setSession(session);
-/// authManager.clear();
+/// authStore.bearerToken;
 /// ```
-class AuthManager {
-  AuthManager({String storageKey = 'auth_session'})
-      : _storageKey = storageKey;
+class AuthStore {
+  AuthStore({String storageKey = 'auth_session'}) : _storageKey = storageKey;
 
   final String _storageKey;
   AuthSession? _current;
@@ -67,4 +59,4 @@ class AuthManager {
 }
 
 /// 全局实例（ProviderScope 前由 AppBootstrap 初始化）。
-final authManager = AuthManager();
+final authStore = AuthStore();

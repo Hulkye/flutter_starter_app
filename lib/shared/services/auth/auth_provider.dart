@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'auth_manager.dart';
+import 'auth_store.dart';
 import 'auth_session.dart';
 
 /// 认证会话 Provider（响应式）。
@@ -13,22 +13,22 @@ final authSessionProvider =
 
 class AuthSessionNotifier extends Notifier<AuthSession?> {
   @override
-  AuthSession? build() => authManager.current;
+  AuthSession? build() => authStore.current;
 
   /// 登录成功后保存会话。
-  void setSession(AuthSession session) {
-    authManager.setSession(session);
+  Future<void> setSession(AuthSession session) async {
+    await authStore.setSession(session);
     state = session;
   }
 
   /// 登出。
-  void clear() {
-    authManager.clear();
+  Future<void> clear() async {
+    await authStore.clear();
     state = null;
   }
 
   /// 更新 payload 中的字段。
-  void updatePayload(Map<String, dynamic> updates) {
+  Future<void> updatePayload(Map<String, dynamic> updates) async {
     final c = state;
     if (c == null) return;
     final updated = AuthSession(
@@ -36,6 +36,6 @@ class AuthSessionNotifier extends Notifier<AuthSession?> {
       refreshToken: c.refreshToken,
       payload: {...c.payload, ...updates},
     );
-    setSession(updated);
+    await setSession(updated);
   }
 }
