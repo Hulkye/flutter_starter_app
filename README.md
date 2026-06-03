@@ -2,10 +2,10 @@
   <img src="assets/app_icon.png" width="120" alt="Flutter Starter App" />
 </p>
 
-<h1 align="center">Flutter Starter App</h1>
+<h1 align="center">🚀 Flutter Starter App</h1>
 
 <p align="center">
-  <strong>开箱即用的 Flutter 快速开发模板</strong>
+  <strong>✨ 主打分层架构 · MVVM · Clean Architecture 的 Flutter 开箱即用代码模板</strong>
 </p>
 
 <p align="center">
@@ -17,54 +17,55 @@
 
 ---
 
-内置企业级网络层、路由管理、主题系统、国际化、状态管理、存储等基础设施，采用 Feature-First + Clean Architecture 分层架构。Clone 即用，专注业务开发。
+这是一个面向中大型 Flutter 项目的快速启动模板。项目以 **Feature-First** 组织业务模块，在每个 Feature 内落地 **Data / Domain / Presentation** 分层，并通过 **BasePage + BaseVM + Riverpod** 建立统一的 MVVM 开发范式。
 
-## 📋 目录
+模板已内置多环境、网络请求、路由守卫、主题、国际化、本地存储、登录会话、Toast/Loading、刷新、按钮、弹窗等常用基础设施。Clone 后只需要替换业务接口与页面，即可进入功能开发。
 
-- [特性速览](#-特性速览)
+## 📚 目录
+
+- [核心优势](#-核心优势)
 - [快速开始](#-快速开始)
 - [项目结构](#-项目结构)
 - [架构设计](#-架构设计)
+- [MVVM 基础能力](#-mvvm-基础能力)
 - [核心模块](#-核心模块)
-  - [启动引导](#启动引导)
-  - [多环境](#多环境)
-  - [网络层](#网络层)
-  - [路由系统](#路由系统)
-  - [主题系统](#主题系统)
-  - [状态管理](#状态管理)
-  - [存储层](#存储层)
-  - [国际化](#国际化)
-  - [通用组件](#通用组件)
-  - [认证模块](#认证模块)
+  - [启动引导与依赖注入](#-启动引导与依赖注入)
+  - [多环境配置](#-多环境配置)
+  - [网络层](#-网络层)
+  - [路由系统](#-路由系统)
+  - [登录会话](#-登录会话)
+  - [主题与资源](#-主题与资源)
+  - [国际化](#-国际化)
+  - [存储层](#-存储层)
+  - [通用组件](#-通用组件)
 - [开发指南](#-开发指南)
 - [脚本工具](#-脚本工具)
-- [依赖清单](#-依赖清单)
+- [主要依赖](#-主要依赖)
 
 ---
 
-## ✨ 特性速览
+## ✨ 核心优势
 
-| 🧩 特性  | 🔧 技术选型                            | 💡 说明                          |
-| -------- | -------------------------------------- | -------------------------------- |
-| 状态管理 | **Riverpod 2.x**                       | 编译时安全，无 BuildContext 依赖 |
-| 路由     | **GoRouter 16.x**                      | 声明式路由，抽象层解耦           |
-| 网络请求 | **Dio 5.x**                            | 拦截器链 · 缓存 · 重试 · Mock    |
-| 主题     | **Material 3 + ThemeExtension**        | 亮/暗双主题，50+ 语义化色值      |
-| 国际化   | **flutter gen-l10n**                   | 中/英双语，一键生成              |
-| 存储     | **SharedPreferences + SecureStorage**  | 偏好设置 & 安全凭证分离          |
-| 屏幕适配 | **flutter_screenutil**                 | 按设计稿自动缩放                 |
-| 多环境   | **Dev / SIT / Prod**                   | 独立入口，配置即切换             |
-| 架构     | **Feature-First + Clean Architecture** | 依赖反转，分层清晰               |
+| 能力 | 说明 |
+| --- | --- |
+| 清晰分层 | 每个业务模块按 `data / domain / presentation` 拆分，职责边界明确 |
+| MVVM 开发范式 | `BasePage` 承载页面骨架，`BaseVM` 承载状态、生命周期与副作用 |
+| Clean Architecture | 业务依赖抽象而非实现，Repository 接口与实现分离，便于替换数据源 |
+| Feature-First | 业务代码按功能聚合，模块可独立演进，避免按技术层级散落全局 |
+| Riverpod 驱动 | 状态管理、依赖注入、服务组合统一使用 Riverpod，减少框架混用成本 |
+| 开箱即用基础设施 | 网络、路由、主题、存储、认证、国际化、异常捕获、日志、组件均已预置 |
+| 多环境支持 | Dev / SIT / Prod 独立入口，环境配置通过 `EnvConfig` 注入 |
+| 易扩展 | 新增 Feature 时复用既有目录、路由、ViewModel、Repository 模式即可 |
 
 ---
 
 ## 🚀 快速开始
 
 ```bash
-# 1. 安装依赖
+# 安装依赖
 flutter pub get
 
-# 2. 运行开发环境
+# 运行开发环境
 flutter run -t lib/main_dev.dart
 
 # 运行 SIT 环境
@@ -77,264 +78,398 @@ flutter run -t lib/main_prod.dart
 flutter run -t lib/main.dart
 ```
 
-> **提示**：首次使用请在 `main_dev.dart` 中将 `baseUrl` 替换为你的 API 地址。
+首次使用建议先修改各环境入口中的 `EnvConfig`：
+
+```dart
+await Application.run(
+  envConfig: const EnvConfig(
+    envTag: EnvTag.dev,
+    baseUrl: 'https://dev.example.com',
+    apiPathPrefix: '/api',
+  ),
+);
+```
 
 ---
 
 ## 📁 项目结构
 
-```
+```text
 lib/
-├── app/                           # 启动编排 + 环境配置
-├── core/                          # 全局基础设施（不依赖业务）
-│   ├── constant/                  # 常量定义
-│   ├── di/                        # 依赖注入引导
+├── app/                           # 应用启动、根组件、环境配置
+│   ├── app.dart                   # MaterialApp.router 根组件
+│   ├── application.dart           # Application.run 启动入口
+│   └── env.dart                   # EnvConfig / EnvTag
+├── core/                          # 全局基础设施，不承载具体业务
+│   ├── constant/                  # 常量
+│   ├── di/                        # AppBootstrap / Provider overrides
 │   ├── exception/                 # 全局异常捕获
 │   ├── l10n/                      # 国际化
-│   ├── network/                   # 网络层
-│   │   ├── connection/            # 网络状态监听
-│   │   └── http/                  # HTTP 客户端（Dio）
-│   ├── router/                    # 路由封装（GoRouter）
-│   ├── service/                   # 公共服务（事件总线、日志等）
-│   ├── storage/                   # 本地存储
-│   ├── theme/                     # 主题系统
+│   ├── network/                   # 网络、连接状态、HTTP 客户端
+│   ├── router/                    # GoRouter 封装、守卫、导航抽象
+│   ├── service/                   # 日志、事件总线等公共服务
+│   ├── storage/                   # SharedPreferences / SecureStorage 封装
+│   ├── theme/                     # 主题、色值、主题资源
 │   └── util/                      # 工具类
 ├── features/                      # 业务功能模块
-├── shared/                        # 跨模块共享
-│   ├── presentation/              # 共享表现层（BasePage / BaseVM / BaseState）
-│   ├── services/                  # 共享服务（认证）
-│   └── widgets/                   # 共享通用组件（Toast / Button等）
-├── header.dart                    # 业务头部import
+│   ├── auth/                      # 登录示例
+│   ├── home/                      # 首页示例
+│   └── profile/                   # 个人中心示例
+├── shared/                        # 跨 Feature 共享能力
+│   ├── presentation/              # BasePage / BaseVM / BaseState
+│   ├── services/                  # AuthSession / AuthStore
+│   └── widgets/                   # Toast、Loading、Button、Dialog 等组件
+├── header.dart                    # 常用导出
 ├── main_dev.dart                  # 开发环境入口
-├── main_sit.dart                  # 测试环境入口
+├── main_sit.dart                  # SIT 环境入口
 ├── main_prod.dart                 # 生产环境入口
-└── main.dart                      # 默认入口，调用 main_prod.dart
+└── main.dart                      # 默认入口
+```
+
+单个 Feature 推荐结构：
+
+```text
+lib/features/<feature>/
+├── data/
+│   ├── datasources/               # 远程/本地数据源
+│   └── repositories/              # Repository 实现
+├── domain/
+│   ├── entities/                  # 业务实体
+│   └── repositories/              # Repository 抽象
+└── presentation/
+    ├── pages/                     # 页面
+    ├── viewmodels/                # ViewModel
+    └── <feature>_routes.dart      # Feature 路由定义
 ```
 
 ---
 
 ## 🏗 架构设计
 
-### 分层架构
+### 分层关系
 
+```text
+┌──────────────────────────────────────────────┐
+│                Presentation                  │
+│       Page · ViewModel · Route · Widget      │
+│             UI 展示、状态管理、交互            │
+├──────────────────────────────────────────────┤
+│                   Domain                     │
+│            Entity · Repository 接口          │
+│              业务模型、业务抽象               │
+├──────────────────────────────────────────────┤
+│                    Data                      │
+│        DataSource · Repository 实现          │
+│              接口请求、缓存、数据转换          │
+└──────────────────────────────────────────────┘
 ```
-┌───────────────────────────────────────────────┐
-│                 Presentation                  │
-│  pages  ·  viewmodels  ·  routes  ·  widgets  │
-│                （UI + 状态管理）                │
-├───────────────────────────────────────────────┤
-│                    Domain                     │
-│           entities  ·  repositories           │
-│             （业务实体 + 接口抽象）              │
-├───────────────────────────────────────────────┤
-│                     Data                      │
-│          datasources  ·  repository impl      │
-│               （数据源 + 接口实现）              │
-└───────────────────────────────────────────────┘
+
+依赖方向：
+
+```text
+Presentation  ──────▶  Domain  ◀──────  Data
+     UI                 抽象              实现
 ```
 
-**依赖方向**：`Presentation → Domain ← Data`（依赖反转）
+这种依赖关系让页面只关心业务抽象，数据来源可以在 API、Mock、本地缓存之间切换，而不会影响 UI 层。
 
-### 模块分工
+### 模块职责
 
-| 层级        | 职责                                            | 依赖规则           |
-| ----------- | ----------------------------------------------- | ------------------ |
-| `app/`      | 启动编排、环境配置、根组件                      | 可依赖所有层级     |
-| `core/`     | 网络、路由、主题、存储、DI                      | 不依赖任何 Feature |
-| `features/` | 按功能组织，内部分 data / domain / presentation | 依赖 core + shared |
-| `shared/`   | BasePage、BaseVM、Toast、通用组件               | 依赖 core          |
+| 模块 | 职责 | 依赖规则 |
+| --- | --- | --- |
+| `app/` | 应用启动、环境注入、根组件挂载 | 可组合全局能力 |
+| `core/` | 网络、路由、存储、主题、DI、异常、工具 | 不依赖具体 Feature |
+| `features/` | 业务模块 | 可依赖 `core` 与 `shared` |
+| `shared/` | BasePage、BaseVM、认证服务、通用组件 | 提供跨业务复用能力 |
+
+---
+
+## 🧭 MVVM 基础能力
+
+模板通过 `BasePage`、`BaseVM`、`BaseState` 固化页面开发方式，避免每个页面重复处理生命周期、Loading、Toast、页面就绪状态等通用逻辑。
+
+### BaseVM
+
+`BaseVM` 基于 Riverpod `Notifier`，用于承载页面状态和业务动作：
+
+- `init` / `onReady` / `onResume` / `onPause` / `onClose` 生命周期
+- `runWithLoading` 包装异步任务
+- 统一触发 Loading、Toast、Hint 等反馈
+- 内置 `pop()` 等基础导航能力
+- 与 `BaseState` 配合控制页面 ready 状态
+
+### BasePage
+
+`BasePage` 统一页面骨架：
+
+- 标准 `Scaffold` 构建
+- AppBar、背景色、SafeArea、KeepAlive 扩展点
+- 页面 ready 前后的构建分流
+- App 生命周期监听
+- Pop 拦截能力
+
+推荐页面开发流程：
+
+```text
+Page 负责 UI 展示
+  ↓ 用户交互
+ViewModel 负责状态变更与业务动作
+  ↓ 调用抽象
+Repository 负责业务数据获取
+  ↓ 委托实现
+DataSource / HttpClient 负责具体数据来源
+```
 
 ---
 
 ## 📦 核心模块
 
-### 启动引导
+### 🧩 启动引导与依赖注入
 
-`Application.run()` 按以下流程启动：
+应用统一从 `Application.run()` 启动，启动过程集中在 `AppBootstrap` 中：
 
+```text
+main()
+  → Application.run(envConfig)
+  → AppBootstrap.create(envConfig)
+      → WidgetsFlutterBinding.ensureInitialized()
+      → 绑定 BaseVM 全局反馈处理
+      → 初始化普通存储与安全存储
+      → 恢复 AuthSession
+      → 创建 Riverpod overrides
+  → AppExceptionCatcher.runAppGuarded()
+  → ProviderScope(overrides: bootstrap.overrides)
+  → MaterialApp.router
 ```
-① appConfig = envConfig               → 设置全局环境
-② AppBootstrap.create(envConfig)      → 初始化存储 → 恢复会话 → 收集 Overrides
-③ AppExceptionCatcher.runAppGuarded() → 全局异常兜底
-④ ProviderScope(overrides: ...)       → 注入环境 Overrides
-⑤ MaterialApp.router                  → 挂载应用
+
+这样可以保证存储、登录会话、环境配置在应用挂载前完成初始化。
+
+### 🌍 多环境配置
+
+| 环境 | 入口 | 适用场景 |
+| --- | --- | --- |
+| Dev | `lib/main_dev.dart` | 本地开发、调试、抓包 |
+| SIT | `lib/main_sit.dart` | 测试环境、联调环境 |
+| Prod | `lib/main_prod.dart` | 生产环境 |
+
+`EnvConfig` 支持配置：
+
+- `baseUrl`、`apiPathPrefix`
+- 日志开关
+- 代理/抓包配置
+- 重试策略
+- 证书校验策略
+- 隐私协议、用户协议地址
+
+### 🌐 网络层
+
+网络层基于 Dio 封装，业务侧依赖统一的 HTTP 抽象，不直接散落 Dio 调用。
+
+```text
+HttpConfig
+  ↓
+httpClientProvider
+  ↓
+BaseHttpClient / DioHttpClient
+  ↓
+Interceptor Chain + Cache + Retry + Mock + Batch Request
 ```
 
-### 多环境
+已内置能力：
 
-| 环境    | 入口             | EnvTag | 特点               |
-| ------- | ---------------- | ------ | ------------------ |
-| 🛠 开发 | `main_dev.dart`  | `dev`  | 日志开启、抓包代理 |
-| 🧪 测试 | `main_sit.dart`  | `sit`  | 日志开启、SIT 域名 |
-| 🚀 生产 | `main_prod.dart` | `prod` | 日志关闭、生产域名 |
+- Token 自动注入
+- 业务状态码解析
+- 异常捕获与分类
+- 日志输出
+- 抓包代理支持
+- 请求缓存策略
+- 指数退避重试
+- Mock 支持
+- 批量请求封装
+
+缓存策略包括：
+
+```text
+noCache · cacheFirst · networkFirst · cacheOnly · networkOnly · staleWhileRevalidate
+```
+
+### 🧭 路由系统
+
+路由基于 GoRouter，但业务层通过模板封装的路由定义与导航抽象使用，减少对第三方路由库的直接依赖。
+
+```text
+Feature Route Define → AppRouteDefine → GoRoute
+Business Navigation  → BaseNavigator  → RouterNavigator
+```
+
+特点：
+
+- 每个 Feature 自己维护路由定义
+- 根路由集中注册
+- 支持公开路由与登录态路由
+- 未登录访问受保护页面时自动跳转登录页
+- 提供 root navigator key，支持非 UI 场景导航
+
+### 🔐 登录会话
+
+模板内置通用登录会话模型与安全存储：
+
+```text
+AuthSession
+  ↓
+AuthStore
+  ↓
+authSessionProvider
+  ↓
+Router Guard / AuthInterceptor / UI
+```
+
+`AuthSession` 以 `token`、`refreshToken` 与可扩展 payload 为核心，适配不同后端登录协议。登录 Feature 中提供了完整示例：页面表单、ViewModel、Repository、DataSource、会话落盘与退出登录。
+
+### 🎨 主题与资源
+
+主题系统支持亮/暗模式，并通过 Riverpod 持久化主题选择。
+
+能力包括：
+
+- Material 3 主题配置
+- `ThemeExtension` 扩展语义化色值
+- 亮/暗主题资产切换
+- `BuildContext` 扩展访问颜色与资源
+- `assets/images/` 与 `assets/images/dark/` 分离
+
+示例：
 
 ```dart
-// lib/main_dev.dart
-Future<void> main() async {
-  await Application.run(
-    envConfig: const EnvConfig(
-      envTag: EnvTag.dev,
-      baseUrl: 'https://dev.example.com',
-      apiPathPrefix: '/api',
-    ),
-  );
-}
+context.appColor.brand
+context.appAsset.logo
 ```
 
-### 网络层
+### 🌏 国际化
 
-基于 Dio 的企业级封装，通过 `BaseHttpClient` 抽象解耦。
+国际化使用 Flutter 官方 `gen-l10n`：
 
-```
-HttpConfig → httpClientProvider → BaseHttpClient (Dio)
-                  │
-       ┌──────────┼──────────┐
-       ▼          ▼          ▼
-    拦截器链    缓存系统    重试策略
-```
+- 源文件：`lib/core/l10n/arb/app_en.arb`
+- 源文件：`lib/core/l10n/arb/app_zh.arb`
+- 配置文件：`l10n.yaml`
+- 生成脚本：`./script/gen_l10n.sh`
 
-**拦截器链**（洋葱模型）：
+切换语言示例：
 
-```
-请求 → PacketCapture → Auth → BusinessStatus → ExceptionCapture → 服务端
-响应 ← PacketCapture ← Auth ← BusinessStatus ← ExceptionCapture ← 服务端
+```dart
+ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 ```
 
-| 拦截器                        | 职责                            |
-| ----------------------------- | ------------------------------- |
-| `AuthInterceptor`             | Token 自动注入，401 触发回调    |
-| `BusinessStatusInterceptor`   | 业务码 `{code, data, msg}` 解包 |
-| `ExceptionCaptureInterceptor` | 异常分类上报                    |
-| `PacketCaptureInterceptor`    | 抓包调试                        |
+### 💾 存储层
 
-**缓存策略**：`noCache` · `cacheFirst` · `networkFirst` · `cacheOnly` · `networkOnly` · `staleWhileRevalidate`
+模板将普通数据与敏感数据分开处理：
 
-**重试策略**：指数退避 + 随机 jitter，按状态码筛选，总耗时硬限制。
+| 实现 | 底层 | 场景 |
+| --- | --- | --- |
+| `PrefsStorage` | SharedPreferences | 主题、语言、普通偏好 |
+| `SecureStorage` | FlutterSecureStorage | Token、登录态、敏感凭证 |
 
-### 路由系统
+业务代码通过统一抽象访问存储，便于测试和替换实现。
 
-GoRouter 的清爽隔离层：
+### 🧱 通用组件
 
-```
-AppRouteDefine (抽象) → toGoRoute() → GoRouter
-BaseNavigator  (接口) → RouterNavigator (实现)
-```
+`shared/widgets` 已内置常用组件：
 
-- **集中注册**：所有路由在 `router_provider.dart` 的 `_allRoutes` 列表中注册
-- **认证守卫**：`isPublic = false` 的路由未登录时自动重定向到登录页
-- **导航抽象**：业务代码依赖 `BaseNavigator` 接口，不直接引用 GoRouter
-
-### 主题系统
-
-基于 Flutter `ThemeExtension`，类型安全的颜色 & 资产访问。
-
-```
-BuildContext.appColor   →  AppColor (50+ 语义化色值)
-BuildContext.appAsset   →  AppAsset (主题感知资源路径)
-```
-
-**颜色体系**：品牌 · 警示 · 字体 · 图标 · 背景 · 组件 · 交互态，每种 4 个色阶。
-
-| 色阶 | 命名            | 示例         |
-| ---- | --------------- | ------------ |
-| 标准 | `brand`         | `0xFF0A59F7` |
-| 浅色 | `brandLight`    | `0xFFE8F1FF` |
-| 按压 | `brandPressed`  | `0xFF084DD6` |
-| 禁用 | `brandDisabled` | `0xFFA3C4FC` |
-
-### 状态管理
-
-全项目统一 **Riverpod 2.x**，无混用。
-
-| Provider 后缀    | 说明              | 示例                     |
-| ---------------- | ----------------- | ------------------------ |
-| `*Provider`      | 只读 Provider     | `httpClientProvider`     |
-| `*Notifier`      | 可变状态 Provider | `authSessionProvider`    |
-| `*ValueProvider` | 简单值 Provider   | `appLocaleValueProvider` |
-
-### 存储层
-
-| 实现            | 底层                 | 场景              |
-| --------------- | -------------------- | ----------------- |
-| `PrefsStorage`  | SharedPreferences    | 偏好设置、UI 缓存 |
-| `SecureStorage` | FlutterSecureStorage | Token、敏感凭证   |
-
-### 国际化
-
-- **源文件**：`lib/core/l10n/arb/app_en.arb` / `app_zh.arb`
-- **切换语言**：`ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh)`
-- **生成脚本**：`./script/gen_l10n.sh`
-
-### 通用组件
-
-| 组件                                | 用途                             |
-| ----------------------------------- | -------------------------------- |
-| `BasePage` / `BaseVM` / `BaseState` | 页面生命周期 + ViewModel 模式    |
-| `BaseToast`                         | 轻提示（自动消失）               |
-| `BaseLoading`                       | 加载中蒙版                       |
-| `CommonDialog` / `WarningDialog`    | 弹窗（队列管理）                 |
-| `SuccessTips` / `FailTips`          | 成功/失败提示                    |
-| `AppTextField` / `InputTextWidget`  | 输入框组件                       |
-| `CountdownRoundButton`              | 验证码倒计时按钮                 |
-| `ImageView`                         | 图片组件（网络/本地/SVG/Base64） |
-
-### 认证模块
-
-双层设计：
-
-```
-shared/services/auth/          ← 共享层
-  AuthSession · AuthStore · authSessionProvider
-
-features/auth/                 ← Feature 层
-  AuthRepository → AuthRepositoryImpl → AuthRemoteDataSource
-  LoginPage + AuthViewModel
-```
-
-流程：`LoginPage → ViewModel.login() → API → AuthStore.setSession() → Provider 更新 → Interceptor 注入新 Token`
+| 组件 | 用途 |
+| --- | --- |
+| Toast / Loading | 全局轻提示、加载态 |
+| Dialog / Sheet | 通用弹窗、确认面板 |
+| RefreshView | 下拉刷新、上拉加载 |
+| PrimaryRoundButton | 主按钮 |
+| CountdownRoundButton | 验证码倒计时按钮 |
+| InputTextWidget | 输入框 |
+| ImageView | 本地、网络、SVG、Base64 图片展示 |
+| SwitchWidget | 开关组件 |
+| ContextMenu / Overlay | 浮层与菜单能力 |
 
 ---
 
-## 📖 开发指南
+## 🛠 开发指南
 
-### 添加新功能模块
+### ➕ 添加一个新 Feature
 
-```
-lib/features/<name>/
+1. 在 `lib/features/` 下创建模块目录。
+2. 按 `data / domain / presentation` 创建分层文件。
+3. 在 `domain/repositories` 中定义 Repository 抽象。
+4. 在 `data/repositories` 中实现 Repository。
+5. 在 `presentation/viewmodels` 中继承 `BaseVM` 管理页面状态。
+6. 在 `presentation/pages` 中继承 `BasePage` 编写 UI。
+7. 在 `<feature>_routes.dart` 中声明路由。
+8. 将 Feature 路由注册到根路由列表。
+
+推荐最小结构：
+
+```text
+lib/features/order/
 ├── data/
-│   ├── datasources/<name>_datasource.dart
-│   └── repositories/<name>_repository_impl.dart
+│   ├── datasources/order_datasource.dart
+│   └── repositories/order_repository_impl.dart
 ├── domain/
-│   ├── entities/
-│   └── repositories/<name>_repository.dart
+│   ├── entities/order.dart
+│   └── repositories/order_repository.dart
 └── presentation/
-    ├── <name>_routes.dart
-    ├── pages/<name>_page.dart
-    └── viewmodels/<name>_viewmodel.dart
+    ├── order_routes.dart
+    ├── pages/order_page.dart
+    └── viewmodels/order_viewmodel.dart
 ```
 
-完成代码后在 `router_provider.dart` 注册路由即可。
+### 📝 页面开发建议
+
+- UI 逻辑放在 Page，业务动作放在 ViewModel。
+- ViewModel 通过 Repository 抽象获取数据。
+- 不在 Page 中直接调用 Dio、SharedPreferences、SecureStorage。
+- 不让 Feature 直接依赖其他 Feature 的内部实现。
+- 可复用 UI 放到 `shared/widgets`，可复用业务服务放到 `shared/services`。
+
+### 🔌 替换为真实接口
+
+1. 修改对应环境入口的 `baseUrl` 与 `apiPathPrefix`。
+2. 在 Feature 的 DataSource 中替换接口路径。
+3. 在 RepositoryImpl 中完成响应数据到业务实体的转换。
+4. 在 ViewModel 中调用 Repository 并更新状态。
 
 ---
 
 ## 🔧 脚本工具
 
-| 脚本                           | 用途                                   |
-| ------------------------------ | -------------------------------------- |
-| `./script/gen_l10n.sh`         | 生成国际化代码                         |
-| `./script/gen_app_icon.sh`     | 从 `assets/app_icon.png` 生成 App 图标 |
-| `./script/rename_project.dart` | 工程项目重命名，替换项目名引用         |
+| 脚本 | 用途 |
+| --- | --- |
+| `./script/gen_l10n.sh` | 生成国际化代码 |
+| `./script/gen_app_icon.sh` | 根据 `assets/app_icon.png` 生成 App 图标 |
+| `dart run script/rename_project.dart <name>` | 重命名项目 |
 
 ```bash
+# 生成国际化代码
+./script/gen_l10n.sh
+
 # 生成 App 图标
 ./script/gen_app_icon.sh
 
-# 项目重命名
+# 重命名项目
 dart run script/rename_project.dart my_app
 ```
 
 ---
 
+## 📚 主要依赖
+
+| 类型 | 依赖 |
+| --- | --- |
+| 状态管理 / DI | `flutter_riverpod` |
+| 路由 | `go_router` |
+| 网络 | `dio`、`connectivity_plus` |
+| 存储 | `shared_preferences`、`flutter_secure_storage` |
+| 国际化 | `flutter_localizations`、`intl` |
+| UI / 体验 | `bot_toast`、`easy_refresh`、`flutter_screenutil`、`cached_network_image`、`loading_animation_widget`、`shimmer`、`flutter_svg` |
+| 工程能力 | `exception_catcher`、`logger`、`package_info_plus`、`permission_handler`、`flutter_launcher_icons` |
+
+---
+
 <p align="center">
-  <sub>MIT License · 自由用于商业和个人项目</sub>
+  <sub>MIT License · 可自由用于个人与商业项目</sub>
 </p>
