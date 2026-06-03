@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/env.dart';
+import '../../shared/presentation/presentation.dart';
 import '../../shared/services/auth/auth_store.dart';
 import '../storage/storage_provider.dart';
 import 'di_overrides.dart';
@@ -35,6 +36,7 @@ class AppBootstrap {
 
   static Future<AppBootstrap> create(EnvConfig env) async {
     WidgetsFlutterBinding.ensureInitialized();
+    bindBaseVmFeedbackHandlers();
 
     // ── Phase 1: Pre-ProviderScope 异步初始化 ──
 
