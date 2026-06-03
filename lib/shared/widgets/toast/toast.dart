@@ -1,7 +1,7 @@
 library;
 
-export 'toast_controller.dart';
-export 'loading_controller.dart';
-export 'dialog_controller.dart';
-export 'tips_controller.dart';
-export 'toast_util.dart';
+export 'tips/result_tips.dart';
+export 'dialog/common_dialog.dart';
+export 'dialog/warning_dailog.dart';
+export 'loading/base_loading.dart';
+export 'toast/base_toast.dart';

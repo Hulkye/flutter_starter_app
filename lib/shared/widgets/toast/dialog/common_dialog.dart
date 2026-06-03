@@ -1,5 +1,5 @@
 import 'package:flutter_starter_app/shared/widgets/toast/dialog/dialog_unit.dart';
-import 'package:flutter_starter_app/shared/widgets/toast/dialog_controller.dart';
+import 'package:flutter_starter_app/shared/widgets/toast/controller/dialog_controller.dart';
 import 'package:flutter_starter_app/header.dart';
 
 /// 通用弹窗

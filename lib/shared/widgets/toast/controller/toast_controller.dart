@@ -19,7 +19,7 @@ class ToastController {
     _cancelFunc?.call();
     final cancelFunc = ToastUtil.customToast(
       toastBuilder: (CancelFunc cancelFunc) {
-        return _toastWidget!;
+        return _toastWidget ?? Container();
       },
       onlyOne: true,
       clickClose: clickClose,

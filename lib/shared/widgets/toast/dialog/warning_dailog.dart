@@ -1,10 +1,10 @@
 import 'package:flutter_starter_app/shared/widgets/toast/dialog/common_dialog.dart';
 import 'package:flutter_starter_app/shared/widgets/toast/dialog/dialog_unit.dart';
-import 'package:flutter_starter_app/shared/widgets/toast/dialog_controller.dart';
+import 'package:flutter_starter_app/shared/widgets/toast/controller/dialog_controller.dart';
 import 'package:flutter_starter_app/header.dart';
 
-class WarnningDialog extends CommonDialog {
-  const WarnningDialog({
+class WarningDialog extends CommonDialog {
+  const WarningDialog({
     super.key,
     super.title,
     super.desc,
@@ -28,7 +28,7 @@ class WarnningDialog extends CommonDialog {
   }) {
     Widget dialogWidget =
         child ??
-        WarnningDialog(
+        WarningDialog(
           title: title,
           desc: desc,
           confirmText: confirmText,
