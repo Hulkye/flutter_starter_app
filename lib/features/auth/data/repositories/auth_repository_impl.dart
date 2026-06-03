@@ -27,12 +27,14 @@ final class AuthRepositoryImpl implements AuthRepository {
       );
     }
     final data = response.data;
-    await _ref.read(authSessionProvider.notifier).setSession(
-      AuthSession(
-        token: data?['token']?.toString() ?? '',
-        payload: <String, dynamic>{'username': username},
-      ),
-    );
+    await _ref
+        .read(authSessionProvider.notifier)
+        .setSession(
+          AuthSession(
+            token: data?['token']?.toString() ?? '',
+            payload: <String, dynamic>{'username': username},
+          ),
+        );
   }
 
   @override

@@ -16,8 +16,8 @@ class HttpCacheInfo {
   final int totalCount;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'memoryCount': memoryCount,
-        'diskCount': diskCount,
-        'totalCount': totalCount,
-      };
+    'memoryCount': memoryCount,
+    'diskCount': diskCount,
+    'totalCount': totalCount,
+  };
 }

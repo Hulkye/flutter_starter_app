@@ -41,8 +41,7 @@ class AuthInterceptor extends HttpInterceptor {
     HttpRequest<dynamic> request,
     HttpException error,
   ) async {
-    if (error.type == HttpErrorType.unauthorized ||
-        error.statusCode == 401) {
+    if (error.type == HttpErrorType.unauthorized || error.statusCode == 401) {
       await authConfig.onAuthFailed?.call();
     }
     return error;

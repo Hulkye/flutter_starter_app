@@ -16,11 +16,7 @@ class ApiException implements Exception {
 /// { "code": 0, "message": "success", "data": { ... } }
 /// ```
 class ApiResponse<T> {
-  const ApiResponse({
-    required this.code,
-    this.message,
-    this.data,
-  });
+  const ApiResponse({required this.code, this.message, this.data});
 
   final int code;
   final String? message;

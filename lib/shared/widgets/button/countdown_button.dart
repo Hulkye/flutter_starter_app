@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_starter_app/header.dart';
 
-
 /// 基于 [PrimaryRoundButton] 的验证码发送按钮。
 ///
 /// 点击后先执行 [onSend]；仅当返回 `true`（接口成功）时进入倒计时。

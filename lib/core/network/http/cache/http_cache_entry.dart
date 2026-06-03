@@ -38,8 +38,7 @@ class HttpCacheEntry {
   final String? cachePolicy;
 
   /// 是否已过期。
-  bool get isExpired =>
-      expiresAt != null && DateTime.now().isAfter(expiresAt!);
+  bool get isExpired => expiresAt != null && DateTime.now().isAfter(expiresAt!);
 
   // -----------------------------------------------------------------------
   // 序列化
@@ -47,15 +46,15 @@ class HttpCacheEntry {
 
   /// 转为 JSON。
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'key': key,
-        'data': encodeJsonFriendly(data),
-        'createdAt': createdAt.toIso8601String(),
-        'expiresAt': expiresAt?.toIso8601String(),
-        'statusCode': statusCode,
-        'headers': headers,
-        'requestSignature': requestSignature,
-        'cachePolicy': cachePolicy,
-      };
+    'key': key,
+    'data': encodeJsonFriendly(data),
+    'createdAt': createdAt.toIso8601String(),
+    'expiresAt': expiresAt?.toIso8601String(),
+    'statusCode': statusCode,
+    'headers': headers,
+    'requestSignature': requestSignature,
+    'cachePolicy': cachePolicy,
+  };
 
   /// 从 JSON 还原。
   static HttpCacheEntry fromJson(Map<String, dynamic> json) {
@@ -67,16 +66,17 @@ class HttpCacheEntry {
           ? null
           : DateTime.parse(json['expiresAt'] as String),
       statusCode: json['statusCode'] as int?,
-      headers: (json['headers'] as Map<String, dynamic>? ??
-              const <String, dynamic>{})
-          .map(
-            (dynamic key, dynamic value) => MapEntry(
-              key as String,
-              (value as List<dynamic>)
-                  .map((dynamic e) => e.toString())
-                  .toList(),
-            ),
-          ),
+      headers:
+          (json['headers'] as Map<String, dynamic>? ??
+                  const <String, dynamic>{})
+              .map(
+                (dynamic key, dynamic value) => MapEntry(
+                  key as String,
+                  (value as List<dynamic>)
+                      .map((dynamic e) => e.toString())
+                      .toList(),
+                ),
+              ),
       requestSignature: json['requestSignature'] as String? ?? '',
       cachePolicy: json['cachePolicy'] as String?,
     );

@@ -22,10 +22,7 @@ final class AuthRemoteDataSource {
   ) async {
     final data = await _client.post<Map<String, dynamic>>(
       '/auth/login',
-      data: <String, dynamic>{
-        'username': username,
-        'password': password,
-      },
+      data: <String, dynamic>{'username': username, 'password': password},
     );
     return ApiResponse<Map<String, dynamic>>.fromJson(data);
   }

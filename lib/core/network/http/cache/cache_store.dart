@@ -67,10 +67,8 @@ class MemoryHttpCacheStore implements HttpCacheStore {
 /// 基于文件的缓存存储，适合持久化 / 冷数据。
 class FileHttpCacheStore implements HttpCacheStore {
   FileHttpCacheStore({Directory? directory})
-      : _directory = directory ??
-            Directory(
-              '${Directory.systemTemp.path}/http3_cache',
-            );
+    : _directory =
+          directory ?? Directory('${Directory.systemTemp.path}/http3_cache');
 
   final Directory _directory;
 

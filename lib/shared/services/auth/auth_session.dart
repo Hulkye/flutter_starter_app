@@ -26,16 +26,16 @@ class AuthSession {
   // ---- JSON ----
 
   factory AuthSession.fromJson(Map<String, dynamic> json) => AuthSession(
-        token: json['token'] as String? ?? '',
-        refreshToken: json['refreshToken'] as String?,
-        payload: (json['payload'] as Map<String, dynamic>?) ?? const {},
-      );
+    token: json['token'] as String? ?? '',
+    refreshToken: json['refreshToken'] as String?,
+    payload: (json['payload'] as Map<String, dynamic>?) ?? const {},
+  );
 
   Map<String, dynamic> toJson() => {
-        'token': token,
-        if (refreshToken != null) 'refreshToken': refreshToken,
-        'payload': payload,
-      };
+    'token': token,
+    if (refreshToken != null) 'refreshToken': refreshToken,
+    'payload': payload,
+  };
 
   // ---- 序列化工具 ----
 

@@ -1,12 +1,13 @@
 import '../enum/http_method.dart';
 
 /// 自定义重试判定函数 —— 返回 `true` 允许继续重试。
-typedef RetryPredicate = bool Function(
-  HttpMethod method,
-  int? statusCode,
-  Object? error,
-  int attempt,
-);
+typedef RetryPredicate =
+    bool Function(
+      HttpMethod method,
+      int? statusCode,
+      Object? error,
+      int attempt,
+    );
 
 /// 精细化的重试策略，支持指数退避与抖动。
 class RetryPolicy {

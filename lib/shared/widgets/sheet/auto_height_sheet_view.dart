@@ -1,5 +1,4 @@
 import '../../../header.dart';
-import 'auto_height_sheet.dart';
 
 double get maxTopPadding => 88.w;
 

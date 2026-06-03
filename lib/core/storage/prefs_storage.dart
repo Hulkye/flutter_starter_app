@@ -16,8 +16,9 @@ final class PrefsStorage implements StorageService {
 
   SharedPreferences get _p {
     final p = _prefs;
-    if (p == null)
+    if (p == null) {
       throw StateError('PrefsStorage not initialized. Call init() first.');
+    }
     return p;
   }
 

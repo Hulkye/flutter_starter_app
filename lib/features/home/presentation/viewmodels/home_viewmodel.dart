@@ -19,11 +19,7 @@ class HomeState extends BaseState {
     return copyWith(isReady: isReady);
   }
 
-  HomeState copyWith({
-    bool? isReady,
-    String? requestResult,
-    bool? requesting,
-  }) {
+  HomeState copyWith({bool? isReady, String? requestResult, bool? requesting}) {
     return HomeState(
       isReady: isReady ?? this.isReady,
       requestResult: requestResult ?? this.requestResult,
@@ -48,14 +44,12 @@ final class HomeViewModel extends BaseVM<HomeState> {
       );
     } catch (e) {
       emitHint(e.toString());
-      state = state.copyWith(
-        requestResult: e.toString(),
-        requesting: false,
-      );
+      state = state.copyWith(requestResult: e.toString(), requesting: false);
     }
   }
 }
 
 /// Home ViewModel Provider。
-final homeViewModelProvider =
-    NotifierProvider<HomeViewModel, HomeState>(HomeViewModel.new);
+final homeViewModelProvider = NotifierProvider<HomeViewModel, HomeState>(
+  HomeViewModel.new,
+);

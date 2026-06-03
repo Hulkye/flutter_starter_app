@@ -32,7 +32,10 @@ abstract interface class StorageService {
   // ---- String List ----
 
   Future<bool> setStringList(String key, List<String> value);
-  List<String>? getStringList(String key, {List<String> defaultValue = const []});
+  List<String>? getStringList(
+    String key, {
+    List<String> defaultValue = const [],
+  });
 
   // ---- 通用 ----
 

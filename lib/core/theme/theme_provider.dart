@@ -17,10 +17,9 @@ class AppThemeModeNotifier extends Notifier<AppThemeMode> {
 
   void setThemeMode(AppThemeMode mode) {
     state = mode;
-    unawaited(ref.read(prefsStorageProvider).setInt(
-      _themeModeKey,
-      mode.storageValue,
-    ));
+    unawaited(
+      ref.read(prefsStorageProvider).setInt(_themeModeKey, mode.storageValue),
+    );
   }
 }
 

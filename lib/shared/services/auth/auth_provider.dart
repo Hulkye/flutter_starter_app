@@ -6,10 +6,9 @@ import 'auth_session.dart';
 /// 认证会话 Provider（响应式）。
 ///
 /// Widget 中通过 `ref.watch(authSessionProvider)` 监听登录状态。
-final authSessionProvider =
-    NotifierProvider<AuthSessionNotifier, AuthSession?>(
-      AuthSessionNotifier.new,
-    );
+final authSessionProvider = NotifierProvider<AuthSessionNotifier, AuthSession?>(
+  AuthSessionNotifier.new,
+);
 
 class AuthSessionNotifier extends Notifier<AuthSession?> {
   @override

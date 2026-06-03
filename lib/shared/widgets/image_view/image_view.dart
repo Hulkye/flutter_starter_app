@@ -181,7 +181,9 @@ class ImageView extends StatelessWidget {
           height: height,
           fit: fit ?? BoxFit.contain,
           alignment: alignment,
-          color: color,
+          colorFilter: color == null
+              ? null
+              : ColorFilter.mode(color!, BlendMode.srcIn),
         );
       }
       return Image.asset(

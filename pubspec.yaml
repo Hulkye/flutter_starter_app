@@ -68,6 +68,8 @@ dependencies:
   loading_animation_widget: ^1.3.0
   # 获取包信息
   package_info_plus: ^9.0.1
+  # 文件系统路径
+  path_provider: ^2.1.5
   # 权限管理
   permission_handler: ^12.0.1
   # 骨架屏

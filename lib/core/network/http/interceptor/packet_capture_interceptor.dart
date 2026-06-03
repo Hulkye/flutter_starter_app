@@ -48,10 +48,7 @@ class PacketCaptureEvent {
 /// )
 /// ```
 class PacketCaptureInterceptor extends HttpInterceptor {
-  PacketCaptureInterceptor({
-    required this.enablePacketCapture,
-    this.onCapture,
-  });
+  PacketCaptureInterceptor({required this.enablePacketCapture, this.onCapture});
 
   /// 全局开关（来自 [HttpConfig.enablePacketCapture]）。
   final bool enablePacketCapture;
@@ -61,11 +58,13 @@ class PacketCaptureInterceptor extends HttpInterceptor {
 
   @override
   Future<HttpRequest<dynamic>> onRequest(HttpRequest<dynamic> request) async {
-    _emit(PacketCaptureEvent(
-      stage: 'request',
-      time: DateTime.now(),
-      request: request,
-    ));
+    _emit(
+      PacketCaptureEvent(
+        stage: 'request',
+        time: DateTime.now(),
+        request: request,
+      ),
+    );
     return request;
   }
 
@@ -74,12 +73,14 @@ class PacketCaptureInterceptor extends HttpInterceptor {
     HttpRequest<dynamic> request,
     HttpResponse<dynamic> response,
   ) async {
-    _emit(PacketCaptureEvent(
-      stage: 'response',
-      time: DateTime.now(),
-      request: request,
-      response: response,
-    ));
+    _emit(
+      PacketCaptureEvent(
+        stage: 'response',
+        time: DateTime.now(),
+        request: request,
+        response: response,
+      ),
+    );
     return response;
   }
 
@@ -88,12 +89,14 @@ class PacketCaptureInterceptor extends HttpInterceptor {
     HttpRequest<dynamic> request,
     HttpException error,
   ) async {
-    _emit(PacketCaptureEvent(
-      stage: 'error',
-      time: DateTime.now(),
-      request: request,
-      exception: error,
-    ));
+    _emit(
+      PacketCaptureEvent(
+        stage: 'error',
+        time: DateTime.now(),
+        request: request,
+        exception: error,
+      ),
+    );
     return error;
   }
 

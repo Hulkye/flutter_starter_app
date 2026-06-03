@@ -10,13 +10,13 @@ class HttpSecurityConfig {
 
   /// 自定义证书校验回调。
   final bool Function(Object certificate, String host, int port)?
-      validateCertificate;
+  validateCertificate;
 
   /// 复制并覆盖部分字段。
   HttpSecurityConfig copyWith({
     bool? allowInvalidCertificates,
     bool Function(Object certificate, String host, int port)?
-        validateCertificate,
+    validateCertificate,
   }) {
     return HttpSecurityConfig(
       allowInvalidCertificates:

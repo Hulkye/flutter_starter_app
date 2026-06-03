@@ -13,7 +13,10 @@ abstract class HttpLogger {
   void logRequest(HttpRequest<dynamic> request);
 
   /// 记录响应。
-  void logResponse(HttpRequest<dynamic> request, HttpResponse<dynamic> response);
+  void logResponse(
+    HttpRequest<dynamic> request,
+    HttpResponse<dynamic> response,
+  );
 
   /// 记录错误。
   void logError(HttpRequest<dynamic> request, Object error);
@@ -85,7 +88,7 @@ class DefaultHttpLogger extends HttpLogger {
     if (!kDebugMode) return;
     _logger.w(
       'HTTP ${request.method.name.toUpperCase()} ${request.path} '
-      '第${retryCount}次重试，等待${delay.inMilliseconds}ms '
+      '第$retryCount次重试，等待${delay.inMilliseconds}ms '
       '(已耗时: ${elapsed.inMilliseconds}ms, 状态码: ${statusCode ?? '-'})',
       error: error,
     );

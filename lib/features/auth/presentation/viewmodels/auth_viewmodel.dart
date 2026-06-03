@@ -20,11 +20,7 @@ class AuthState extends BaseState {
     return copyWith(isReady: isReady);
   }
 
-  AuthState copyWith({
-    bool? isReady,
-    bool? isLoading,
-    String? errorMessage,
-  }) {
+  AuthState copyWith({bool? isReady, bool? isLoading, String? errorMessage}) {
     return AuthState(
       isReady: isReady ?? this.isReady,
       isLoading: isLoading ?? this.isLoading,

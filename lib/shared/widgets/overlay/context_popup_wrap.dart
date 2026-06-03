@@ -8,7 +8,8 @@ enum PrePopupDirection {
   bottomRight, // 向下展开，弹窗内容右上角对齐目标右下角
 }
 
-typedef ContextPopupBuilder = Widget Function(Future<void> Function() cancelFunc);
+typedef ContextPopupBuilder =
+    Widget Function(Future<void> Function() cancelFunc);
 
 class ContextPopupWrap extends StatefulWidget {
   final Widget child; // 触发弹窗的对象
