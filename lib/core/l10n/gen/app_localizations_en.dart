@@ -21,6 +21,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goToProfile => 'Go to profile';
 
   @override
+  String get goToTodo => 'Go to Todo example';
+
+  @override
   String get requestDemo => 'Request demo API';
 
   @override
@@ -84,6 +87,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String welcomeUser(String username) {
     return 'Welcome, $username';
   }
+
+  @override
+  String get todoTitle => 'Todo Example';
+
+  @override
+  String get todoCreateTitle => 'Create Todo';
+
+  @override
+  String get todoInputHint => 'Enter a todo item';
+
+  @override
+  String get todoEmptyTitleHint => 'Please enter a todo item';
+
+  @override
+  String get todoTotalCount => 'Total';
+
+  @override
+  String get todoCompletedCount => 'Completed';
+
+  @override
+  String get todoRemainingCount => 'Remaining';
+
+  @override
+  String get todoDeleteConfirmTitle => 'Delete todo';
+
+  @override
+  String get todoDeleteConfirmContent =>
+      'Are you sure you want to delete this todo item?';
+
+  @override
+  String get todoEmpty => 'No todos yet. Add one to get started.';
 
   @override
   String get loginFailed => 'Login failed';

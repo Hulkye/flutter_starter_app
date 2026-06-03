@@ -122,6 +122,12 @@ abstract class AppLocalizations {
   /// **'前往我的页面'**
   String get goToProfile;
 
+  /// No description provided for @goToTodo.
+  ///
+  /// In zh, this message translates to:
+  /// **'前往 Todo 示例'**
+  String get goToTodo;
+
   /// No description provided for @requestDemo.
   ///
   /// In zh, this message translates to:
@@ -247,6 +253,66 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'欢迎，{username}'**
   String welcomeUser(String username);
+
+  /// No description provided for @todoTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'Todo 示例'**
+  String get todoTitle;
+
+  /// No description provided for @todoCreateTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建 Todo'**
+  String get todoCreateTitle;
+
+  /// No description provided for @todoInputHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入待办事项'**
+  String get todoInputHint;
+
+  /// No description provided for @todoEmptyTitleHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入待办事项'**
+  String get todoEmptyTitleHint;
+
+  /// No description provided for @todoTotalCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'总数'**
+  String get todoTotalCount;
+
+  /// No description provided for @todoCompletedCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'已完成'**
+  String get todoCompletedCount;
+
+  /// No description provided for @todoRemainingCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'待完成'**
+  String get todoRemainingCount;
+
+  /// No description provided for @todoDeleteConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除待办'**
+  String get todoDeleteConfirmTitle;
+
+  /// No description provided for @todoDeleteConfirmContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认删除这条待办事项吗？'**
+  String get todoDeleteConfirmContent;
+
+  /// No description provided for @todoEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无待办，添加一条试试吧'**
+  String get todoEmpty;
 
   /// No description provided for @loginFailed.
   ///

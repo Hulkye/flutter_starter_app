@@ -21,6 +21,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get goToProfile => '前往我的页面';
 
   @override
+  String get goToTodo => '前往 Todo 示例';
+
+  @override
   String get requestDemo => '请求示例接口';
 
   @override
@@ -84,6 +87,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String welcomeUser(String username) {
     return '欢迎，$username';
   }
+
+  @override
+  String get todoTitle => 'Todo 示例';
+
+  @override
+  String get todoCreateTitle => '创建 Todo';
+
+  @override
+  String get todoInputHint => '输入待办事项';
+
+  @override
+  String get todoEmptyTitleHint => '请输入待办事项';
+
+  @override
+  String get todoTotalCount => '总数';
+
+  @override
+  String get todoCompletedCount => '已完成';
+
+  @override
+  String get todoRemainingCount => '待完成';
+
+  @override
+  String get todoDeleteConfirmTitle => '删除待办';
+
+  @override
+  String get todoDeleteConfirmContent => '确认删除这条待办事项吗？';
+
+  @override
+  String get todoEmpty => '暂无待办，添加一条试试吧';
 
   @override
   String get loginFailed => '登录失败';

@@ -7,6 +7,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../../shared/presentation/presentation.dart';
 import '../viewmodels/home_viewmodel.dart';
 import '../../../profile/presentation/profile_routes.dart';
+import '../../../todo/presentation/todo_routes.dart';
 
 class HomePage extends BasePage<HomeViewModel> {
   const HomePage({super.key});
@@ -92,6 +93,13 @@ class HomePage extends BasePage<HomeViewModel> {
               ref.read(appRouterProvider).push(const ProfileRoute());
             },
             child: Text(context.i18n.goToProfile),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            onPressed: () {
+              ref.read(appRouterProvider).push(const TodoRoute());
+            },
+            child: Text(context.i18n.goToTodo),
           ),
           const SizedBox(height: 12),
           ElevatedButton(

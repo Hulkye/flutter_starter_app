@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/auth_routes.dart';
 import '../../features/home/presentation/home_routes.dart';
 import '../../features/profile/presentation/profile_routes.dart';
+import '../../features/todo/presentation/todo_routes.dart';
 import '../../shared/services/auth/auth.dart';
 import '../../shared/widgets/toast/toast_util.dart';
 import 'app_route_define.dart';
@@ -26,6 +27,7 @@ final List<AppRouteDefine> _allRoutes = [
   HomeRoute(),
   ProfileRoute(),
   LoginRoute(),
+  TodoRoute(),
 ];
 
 // =============================================================================

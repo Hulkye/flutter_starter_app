@@ -21,9 +21,12 @@
 
 模板已内置多环境、网络请求、路由守卫、主题、国际化、本地存储、登录会话、Toast/Loading、刷新、按钮、弹窗等常用基础设施。Clone 后只需要替换业务接口与页面，即可进入功能开发。
 
+> 📘 第一次使用模板请先阅读：[模板使用说明](docs/template_usage.md)。
+
 ## 📚 目录
 
 - [核心优势](#-核心优势)
+- [模板使用说明](docs/template_usage.md)
 - [快速开始](#-快速开始)
 - [项目结构](#-项目结构)
 - [架构设计](#-架构设计)
@@ -114,7 +117,8 @@ lib/
 ├── features/                      # 业务功能模块
 │   ├── auth/                      # 登录示例
 │   ├── home/                      # 首页示例
-│   └── profile/                   # 个人中心示例
+│   ├── profile/                   # 个人中心示例
+│   └── todo/                      # Todo 完整分层示例
 ├── shared/                        # 跨 Feature 共享能力
 │   ├── presentation/              # BasePage / BaseVM / BaseState
 │   ├── services/                  # AuthSession / AuthStore
