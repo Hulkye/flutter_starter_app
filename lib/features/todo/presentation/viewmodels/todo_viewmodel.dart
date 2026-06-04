@@ -7,11 +7,12 @@ import '../../domain/entities/todo_item.dart';
 
 final class TodoState extends BaseState {
   const TodoState({
-    super.isReady = false,
+    this.initialized = false,
     this.todos = const [],
     this.draftTitle = '',
   });
 
+  final bool initialized;
   final List<TodoItem> todos;
   final String draftTitle;
 
@@ -19,18 +20,13 @@ final class TodoState extends BaseState {
 
   int get remainingCount => todos.length - completedCount;
 
-  @override
-  TodoState copyWithBase({bool? isReady}) {
-    return copyWith(isReady: isReady);
-  }
-
   TodoState copyWith({
-    bool? isReady,
+    bool? initialized,
     List<TodoItem>? todos,
     String? draftTitle,
   }) {
     return TodoState(
-      isReady: isReady ?? this.isReady,
+      initialized: initialized ?? this.initialized,
       todos: todos ?? this.todos,
       draftTitle: draftTitle ?? this.draftTitle,
     );
@@ -41,14 +37,9 @@ final class TodoViewModel extends BaseVM<TodoState> {
   @override
   TodoState initialState() => const TodoState();
 
-  @override
-  void onReady() {
-    loadTodos();
-  }
-
   Future<void> loadTodos() async {
     final todos = await ref.read(todoRepositoryProvider).fetchTodos();
-    state = state.copyWith(todos: todos, isReady: true);
+    state = state.copyWith(todos: todos, initialized: true);
   }
 
   void updateDraft(String value) {
@@ -58,11 +49,13 @@ final class TodoViewModel extends BaseVM<TodoState> {
   Future<void> addTodo() async {
     final title = state.draftTitle.trim();
     if (title.isEmpty) {
-      emitHint(ref.read(appLocalizationsProvider).todoEmptyTitleHint);
+      PresentationHelper.emitHint(
+        ref.read(appLocalizationsProvider).todoEmptyTitleHint,
+      );
       return;
     }
 
-    await runWithLoading(() async {
+    await PresentationHelper.runWithLoading(() async {
       final todos = await ref.read(todoRepositoryProvider).addTodo(title);
       state = state.copyWith(todos: todos, draftTitle: '');
     });
@@ -74,7 +67,7 @@ final class TodoViewModel extends BaseVM<TodoState> {
   }
 
   Future<void> deleteTodo(String id) async {
-    await runWithLoading(() async {
+    await PresentationHelper.runWithLoading(() async {
       final todos = await ref.read(todoRepositoryProvider).deleteTodo(id);
       state = state.copyWith(todos: todos);
     });

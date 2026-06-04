@@ -1,6 +1,6 @@
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_starter_app/features/todo/presentation/viewmodels/todo_viewmodel.dart';
-import 'package:flutter_starter_app/shared/presentation/base_vm.dart';
+import 'package:flutter_starter_app/shared/presentation/presentation_helper.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,25 +11,21 @@ void main() {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       await prefsStorage.init();
-      BaseVM.showHintHandler = null;
-      BaseVM.showLoadingHandler = null;
-      BaseVM.hideLoadingHandler = null;
+      PresentationHelper.resetHandlers();
     });
 
     tearDown(() {
-      BaseVM.showHintHandler = null;
-      BaseVM.showLoadingHandler = null;
-      BaseVM.hideLoadingHandler = null;
+      PresentationHelper.resetHandlers();
     });
 
-    test('loads seeded todos and marks state ready', () async {
+    test('loads seeded todos and marks state initialized', () async {
       final container = createTestContainer();
       final vm = container.read(todoViewModelProvider.notifier);
 
       await vm.loadTodos();
       final state = container.read(todoViewModelProvider);
 
-      expect(state.isReady, isTrue);
+      expect(state.initialized, isTrue);
       expect(state.todos, hasLength(3));
       expect(state.completedCount, 1);
       expect(state.remainingCount, 2);
@@ -63,7 +59,7 @@ void main() {
 
     test('emits hint when adding empty todo', () async {
       final hints = <String>[];
-      BaseVM.showHintHandler = hints.add;
+      PresentationHelper.showHintHandler = hints.add;
       final container = createTestContainer();
       final vm = container.read(todoViewModelProvider.notifier);
 

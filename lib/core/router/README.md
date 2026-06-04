@@ -117,17 +117,13 @@ Consumer(
 )
 ```
 
-### 在 Controller 中返回
+### 返回上一页
 
 ```dart
-import '../../core/router/router_provider.dart';
-
-class MyController extends BasePageController {
-  void done() {
-    rootNavigatorKey.currentState?.pop();
-  }
-}
+ref.read(appRouterProvider).back();
 ```
+
+在 `BasePage` 中，默认返回按钮和 Pop 拦截也会通过 `appRouterProvider` 执行返回。
 
 ### 带参数路由
 

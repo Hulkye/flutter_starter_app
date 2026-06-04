@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/l10n.dart';
 import '../../../../core/router/router.dart';
@@ -9,26 +8,16 @@ import '../viewmodels/home_viewmodel.dart';
 import '../../../profile/presentation/profile_routes.dart';
 import '../../../todo/presentation/todo_routes.dart';
 
-class HomePage extends BasePage<HomeViewModel> {
+class HomePage extends BasePage {
   const HomePage({super.key});
-
-  // ── VM 接入 ──
-
-  @override
-  HomeViewModel notifier(WidgetRef ref) =>
-      ref.read(homeViewModelProvider.notifier);
-
-  @override
-  BaseState watchState(WidgetRef ref) => ref.watch(homeViewModelProvider);
 
   // ── AppBar ──
 
   @override
-  PreferredSizeWidget? appBar(
-    BuildContext context,
-    WidgetRef ref,
-    HomeViewModel vm,
-  ) {
+  PreferredSizeWidget? appBar(PageScope scope) {
+    final context = scope.context;
+    final ref = scope.ref;
+
     return AppBar(
       title: Text(context.i18n.homeTitle),
       actions: [
@@ -52,9 +41,12 @@ class HomePage extends BasePage<HomeViewModel> {
   // ── 页面 ──
 
   @override
-  Widget page(BuildContext context, WidgetRef ref, HomeViewModel vm) {
-    final themeMode = ref.watch(appThemeModeProvider);
+  Widget page(PageScope scope) {
+    final context = scope.context;
+    final ref = scope.ref;
+    final vm = ref.read(homeViewModelProvider.notifier);
     final homeState = ref.watch(homeViewModelProvider);
+    final themeMode = ref.watch(appThemeModeProvider);
     final appColors = context.appColor;
     final appAssets = context.appAsset;
 

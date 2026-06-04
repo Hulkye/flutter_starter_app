@@ -17,7 +17,7 @@
 
 ---
 
-这是一个面向中大型 Flutter 项目的快速启动模板。项目以 **Feature-First** 组织业务模块，在每个 Feature 内落地 **Data / Domain / Presentation** 分层，并通过 **BasePage + BaseVM + Riverpod** 建立统一的 MVVM 开发范式。
+这是一个面向中大型 Flutter 项目的快速启动模板。项目以 **Feature-First** 组织业务模块，在每个 Feature 内落地 **Data / Domain / Presentation** 分层，并通过 **BasePage + BaseVM + Riverpod** 建立职责清晰的 MVVM 开发范式。
 
 模板已内置多环境、网络请求、路由守卫、主题、国际化、本地存储、登录会话、Toast/Loading、刷新、按钮、弹窗等常用基础设施。Clone 后只需要替换业务接口与页面，即可进入功能开发。
 
@@ -55,7 +55,7 @@
 | 能力 | 说明 |
 | --- | --- |
 | 清晰分层 | 每个业务模块按 `data / domain / presentation` 拆分，职责边界明确 |
-| MVVM 开发范式 | `BasePage` 承载页面骨架，`BaseVM` 承载状态、生命周期与副作用 |
+| MVVM 开发范式 | `BasePage` 承载页面骨架与 Widget 生命周期，`BaseVM` 只承载状态与业务动作 |
 | Clean Architecture | 业务依赖抽象而非实现，Repository 接口与实现分离，便于替换数据源 |
 | Feature-First | 业务代码按功能聚合，模块可独立演进，避免按技术层级散落全局 |
 | Riverpod 驱动 | 状态管理、依赖注入、服务组合统一使用 Riverpod，减少框架混用成本 |
@@ -123,7 +123,7 @@ lib/
 │   ├── profile/                   # 个人中心示例
 │   └── todo/                      # Todo 完整分层示例
 ├── shared/                        # 跨 Feature 共享能力
-│   ├── presentation/              # BasePage / BaseVM / BaseState
+│   ├── presentation/              # BasePage / BaseVM / BaseState / PresentationHelper
 │   ├── services/                  # AuthSession / AuthStore
 │   └── widgets/                   # Toast、Loading、Button、Dialog 等组件
 ├── header.dart                    # 常用导出
@@ -187,33 +187,59 @@ Presentation  ──────▶  Domain  ◀──────  Data
 | `app/` | 应用启动、环境注入、根组件挂载 | 可组合全局能力 |
 | `core/` | 网络、路由、存储、主题、DI、异常、工具 | 不依赖具体 Feature |
 | `features/` | 业务模块 | 可依赖 `core` 与 `shared` |
-| `shared/` | BasePage、BaseVM、认证服务、通用组件 | 提供跨业务复用能力 |
+| `shared/` | BasePage、BaseVM、PresentationHelper、认证服务、通用组件 | 提供跨业务复用能力 |
 
 ---
 
 ## 🧭 MVVM 基础能力
 
-模板通过 `BasePage`、`BaseVM`、`BaseState` 固化页面开发方式，避免每个页面重复处理生命周期、Loading、Toast、页面就绪状态等通用逻辑。
-
-### BaseVM
-
-`BaseVM` 基于 Riverpod `Notifier`，用于承载页面状态和业务动作：
-
-- `init` / `onReady` / `onResume` / `onPause` / `onClose` 生命周期
-- `runWithLoading` 包装异步任务
-- 统一触发 Loading、Toast、Hint 等反馈
-- 内置 `pop()` 等基础导航能力
-- 与 `BaseState` 配合控制页面 ready 状态
+模板通过 `BasePage`、`BaseVM`、`BaseState`、`PresentationHelper` 固化页面开发方式，同时保持 View 与 ViewModel 的职责边界：页面生命周期由 View 层管理，ViewModel 只负责状态与业务动作。
 
 ### BasePage
 
-`BasePage` 统一页面骨架：
+`BasePage` 是纯页面壳，不绑定具体 ViewModel：
 
 - 标准 `Scaffold` 构建
 - AppBar、背景色、SafeArea、KeepAlive 扩展点
-- 页面 ready 前后的构建分流
-- App 生命周期监听
-- Pop 拦截能力
+- 背景点击自动收起键盘
+- App 生命周期监听与页面生命周期 hook：`onPageReady` / `onPageResume` / `onPagePause` / `onPageClose`
+- Pop 拦截与默认返回能力
+- 通过 `PageScope` 向子类提供 `context` 与 `ref`
+
+页面在 `page(scope)` 中按需桥接状态与 ViewModel：
+
+```dart
+@override
+Widget page(PageScope scope) {
+  final state = scope.ref.watch(todoViewModelProvider);
+  final vm = scope.ref.read(todoViewModelProvider.notifier);
+
+  return TodoContent(state: state, vm: vm);
+}
+```
+
+### BaseVM
+
+`BaseVM` 基于 Riverpod `Notifier`，只用于承载页面状态和业务动作：
+
+- `initialState()` 提供初始状态
+- 通过 `state = state.copyWith(...)` 更新 UI 状态
+- 调用 Repository 抽象完成业务数据读写
+- 不感知 `BuildContext`、Widget 生命周期、页面返回或页面 ready 策略
+
+### BaseState
+
+`BaseState` 是纯状态基类，不内置页面级字段。业务页面如需首屏加载、空态、错误态，应在各自 Feature 的 State 中显式建模，例如 `initialized`、`loading`、`errorMessage`。
+
+### PresentationHelper
+
+`PresentationHelper` 承接 Presentation 层的一次性 UI 反馈：
+
+- `runWithLoading` 包装异步任务
+- `emitHint` 展示提示
+- `showLoading` / `hideLoading` 控制全局 Loading
+
+这些反馈不进入 `BaseState`，避免临时事件污染可渲染状态。
 
 推荐页面开发流程：
 
@@ -240,7 +266,7 @@ main()
   → Application.run(envConfig)
   → AppBootstrap.create(envConfig)
       → WidgetsFlutterBinding.ensureInitialized()
-      → 绑定 BaseVM 全局反馈处理
+      → 绑定 PresentationHelper 全局反馈处理
       → 初始化普通存储与安全存储
       → 恢复 AuthSession
       → 创建 Riverpod overrides
@@ -404,8 +430,8 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 2. 按 `data / domain / presentation` 创建分层文件。
 3. 在 `domain/repositories` 中定义 Repository 抽象。
 4. 在 `data/repositories` 中实现 Repository。
-5. 在 `presentation/viewmodels` 中继承 `BaseVM` 管理页面状态。
-6. 在 `presentation/pages` 中继承 `BasePage` 编写 UI。
+5. 在 `presentation/viewmodels` 中继承 `BaseVM` 管理 UI 状态与业务动作。
+6. 在 `presentation/pages` 中继承 `BasePage` 编写 UI，并在 `page(scope)` 中读取状态、调用 ViewModel。
 7. 在 `<feature>_routes.dart` 中声明路由。
 8. 将 Feature 路由注册到根路由列表。
 

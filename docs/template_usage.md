@@ -328,20 +328,53 @@ final class OrderRepositoryImpl implements OrderRepository {
 ### 4. 在 ViewModel 中更新页面状态
 
 ```dart
+final class OrderState extends BaseState {
+  const OrderState({this.initialized = false, this.orders = const []});
+
+  final bool initialized;
+  final List<Order> orders;
+
+  OrderState copyWith({bool? initialized, List<Order>? orders}) {
+    return OrderState(
+      initialized: initialized ?? this.initialized,
+      orders: orders ?? this.orders,
+    );
+  }
+}
+
 final class OrderViewModel extends BaseVM<OrderState> {
   @override
   OrderState initialState() => const OrderState();
 
+  Future<void> loadOrders() async {
+    await PresentationHelper.runWithLoading(() async {
+      final orders = await ref.read(orderRepositoryProvider).fetchOrders();
+      state = state.copyWith(initialized: true, orders: orders);
+    });
+  }
+}
+```
+
+由页面决定何时触发首屏加载：
+
+```dart
+final class OrderPage extends BasePage {
+  const OrderPage({super.key});
+
   @override
-  Future<void> onReady() async {
-    await loadOrders();
+  void onPageReady(PageScope scope) {
+    scope.ref.read(orderViewModelProvider.notifier).loadOrders();
   }
 
-  Future<void> loadOrders() async {
-    await runWithLoading(() async {
-      final orders = await ref.read(orderRepositoryProvider).fetchOrders();
-      state = state.copyWith(orders: orders);
-    });
+  @override
+  Widget page(PageScope scope) {
+    final state = scope.ref.watch(orderViewModelProvider);
+
+    if (!state.initialized) {
+      return ColoredBox(color: scope.context.appColor.backgroundPrimary);
+    }
+
+    return OrderList(orders: state.orders);
   }
 }
 ```
@@ -459,8 +492,8 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 ### 推荐做法
 
 - 一个业务模块对应一个 `Feature` 目录。
-- 页面继承 `BasePage`，状态逻辑放到 `BaseVM`。
-- ViewModel 只依赖 Repository 抽象，不直接依赖 HTTP 客户端。
+- 页面继承 `BasePage`，在 `page(scope)` 中读取状态并调用 ViewModel。
+- ViewModel 只依赖 Repository 抽象，不直接依赖 HTTP 客户端，也不管理页面生命周期。
 - RepositoryImpl 负责把接口数据转换成业务实体。
 - 公共 UI 放到 `shared/widgets`。
 - 公共业务服务放到 `shared/services`。

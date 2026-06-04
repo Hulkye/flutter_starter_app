@@ -1,40 +1,27 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_starter_app/header.dart';
 
-import 'base_state.dart';
-import 'base_vm.dart';
+/// 页面上下文。
+final class PageScope {
+  const PageScope({required this.context, required this.ref});
+
+  final BuildContext context;
+  final WidgetRef ref;
+}
 
 /// 页面基类。
 ///
-/// 泛型 [V] 为页面对应的 ViewModel 类型，须继承 [BaseVM]。
-///
-/// [BasePage] 只负责页面结构：Scaffold、AppBar、SafeArea、背景层、PopScope、
-/// prePage/page 切换。Loading / Hint 这类一次性反馈由 [BaseVM] 直接处理。
-abstract class BasePage<V extends BaseVM> extends ConsumerStatefulWidget {
+/// [BasePage] 只负责页面结构：Scaffold、AppBar、SafeArea、背景层、PopScope
+/// 以及 Widget/App 生命周期，不绑定具体 ViewModel。
+abstract class BasePage extends ConsumerStatefulWidget {
   const BasePage({super.key});
-
-  // ===========================================================================
-  // VM 接入（子类必须实现）
-  // ===========================================================================
-
-  /// 获取 VM notifier（用于调用 pop、showLoading、emitHint 等操作）。
-  V notifier(WidgetRef ref);
-
-  /// 监听 state 变化（用于响应式 UI 重建）。
-  BaseState watchState(WidgetRef ref);
 
   // ===========================================================================
   // 页面内容（子类必须实现）
   // ===========================================================================
 
   /// 页面主体。BasePage 自动包裹 Scaffold。
-  Widget page(BuildContext context, WidgetRef ref, V vm);
-
-  /// 数据就绪前的占位视图。
-  Widget prePage(BuildContext context) {
-    return ColoredBox(color: Theme.of(context).scaffoldBackgroundColor);
-  }
+  Widget page(PageScope scope);
 
   // ===========================================================================
   // Scaffold 配置
@@ -43,29 +30,29 @@ abstract class BasePage<V extends BaseVM> extends ConsumerStatefulWidget {
   bool get showAppBar => true;
   String get title => '';
   Color backgroundColor(BuildContext context) =>
-      Theme.of(context).scaffoldBackgroundColor;
+      context.appColor.backgroundPrimary;
   bool? get resizeToAvoidBottomInset => null;
 
   // ===========================================================================
   // AppBar
   // ===========================================================================
 
-  Widget? buildBackButton(BuildContext context, WidgetRef ref, V vm) {
+  Widget? buildBackButton(PageScope scope) {
     return IconButton(
       icon: const Icon(Icons.arrow_back_ios),
-      onPressed: () => vm.pop(),
+      onPressed: () => scope.ref.read(appRouterProvider).back(),
     );
   }
 
-  List<Widget> appBarActions(BuildContext context, WidgetRef ref) => const [];
+  List<Widget> appBarActions(PageScope scope) => const [];
 
-  PreferredSizeWidget? appBar(BuildContext context, WidgetRef ref, V vm) {
+  PreferredSizeWidget? appBar(PageScope scope) {
     if (!showAppBar) return null;
     return AppBar(
-      leading: buildBackButton(context, ref, vm),
+      leading: buildBackButton(scope),
       title: title.isNotEmpty ? Text(title) : null,
-      actions: appBarActions(context, ref),
-      systemOverlayStyle: systemOverlayStyle(context),
+      actions: appBarActions(scope),
+      systemOverlayStyle: systemOverlayStyle(scope.context),
     );
   }
 
@@ -84,8 +71,7 @@ abstract class BasePage<V extends BaseVM> extends ConsumerStatefulWidget {
   // Scaffold 元素
   // ===========================================================================
 
-  Widget? floatingActionButton(BuildContext context, WidgetRef ref, V vm) =>
-      null;
+  Widget? floatingActionButton(PageScope scope) => null;
   FloatingActionButtonLocation? get floatingActionButtonLocation => null;
   Widget? bottomNavigationBar(BuildContext context) => null;
 
@@ -97,12 +83,21 @@ abstract class BasePage<V extends BaseVM> extends ConsumerStatefulWidget {
   Future<bool> onPopInvoked(dynamic result) async => true;
 
   // ===========================================================================
+  // 生命周期
+  // ===========================================================================
+
+  void onPageReady(PageScope scope) {}
+  void onPageResume(PageScope scope) {}
+  void onPagePause(PageScope scope) {}
+  void onPageClose(PageScope scope) {}
+
+  // ===========================================================================
   // 其他
   // ===========================================================================
 
   bool get keepAlive => false;
 
-  void onBackgroundTap(BuildContext context, WidgetRef ref, V vm) {
+  void onBackgroundTap(PageScope scope) {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
@@ -111,18 +106,18 @@ abstract class BasePage<V extends BaseVM> extends ConsumerStatefulWidget {
   // ===========================================================================
 
   /// 页面外层结构，默认返回 Scaffold。
-  Widget wrap(BuildContext context, WidgetRef ref, V vm, Widget body) {
+  Widget wrap(PageScope scope, Widget body) {
     Widget child = Scaffold(
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-      appBar: appBar(context, ref, vm),
+      appBar: appBar(scope),
       body: body,
-      backgroundColor: backgroundColor(context),
-      floatingActionButton: floatingActionButton(context, ref, vm),
+      backgroundColor: backgroundColor(scope.context),
+      floatingActionButton: floatingActionButton(scope),
       floatingActionButtonLocation: floatingActionButtonLocation,
-      bottomNavigationBar: bottomNavigationBar(context),
+      bottomNavigationBar: bottomNavigationBar(scope.context),
     );
 
-    final bgWidgets = backgroundWidgets(context);
+    final bgWidgets = backgroundWidgets(scope.context);
     if (bgWidgets.isNotEmpty) {
       child = Stack(
         children: [
@@ -132,7 +127,7 @@ abstract class BasePage<V extends BaseVM> extends ConsumerStatefulWidget {
       );
     }
 
-    final overlay = systemOverlayStyle(context);
+    final overlay = systemOverlayStyle(scope.context);
     if (overlay != null) {
       child = AnnotatedRegion<SystemUiOverlayStyle>(
         value: overlay,
@@ -151,14 +146,14 @@ abstract class BasePage<V extends BaseVM> extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<BasePage<V>> createState() => _BasePageState<V>();
+  ConsumerState<BasePage> createState() => _BasePageState();
 }
 
-class _BasePageState<V extends BaseVM> extends ConsumerState<BasePage<V>>
+class _BasePageState extends ConsumerState<BasePage>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   bool _readyCalled = false;
   bool _paused = false;
-  V? _vm;
+  PageScope? _scope;
 
   @override
   bool get wantKeepAlive => widget.keepAlive;
@@ -169,38 +164,38 @@ class _BasePageState<V extends BaseVM> extends ConsumerState<BasePage<V>>
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _readyCalled) return;
+      final scope = _scope;
+      if (scope == null) return;
       _readyCalled = true;
-      final vm = _vm;
-      if (vm == null) return;
-      vm.onReady();
-      vm.onResume();
+      widget.onPageReady(scope);
+      widget.onPageResume(scope);
       _paused = false;
     });
   }
 
   @override
   void dispose() {
-    final vm = _vm;
-    if (vm != null) {
-      vm.onClose();
+    final scope = _scope;
+    if (scope != null) {
+      widget.onPageClose(scope);
       if (!_paused) {
-        vm.onPause();
+        widget.onPagePause(scope);
         _paused = true;
       }
     }
-    _vm = null;
+    _scope = null;
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final vm = _vm;
-    if (vm == null) return;
+    final scope = _scope;
+    if (scope == null) return;
     switch (state) {
       case AppLifecycleState.resumed:
         if (_paused) {
-          vm.onResume();
+          widget.onPageResume(scope);
           _paused = false;
         }
         break;
@@ -208,7 +203,7 @@ class _BasePageState<V extends BaseVM> extends ConsumerState<BasePage<V>>
       case AppLifecycleState.hidden:
       case AppLifecycleState.paused:
         if (!_paused) {
-          vm.onPause();
+          widget.onPagePause(scope);
           _paused = true;
         }
         break;
@@ -221,19 +216,14 @@ class _BasePageState<V extends BaseVM> extends ConsumerState<BasePage<V>>
   Widget build(BuildContext context) {
     super.build(context);
 
-    final state = widget.watchState(ref);
-    final vm = widget.notifier(ref);
-    _vm = vm;
+    final scope = PageScope(context: context, ref: ref);
+    _scope = scope;
 
-    final body = state.isReady
-        ? widget.page(context, ref, vm)
-        : widget.prePage(context);
-
-    Widget child = widget.wrap(context, ref, vm, body);
+    Widget child = widget.wrap(scope, widget.page(scope));
 
     child = GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTap: () => widget.onBackgroundTap(context, ref, vm),
+      onTap: () => widget.onBackgroundTap(scope),
       child: child,
     );
 
@@ -243,7 +233,7 @@ class _BasePageState<V extends BaseVM> extends ConsumerState<BasePage<V>>
         if (didPop) return;
         final ok = await widget.onPopInvoked(result);
         if (ok && mounted) {
-          vm.pop(result);
+          ref.read(appRouterProvider).back(result);
         }
       },
       child: child,

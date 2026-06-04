@@ -6,23 +6,13 @@ import '../../data/repositories/auth_repository_impl.dart';
 
 /// Auth 页面状态。
 class AuthState extends BaseState {
-  const AuthState({
-    super.isReady = true,
-    this.isLoading = false,
-    this.errorMessage,
-  });
+  const AuthState({this.isLoading = false, this.errorMessage});
 
   final bool isLoading;
   final String? errorMessage;
 
-  @override
-  AuthState copyWithBase({bool? isReady}) {
-    return copyWith(isReady: isReady);
-  }
-
-  AuthState copyWith({bool? isReady, bool? isLoading, String? errorMessage}) {
+  AuthState copyWith({bool? isLoading, String? errorMessage}) {
     return AuthState(
-      isReady: isReady ?? this.isReady,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
     );

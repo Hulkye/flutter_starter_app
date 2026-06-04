@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/theme.dart';
@@ -11,31 +10,28 @@ import '../../../../shared/widgets/sheet/common_confirm_sheet.dart';
 import '../../domain/entities/todo_item.dart';
 import '../viewmodels/todo_viewmodel.dart';
 
-final class TodoPage extends BasePage<TodoViewModel> {
+final class TodoPage extends BasePage {
   const TodoPage({super.key});
 
   @override
-  TodoViewModel notifier(WidgetRef ref) {
-    return ref.read(todoViewModelProvider.notifier);
+  void onPageReady(PageScope scope) {
+    scope.ref.read(todoViewModelProvider.notifier).loadTodos();
   }
 
   @override
-  BaseState watchState(WidgetRef ref) {
-    return ref.watch(todoViewModelProvider);
+  PreferredSizeWidget? appBar(PageScope scope) {
+    return AppBar(title: Text(scope.context.i18n.todoTitle));
   }
 
   @override
-  PreferredSizeWidget? appBar(
-    BuildContext context,
-    WidgetRef ref,
-    TodoViewModel vm,
-  ) {
-    return AppBar(title: Text(context.i18n.todoTitle));
-  }
+  Widget page(PageScope scope) {
+    final state = scope.ref.watch(todoViewModelProvider);
+    final vm = scope.ref.read(todoViewModelProvider.notifier);
 
-  @override
-  Widget page(BuildContext context, WidgetRef ref, TodoViewModel vm) {
-    final state = ref.watch(todoViewModelProvider);
+    if (!state.initialized) {
+      return ColoredBox(color: scope.context.appColor.backgroundPrimary);
+    }
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.w),
       child: Column(

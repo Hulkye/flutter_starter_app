@@ -2,7 +2,7 @@ import 'package:flutter_starter_app/app/app.dart';
 import 'package:flutter_starter_app/app/env.dart';
 import 'package:flutter_starter_app/core/di/di_overrides.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
-import 'package:flutter_starter_app/shared/presentation/base_feedback_binding.dart';
+import 'package:flutter_starter_app/shared/presentation/presentation_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,7 +12,7 @@ void main() {
     'App renders home page smoke test',
     (WidgetTester tester) async {
       SharedPreferences.setMockInitialValues({'app_locale_code': 'zh'});
-      bindBaseVmFeedbackHandlers();
+      bindPresentationHelper();
       await prefsStorage.init();
 
       appConfig = const EnvConfig();

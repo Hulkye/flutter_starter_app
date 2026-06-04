@@ -36,7 +36,7 @@ class AppBootstrap {
 
   static Future<AppBootstrap> create(EnvConfig env) async {
     WidgetsFlutterBinding.ensureInitialized();
-    bindBaseVmFeedbackHandlers();
+    bindPresentationHelper();
 
     // ── Phase 1: Pre-ProviderScope 异步初始化 ──
 

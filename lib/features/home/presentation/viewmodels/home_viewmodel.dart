@@ -5,23 +5,13 @@ import '../../data/repositories/home_repository_impl.dart';
 
 /// Home 页面状态。
 class HomeState extends BaseState {
-  const HomeState({
-    super.isReady = true,
-    this.requestResult = '',
-    this.requesting = false,
-  });
+  const HomeState({this.requestResult = '', this.requesting = false});
 
   final String requestResult;
   final bool requesting;
 
-  @override
-  HomeState copyWithBase({bool? isReady}) {
-    return copyWith(isReady: isReady);
-  }
-
-  HomeState copyWith({bool? isReady, String? requestResult, bool? requesting}) {
+  HomeState copyWith({String? requestResult, bool? requesting}) {
     return HomeState(
-      isReady: isReady ?? this.isReady,
       requestResult: requestResult ?? this.requestResult,
       requesting: requesting ?? this.requesting,
     );
@@ -43,7 +33,7 @@ final class HomeViewModel extends BaseVM<HomeState> {
         requesting: false,
       );
     } catch (e) {
-      emitHint(e.toString());
+      PresentationHelper.emitHint(e.toString());
       state = state.copyWith(requestResult: e.toString(), requesting: false);
     }
   }
