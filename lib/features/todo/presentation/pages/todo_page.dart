@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_starter_app/shared/widgets/input/base_text_field.dart';
 
 import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../core/util/screen_util.dart';
 import '../../../../shared/presentation/presentation.dart';
 import '../../../../shared/widgets/button/primary_round_button.dart';
-import '../../../../shared/widgets/input/input_text_widget.dart';
 import '../../../../shared/widgets/sheet/common_confirm_sheet.dart';
 import '../../domain/entities/todo_item.dart';
 import '../viewmodels/todo_viewmodel.dart';
@@ -114,7 +114,7 @@ final class _TodoInputCardState extends State<_TodoInputCard> {
               ),
             ),
             SizedBox(height: 12.w),
-            AppTextField(
+            BaseTextField(
               controller: _controller,
               hintText: context.i18n.todoInputHint,
               onChanged: vm.updateDraft,

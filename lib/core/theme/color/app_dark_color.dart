@@ -73,7 +73,7 @@ class AppDarkColor extends AppColor {
     super.iconOnFourth = const Color(0x33FFFFFF),
 
     /// 一级背景（实色/不透明色）
-    super.backgroundPrimary = const Color(0xFFE5E5E5),
+    super.backgroundPrimary = const Color(0xFF000000),
 
     /// 二级背景（实色/不透明色）
     super.backgroundSecondary = const Color(0xFF191A1C),

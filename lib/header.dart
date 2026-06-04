@@ -25,7 +25,7 @@ export 'shared/widgets/button/primary_round_button.dart';
 export 'shared/widgets/button/round_button.dart';
 export 'shared/widgets/button/sheet_btns.dart';
 export 'shared/widgets/image_view/image_view.dart';
-export 'shared/widgets/input/input_text_widget.dart';
+export 'shared/widgets/input/input_widget.dart';
 export 'shared/widgets/sheet/auto_height_sheet.dart';
 export 'shared/widgets/sheet/auto_height_sheet_view.dart';
 export 'shared/widgets/sheet/common_confirm_sheet.dart';

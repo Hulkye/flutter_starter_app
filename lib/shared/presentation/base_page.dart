@@ -67,13 +67,27 @@ abstract class BasePage extends ConsumerStatefulWidget {
   bool get safeAreaBottom => false;
   bool get maintainBottomViewPadding => false;
 
+  Widget addSafeArea(
+    Widget child, {
+    bool top = false,
+    bool bottom = false,
+    bool maintainBottomViewPadding = false,
+  }) {
+    return SafeArea(
+      top: top,
+      bottom: bottom,
+      maintainBottomViewPadding: maintainBottomViewPadding,
+      child: child,
+    );
+  }
+
   // ===========================================================================
   // Scaffold 元素
   // ===========================================================================
 
   Widget? floatingActionButton(PageScope scope) => null;
   FloatingActionButtonLocation? get floatingActionButtonLocation => null;
-  Widget? bottomNavigationBar(BuildContext context) => null;
+  Widget? bottomNavigationBar(PageScope scope) => null;
 
   // ===========================================================================
   // 返回拦截
@@ -114,7 +128,7 @@ abstract class BasePage extends ConsumerStatefulWidget {
       backgroundColor: backgroundColor(scope.context),
       floatingActionButton: floatingActionButton(scope),
       floatingActionButtonLocation: floatingActionButtonLocation,
-      bottomNavigationBar: bottomNavigationBar(scope.context),
+      bottomNavigationBar: bottomNavigationBar(scope),
     );
 
     final bgWidgets = backgroundWidgets(scope.context);
@@ -135,11 +149,11 @@ abstract class BasePage extends ConsumerStatefulWidget {
       );
     }
 
-    child = SafeArea(
+    child = addSafeArea(
+      child,
       top: safeAreaTop,
       bottom: safeAreaBottom,
       maintainBottomViewPadding: maintainBottomViewPadding,
-      child: child,
     );
 
     return child;
