@@ -28,10 +28,18 @@ abstract class BasePage extends ConsumerStatefulWidget {
   // ===========================================================================
 
   bool get showAppBar => true;
+
   String get title => '';
+
   Color backgroundColor(BuildContext context) =>
       context.appColor.backgroundPrimary;
+
   bool? get resizeToAvoidBottomInset => null;
+
+  Color appBarBgColor(BuildContext context) =>
+      context.appColor.backgroundPrimary;
+
+  Color appBarTitleColor(BuildContext context) => context.appColor.fontPrimary;
 
   // ===========================================================================
   // AppBar
@@ -50,9 +58,21 @@ abstract class BasePage extends ConsumerStatefulWidget {
     if (!showAppBar) return null;
     return AppBar(
       leading: buildBackButton(scope),
-      title: title.isNotEmpty ? Text(title) : null,
+      title: createTitleWidget(scope),
+      backgroundColor: appBarBgColor(scope.context),
       actions: appBarActions(scope),
       systemOverlayStyle: systemOverlayStyle(scope.context),
+    );
+  }
+
+  Widget createTitleWidget(PageScope scope, [String? titleStr]) {
+    return Text(
+      titleStr ?? title,
+      style: TextStyle(
+        fontSize: 17.sp,
+        color: appBarTitleColor(scope.context),
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 
