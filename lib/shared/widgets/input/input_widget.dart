@@ -220,7 +220,7 @@ class InputWidgetState<T extends InputWidget> extends State<T> {
       child: child,
     );
     return Visibility(
-      visible: visible,
+      visible: visible && focusNode.hasFocus,
       maintainState: true,
       maintainSize: true,
       maintainAnimation: true,
