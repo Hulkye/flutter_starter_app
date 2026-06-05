@@ -84,3 +84,16 @@ app_release_packages/
 .cursor/
 .claude/
 example_app/
+
+
+# START Ruler Generated Files
+/.claude/skills
+/.codex/config.toml
+/.codex/config.toml.bak
+/.codex/skills
+/.cursor/skills
+/AGENTS.md
+/AGENTS.md.bak
+/CLAUDE.md
+/CLAUDE.md.bak
+# END Ruler Generated Files
