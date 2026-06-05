@@ -41,6 +41,9 @@ abstract class BasePage extends ConsumerStatefulWidget {
 
   Color appBarTitleColor(BuildContext context) => context.appColor.fontPrimary;
 
+  Color appBarBackButtonColor(BuildContext context) =>
+      context.appColor.fontPrimary;
+
   // ===========================================================================
   // AppBar
   // ===========================================================================
@@ -48,6 +51,7 @@ abstract class BasePage extends ConsumerStatefulWidget {
   Widget? buildBackButton(PageScope scope) {
     return IconButton(
       icon: const Icon(Icons.arrow_back_ios),
+      color: appBarBackButtonColor(scope.context),
       onPressed: () => scope.ref.read(appRouterProvider).back(),
     );
   }
@@ -59,9 +63,12 @@ abstract class BasePage extends ConsumerStatefulWidget {
     return AppBar(
       leading: buildBackButton(scope),
       title: createTitleWidget(scope),
+      centerTitle: true,
       backgroundColor: appBarBgColor(scope.context),
       actions: appBarActions(scope),
+      toolbarHeight: ScreenUtil.appBarHeight,
       systemOverlayStyle: systemOverlayStyle(scope.context),
+      scrolledUnderElevation: 0,
     );
   }
 
