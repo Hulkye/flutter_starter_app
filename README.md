@@ -110,6 +110,7 @@ lib/
 │   ├── constant/                  # 常量
 │   ├── di/                        # AppBootstrap / Provider overrides
 │   ├── exception/                 # 全局异常捕获
+│   ├── feature/                   # AppFeature 模块协议
 │   ├── l10n/                      # 国际化
 │   ├── network/                   # 网络、连接状态、HTTP 客户端
 │   ├── router/                    # GoRouter 封装、守卫、导航抽象
@@ -118,6 +119,7 @@ lib/
 │   ├── theme/                     # 主题、色值、主题资源
 │   └── util/                      # 工具类
 ├── features/                      # 业务功能模块
+│   ├── features.dart              # Feature 汇聚与业务路由统一导出
 │   ├── auth/                      # 登录示例
 │   ├── home/                      # 首页示例
 │   ├── profile/                   # 个人中心示例
@@ -137,6 +139,7 @@ lib/
 
 ```text
 lib/features/<feature>/
+├── <feature>_feature.dart          # Feature 声明与路由导出
 ├── data/
 │   ├── datasources/               # 远程/本地数据源
 │   └── repositories/              # Repository 实现
@@ -332,13 +335,15 @@ noCache · cacheFirst · networkFirst · cacheOnly · networkOnly · staleWhileR
 
 ```text
 Feature Route Define → AppRouteDefine → GoRoute
+Feature Module       → AppFeature      → appFeatureRoutes
 Page Navigation       → BaseNavigator  → RouterNavigator
 ```
 
 特点：
 
 - 每个 Feature 自己维护路由定义
-- 根路由集中注册
+- 每个 Feature 通过 `XxxFeature` 暴露模块路由
+- `features/features.dart` 汇聚所有 Feature，并统一导出业务 Route class
 - 支持公开路由与登录态路由
 - 未登录访问受保护页面时自动跳转登录页
 - 提供 root navigator key，支持非 UI 场景导航
@@ -435,12 +440,14 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 5. 在 `presentation/viewmodels` 中继承 `BaseVM` 管理 UI 状态与业务动作。
 6. 在 `presentation/pages` 中继承 `BasePage` 编写 UI，并在 `page(scope)` 中读取状态、调用 ViewModel。
 7. 在 `<feature>_routes.dart` 中声明路由。
-8. 将 Feature 路由注册到根路由列表。
+8. 在 `<feature>_feature.dart` 中继承 `AppFeature` 并暴露路由。
+9. 在 `features/features.dart` 中注册 `XxxFeature()`，并导出该 Feature。
 
 推荐最小结构：
 
 ```text
 lib/features/order/
+├── order_feature.dart
 ├── data/
 │   ├── datasources/order_datasource.dart
 │   └── repositories/order_repository_impl.dart

@@ -17,6 +17,7 @@ export 'core/theme/theme.dart';
 export 'core/util/image_util.dart';
 export 'core/util/permission_util.dart';
 export 'core/util/screen_util.dart';
+export 'features/features.dart';
 export 'shared/presentation/presentation.dart';
 export 'shared/services/auth/auth.dart';
 export 'shared/widgets/button/countdown_button.dart';

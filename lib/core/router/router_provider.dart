@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/auth/presentation/auth_routes.dart';
-import '../../features/home/presentation/home_routes.dart';
-import '../../features/profile/presentation/profile_routes.dart';
-import '../../features/todo/presentation/todo_routes.dart';
+import '../../features/features.dart';
 import '../../shared/services/auth/auth.dart';
 import '../../shared/widgets/toast/toast_util.dart';
 import 'app_route_define.dart';
@@ -15,20 +12,11 @@ import 'router_guard.dart';
 import 'router_navigator.dart';
 
 // =============================================================================
-// 路由注册表 —— 新增 Feature 时在这里添加一行
+// 路由注册表 —— 由各 Feature 汇聚生成
 // =============================================================================
 
-/// 所有 Feature 的路由定义集中注册。
-///
-/// 新增路由步骤：
-/// 1. 创建 `XxxRoute extends AppRouteDefine`
-/// 2. 在此列表中添加 `XxxRoute()`
-final List<AppRouteDefine> _allRoutes = [
-  HomeRoute(),
-  ProfileRoute(),
-  LoginRoute(),
-  TodoRoute(),
-];
+/// 所有 Feature 的路由定义。
+final List<AppRouteDefine> _allRoutes = appFeatureRoutes;
 
 // =============================================================================
 // Provider

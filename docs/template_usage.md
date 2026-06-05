@@ -161,6 +161,7 @@ await Application.run(
 
 ```text
 lib/features/todo/
+├── todo_feature.dart
 ├── data/
 │   ├── datasources/todo_local_datasource.dart
 │   └── repositories/todo_repository_impl.dart
@@ -179,6 +180,7 @@ lib/features/todo/
 
 ```text
 lib/features/order/
+├── order_feature.dart
 ├── data/
 │   ├── datasources/order_datasource.dart
 │   └── repositories/order_repository_impl.dart
@@ -250,30 +252,53 @@ final class OrderRoute extends AppRouteDefine {
 | `true` | 公开页面，未登录也可以访问 |
 | `false` | 受保护页面，未登录会跳转到登录页 |
 
-### 2. 注册到根路由表
+### 2. 在 Feature 中暴露路由
 
-打开 `lib/core/router/router_provider.dart`：
+新增 `lib/features/order/order_feature.dart`：
 
 ```dart
-final List<AppRouteDefine> _allRoutes = [
-  HomeRoute(),
-  ProfileRoute(),
-  LoginRoute(),
-  OrderRoute(),
+import '../../core/feature/app_feature.dart';
+import '../../core/router/app_route_define.dart';
+import 'presentation/order_routes.dart';
+
+export 'presentation/order_routes.dart';
+
+final class OrderFeature extends AppFeature {
+  const OrderFeature();
+
+  @override
+  String get name => 'order';
+
+  @override
+  List<AppRouteDefine> get routes => const [OrderRoute()];
+}
+```
+
+### 3. 注册到 Feature 汇聚入口
+
+打开 `lib/features/features.dart`，补充 import、export 与 `appFeatures` 注册项：
+
+```dart
+import 'order/order_feature.dart';
+
+export 'order/order_feature.dart';
+
+const List<AppFeature> appFeatures = [
+  HomeFeature(),
+  AuthFeature(),
+  ProfileFeature(),
+  TodoFeature(),
+  OrderFeature(),
 ];
 ```
 
-同时补充 import：
-
-```dart
-import '../../features/order/presentation/order_routes.dart';
-```
-
-### 3. 在页面中导航
+### 4. 在页面中导航
 
 Presentation/Page 层建议依赖 `BaseNavigator` 抽象，并传入 route 的 `location`，而不是直接依赖 GoRouter：
 
 ```dart
+import 'package:flutter_starter_app/header.dart';
+
 ref.read(appRouterProvider).push(const OrderRoute().location);
 ```
 

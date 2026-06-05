@@ -162,14 +162,14 @@ redirect: (context, state) {
 
 ## 新增路由
 
-只需两步：
+新增业务页面时，由 Feature 自己声明路由，再通过 `AppFeature` 暴露给 App 汇聚入口。
 
 **1. 创建路由类：**
 
 ```dart
-// lib/features/settings/settings_routes.dart
+// lib/features/settings/presentation/settings_routes.dart
 import 'package:flutter/widgets.dart';
-import '../../core/router/app_route_define.dart';
+import '../../../core/router/app_route_define.dart';
 
 final class SettingsRoute extends AppRouteDefine {
   const SettingsRoute();
@@ -182,20 +182,49 @@ final class SettingsRoute extends AppRouteDefine {
 }
 ```
 
-**2. 注册到路由表：**
+**2. 创建 Feature 声明：**
 
 ```dart
-// lib/core/router/router_provider.dart
-final List<AppRouteDefine> _allRoutes = [
-  HomeRoute(),
-  ProfileRoute(),
-  SettingsRoute(),  // ← 添加一行
+// lib/features/settings/settings_feature.dart
+import '../../core/feature/app_feature.dart';
+import '../../core/router/app_route_define.dart';
+import 'presentation/settings_routes.dart';
+
+export 'presentation/settings_routes.dart';
+
+final class SettingsFeature extends AppFeature {
+  const SettingsFeature();
+
+  @override
+  String get name => 'settings';
+
+  @override
+  List<AppRouteDefine> get routes => const [SettingsRoute()];
+}
+```
+
+**3. 注册到 Feature 汇聚入口：**
+
+```dart
+// lib/features/features.dart
+import 'settings/settings_feature.dart';
+
+export 'settings/settings_feature.dart';
+
+const List<AppFeature> appFeatures = [
+  HomeFeature(),
+  AuthFeature(),
+  ProfileFeature(),
+  TodoFeature(),
+  SettingsFeature(),
 ];
 ```
 
 完成。业务代码即可导航：
 
 ```dart
+import 'package:flutter_starter_app/header.dart';
+
 ref.read(appRouterProvider).go(const SettingsRoute().location);
 ```
 
@@ -204,6 +233,7 @@ ref.read(appRouterProvider).go(const SettingsRoute().location);
 - **业务层不 import `go_router`** — 通过 `AppRouteDefine` + `BaseNavigator` 解耦
 - **一个 Route class 表达一个路由** — 导航目标 + 页面构建合并在一个对象中，不再分离
 - **RouterNavigator 是唯一调用 GoRouter 导航 API 的类** — 切换路由框架只需重写此类
-- **路由注册表集中管理** — `_allRoutes` 是唯一真相源
+- **Feature 负责暴露路由** — 每个 `XxxFeature` 维护自己的路由列表
+- **Feature 汇聚入口集中管理** — `features/features.dart` 是业务 Feature 注册与路由导出的统一入口
 - **Provider 而非单例** — `goRouterProvider` / `appRouterProvider` 通过 Riverpod 注入，测试可用 `ProviderScope.overrides` 替换
 - **`router.dart` 是对外唯一入口** — 业务代码只 import 这一个文件

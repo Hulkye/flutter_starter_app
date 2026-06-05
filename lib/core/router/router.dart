@@ -24,7 +24,8 @@
 /// ## 新增路由步骤
 ///
 /// 1. `features/xxx/xxx_routes.dart` — 创建 `XxxRoute extends AppRouteDefine`
-/// 2. `router_provider.dart` — 在 `_allRoutes` 列表中添加一行
+/// 2. `features/xxx/xxx_feature.dart` — 创建 `XxxFeature extends AppFeature`
+/// 3. `features/features.dart` — 注册 `XxxFeature()` 并导出该 Feature
 library;
 
 export 'base_navigator.dart';
