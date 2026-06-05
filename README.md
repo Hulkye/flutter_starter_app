@@ -24,12 +24,15 @@
 > 📘 第一次使用模板请先阅读：[模板使用说明](docs/template_usage.md)。
 >
 > 🧪 测试与质量门禁请查看：[测试与质量保障](docs/testing_quality.md)。
+>
+> 🤖 AI 指令统一管理请查看：[Ruler AI 指令管理](docs/ruler_usage.md)。
 
 ## 📚 目录
 
 - [核心优势](#-核心优势)
 - [模板使用说明](docs/template_usage.md)
 - [测试与质量保障](docs/testing_quality.md)
+- [Ruler AI 指令管理](docs/ruler_usage.md)
 - [快速开始](#-快速开始)
 - [项目结构](#-项目结构)
 - [架构设计](#-架构设计)
@@ -134,6 +137,23 @@ lib/
 ├── main_prod.dart                 # 生产环境入口
 └── main.dart                      # 默认入口
 ```
+
+项目根目录还包含 AI 指令管理源文件：
+
+```text
+.ruler/                            # Ruler AI 指令源文件，需纳入版本控制
+├── AGENTS.md                      # 项目 AI 指令总入口
+├── ruler.toml                     # Ruler 配置
+├── architecture.md                # 架构规则
+├── flutter_conventions.md         # Flutter / Dart 约定
+├── routing.md                     # 路由规则
+├── state_management.md            # 状态管理规则
+├── testing.md                     # 测试与质量规则
+├── documentation.md               # 文档维护规则
+└── skills/                        # 可分发给 AI 工具的项目技能
+```
+
+Ruler 生成的 `AGENTS.md`、`CLAUDE.md`、`.claude/skills/`、`.cursor/skills/`、`.codex/` 等文件由 `.gitignore` 忽略，不应手动修改或提交。详见 [Ruler AI 指令管理](docs/ruler_usage.md)。
 
 单个 Feature 推荐结构：
 
@@ -474,6 +494,17 @@ lib/features/order/
 2. 在 Feature 的 DataSource 中替换接口路径。
 3. 在 RepositoryImpl 中完成响应数据到业务实体的转换。
 4. 在 ViewModel 中调用 Repository 并更新状态。
+
+### 🤖 维护 AI 指令
+
+本项目使用 Ruler 统一管理 Copilot、Cursor、Claude Code、Codex 等 AI Coding Assistant 指令。
+
+- 指令源文件统一维护在 `.ruler/`。
+- 不手动修改 Ruler 生成的 `AGENTS.md`、`CLAUDE.md`、`.claude/skills/`、`.cursor/skills/`、`.codex/` 等文件。
+- 修改 `.ruler/` 后，先运行 `ruler apply --dry-run --verbose` 预览，再运行 `ruler apply`。
+- 提交时包含 `.ruler/` 与 `.gitignore` 的变更，不提交生成文件。
+
+详细说明见：[Ruler AI 指令管理](docs/ruler_usage.md)。
 
 ---
 
