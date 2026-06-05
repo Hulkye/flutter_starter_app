@@ -411,13 +411,15 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 | 组件 | 用途 |
 | --- | --- |
 | Toast / Loading | 全局轻提示、加载态 |
-| Dialog / Sheet | 通用弹窗、确认面板 |
+| Dialog / Sheet | 通用弹窗、确认面板、选择面板与业务选择面板 |
 | RefreshView | 下拉刷新、上拉加载 |
 | PrimaryRoundButton | 主按钮 |
 | CountdownRoundButton | 验证码倒计时按钮 |
 | InputTextWidget | 输入框 |
 | ImageView | 本地、网络、SVG、Base64 图片展示 |
 | SwitchWidget | 开关组件 |
+| BaseCard | 基础卡片容器 |
+| LabelRow | 标签行、箭头行、开关行 |
 | ContextMenu / Overlay | 浮层与菜单能力 |
 
 ---

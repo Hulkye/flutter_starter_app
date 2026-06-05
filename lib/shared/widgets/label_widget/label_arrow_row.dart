@@ -1,5 +1,4 @@
 import 'package:flutter_starter_app/header.dart';
-import 'package:flutter_starter_app/shared/widgets/label_widget/label_row.dart';
 
 typedef LabelRowValueBuilder = Widget Function();
 typedef LabelRowDescBuilder = Widget Function();

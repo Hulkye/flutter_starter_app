@@ -154,7 +154,7 @@ redirect: (context, state) {
   final isPublic = _allRoutes.any((r) => r.public && r.path == currentPath);
   if (isPublic) return null;
   if (AuthSessionStore.instance.hasValidSession) return null;
-  return const HomeRoute().location;
+  return const LoginRoute().location;
 },
 ```
 
