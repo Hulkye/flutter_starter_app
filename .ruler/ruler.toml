@@ -1,0 +1,38 @@
+# 当前项目使用 Ruler 统一管理 AI Coding Assistant 指令。
+# 人工维护 .ruler/ 下的源文件；由 ruler apply 生成各工具目标文件。
+
+default_agents = ["copilot", "cursor", "claude", "codex", "agentsmd"]
+nested = false
+
+[mcp]
+enabled = false
+merge_strategy = "merge"
+
+[gitignore]
+enabled = true
+local = false
+
+[backup]
+enabled = true
+
+[skills]
+enabled = true
+
+# Ruler 的原生 subagents 传播仍是实验能力，当前项目暂不启用。
+[agents]
+enabled = false
+
+[agents.copilot]
+enabled = true
+
+[agents.cursor]
+enabled = true
+
+[agents.claude]
+enabled = true
+
+[agents.codex]
+enabled = true
+
+[agents.agentsmd]
+enabled = true
