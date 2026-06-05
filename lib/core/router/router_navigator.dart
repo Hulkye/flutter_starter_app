@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 
 import 'base_navigator.dart';
-import 'app_route_define.dart';
 
 /// [BaseNavigator] 的 GoRouter 实现。
 ///
@@ -12,23 +11,23 @@ final class RouterNavigator implements BaseNavigator {
   final GoRouter _router;
 
   @override
-  void go(AppRouteDefine route) {
-    _router.go(route.location);
+  void go(String location) {
+    _router.go(location);
   }
 
   @override
-  Future<T?> push<T extends Object?>(AppRouteDefine route) {
-    return _router.push<T>(route.location);
+  Future<T?> push<T extends Object?>(String location) {
+    return _router.push<T>(location);
   }
 
   @override
-  void replace(AppRouteDefine route) {
-    _router.replace(route.location);
+  void replace(String location) {
+    _router.replace(location);
   }
 
   @override
-  void replaceAll(AppRouteDefine route) {
-    _router.go(route.location);
+  void replaceAll(String location) {
+    _router.go(location);
   }
 
   @override

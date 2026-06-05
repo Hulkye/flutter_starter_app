@@ -34,15 +34,15 @@ class RouteState {
 
 /// 应用路由定义。
 ///
-/// 一个 [AppRouteDefine] 同时承担两种职责：
-/// 1. **导航目标** — 业务代码用它表达"我要去哪"
-/// 2. **注册描述** — Infrastructure 层通过 [toGoRoute] 将其转为 GoRoute
+/// [AppRouteDefine] 描述路由注册信息，也可以作为类型安全的 location helper。
+/// 真正的导航接口接收 location 字符串，方便深链入口直接复用同一套协议。
 ///
 /// ## 使用
 ///
 /// ```dart
 /// // 导航
-/// ref.read(appRouterProvider).push(const ProfileRoute());
+/// ref.read(appRouterProvider).push(const ProfileRoute().location);
+/// ref.read(appRouterProvider).go('/profile/42?tab=posts');
 ///
 /// // 路由注册（在 router_provider.dart 中集中管理）
 /// final List<AppRouteDefine> _allRoutes = [

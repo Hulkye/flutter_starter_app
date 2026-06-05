@@ -328,11 +328,11 @@ noCache · cacheFirst · networkFirst · cacheOnly · networkOnly · staleWhileR
 
 ### 🧭 路由系统
 
-路由基于 GoRouter，但业务层通过模板封装的路由定义与导航抽象使用，减少对第三方路由库的直接依赖。
+路由基于 GoRouter，但 Presentation/Page 层通过模板封装的路由定义与导航抽象使用，减少对第三方路由库的直接依赖。
 
 ```text
 Feature Route Define → AppRouteDefine → GoRoute
-Business Navigation  → BaseNavigator  → RouterNavigator
+Page Navigation       → BaseNavigator  → RouterNavigator
 ```
 
 特点：

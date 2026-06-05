@@ -269,12 +269,12 @@ final List<AppRouteDefine> _allRoutes = [
 import '../../features/order/presentation/order_routes.dart';
 ```
 
-### 3. 在业务代码中导航
+### 3. 在页面中导航
 
-业务层建议依赖 `BaseNavigator` 抽象，而不是直接依赖 GoRouter：
+Presentation/Page 层建议依赖 `BaseNavigator` 抽象，并传入 route 的 `location`，而不是直接依赖 GoRouter：
 
 ```dart
-ref.read(appRouterProvider).push(const OrderRoute());
+ref.read(appRouterProvider).push(const OrderRoute().location);
 ```
 
 ---

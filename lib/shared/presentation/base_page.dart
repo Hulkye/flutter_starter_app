@@ -29,7 +29,7 @@ abstract class BasePage extends ConsumerStatefulWidget {
 
   bool get showAppBar => true;
 
-  String get title => '';
+  String title(BuildContext context) => '';
 
   Color backgroundColor(BuildContext context) =>
       context.appColor.backgroundPrimary;
@@ -67,7 +67,7 @@ abstract class BasePage extends ConsumerStatefulWidget {
 
   Widget createTitleWidget(PageScope scope, [String? titleStr]) {
     return Text(
-      titleStr ?? title,
+      titleStr ?? title(scope.context),
       style: TextStyle(
         fontSize: 17.sp,
         color: appBarTitleColor(scope.context),

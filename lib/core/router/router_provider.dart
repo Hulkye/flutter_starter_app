@@ -60,7 +60,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
 /// 导航接口 Provider。
 ///
-/// 业务层依赖此 Provider 执行导航，不直接引用 [GoRouter]。
+/// Presentation/Page 层依赖此 Provider 执行导航，不直接引用 [GoRouter]。
 final appRouterProvider = Provider<BaseNavigator>((ref) {
   return RouterNavigator(ref.watch(goRouterProvider));
 });

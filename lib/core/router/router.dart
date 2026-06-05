@@ -5,7 +5,7 @@
 /// ```
 /// 业务层                               Infrastructure 层
 /// ═══════                             ═════════════════
-/// AppRouteDefine (导航目标 + 注册描述)    GoRoute (配置)
+/// AppRouteDefine (注册描述 + location helper)   GoRoute (配置)
 /// RouteState (路由状态)           ──→    GoRouterState
 ///
 /// BaseNavigator (导航接口)       ──→    RouterNavigator (GoRouter 实现)
@@ -15,18 +15,16 @@
 /// ## 导航方式
 ///
 /// ```dart
-/// // Widget / ViewModel 中
-/// ref.read(appRouterProvider).push(const ProfileRoute());
+/// // Widget / Page 中
+/// ref.read(appRouterProvider).push(const ProfileRoute().location);
+/// ref.read(appRouterProvider).go('/profile/42?tab=posts');
 /// ref.read(appRouterProvider).back();
-///
-/// // Controller 中（无 BuildContext）
-/// rootNavigatorKey.currentState?.pop();
 /// ```
 ///
 /// ## 新增路由步骤
 ///
-/// 1. `features/xxx/xxx_routes.dart` — 创建 `XxxRoute` + `xxxRouteDefinition`
-/// 2. `router_provider.dart` — 在 `_allRouteDefinitions` 列表中添加一行
+/// 1. `features/xxx/xxx_routes.dart` — 创建 `XxxRoute extends AppRouteDefine`
+/// 2. `router_provider.dart` — 在 `_allRoutes` 列表中添加一行
 library;
 
 export 'base_navigator.dart';

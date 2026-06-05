@@ -18,11 +18,11 @@
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  业务层 (Presentation / ViewModel)                        │
+│  Presentation / Page                                    │
 │                                                          │
 │  import 'router.dart'  ← 唯一依赖                          │
 │                                                          │
-│  ref.read(appRouterProvider).push(const ProfileRoute()); │
+│  ref.read(appRouterProvider).push(const ProfileRoute().location); │
 │  ref.read(appRouterProvider).back();                     │
 └────────────────────────┬─────────────────────────────────┘
                          │
@@ -85,16 +85,16 @@ GoRouterState 的中立替代。Feature 路由定义的 `buildPage` 只接触这
 
 ```dart
 abstract interface class BaseNavigator {
-  void go(AppRouteDefine route);
-  Future<T?> push<T extends Object?>(AppRouteDefine route);
-  void replace(AppRouteDefine route);
-  void replaceAll(AppRouteDefine route);
+  void go(String location);
+  Future<T?> push<T extends Object?>(String location);
+  void replace(String location);
+  void replaceAll(String location);
   void back<T extends Object?>([T? result]);
   bool canBack();
 }
 ```
 
-业务层依赖这个接口，而非具体实现。测试时可直接 mock。
+Presentation 层依赖这个接口，而非具体 GoRouter 实现。接口接收 location 字符串，`AppRouteDefine` 负责提供类型化的 `location` helper，测试时可直接 mock `BaseNavigator`。
 
 ## 使用方式
 
@@ -109,7 +109,7 @@ Consumer(
   builder: (context, ref, _) {
     return ElevatedButton(
       onPressed: () {
-        ref.read(appRouterProvider).push(const ProfileRoute());
+        ref.read(appRouterProvider).push(const ProfileRoute().location);
       },
       child: const Text('Go to Profile'),
     );
@@ -142,7 +142,7 @@ final class ProfileDetailRoute extends AppRouteDefine {
 }
 
 // 导航
-ref.read(appRouterProvider).push(ProfileDetailRoute(userId: '42'));
+ref.read(appRouterProvider).push(ProfileDetailRoute(userId: '42').location);
 ```
 
 ### 认证守卫
@@ -196,7 +196,7 @@ final List<AppRouteDefine> _allRoutes = [
 完成。业务代码即可导航：
 
 ```dart
-ref.read(appRouterProvider).go(const SettingsRoute());
+ref.read(appRouterProvider).go(const SettingsRoute().location);
 ```
 
 ## 设计原则

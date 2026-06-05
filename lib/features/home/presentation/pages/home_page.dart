@@ -82,14 +82,14 @@ class HomePage extends BasePage {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              ref.read(appRouterProvider).push(const ProfileRoute());
+              ref.read(appRouterProvider).push(const ProfileRoute().location);
             },
             child: Text(context.i18n.goToProfile),
           ),
           const SizedBox(height: 12),
           ElevatedButton(
             onPressed: () {
-              ref.read(appRouterProvider).push(const TodoRoute());
+              ref.read(appRouterProvider).push(const TodoRoute().location);
             },
             child: Text(context.i18n.goToTodo),
           ),
