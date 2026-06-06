@@ -84,6 +84,7 @@ app_release_packages/
 .cursor/
 .claude/
 example_app/
+.ruler/local_profile.md
 
 
 # START Ruler Generated Files
