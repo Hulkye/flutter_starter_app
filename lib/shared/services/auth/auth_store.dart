@@ -31,6 +31,13 @@ class AuthStore {
   String? get token => _current?.token;
   String? get bearerToken => _current?.bearerToken;
 
+  /// 仅更新内存会话，不写入持久化存储。
+  ///
+  /// 主要用于 Widget 测试或外部已完成持久化的高级场景。
+  void setMemorySession(AuthSession? session) {
+    _current = session?.isValid == true ? session : null;
+  }
+
   // ---- 持久化操作 ----
 
   /// 从安全存储恢复会话。

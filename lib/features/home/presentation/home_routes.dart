@@ -11,9 +11,6 @@ final class HomeRoute extends AppRouteDefine {
   String get path => '/';
 
   @override
-  bool get public => true;
-
-  @override
   Widget buildPage(BuildContext context, RouteState state) {
     return const HomePage();
   }

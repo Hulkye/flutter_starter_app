@@ -6,13 +6,27 @@ import '../../data/repositories/auth_repository_impl.dart';
 
 /// Auth 页面状态。
 class AuthState extends BaseState {
-  const AuthState({this.isLoading = false, this.errorMessage});
+  const AuthState({
+    this.account = '',
+    this.password = '',
+    this.isLoading = false,
+    this.errorMessage,
+  });
 
+  final String account;
+  final String password;
   final bool isLoading;
   final String? errorMessage;
 
-  AuthState copyWith({bool? isLoading, String? errorMessage}) {
+  AuthState copyWith({
+    String? account,
+    String? password,
+    bool? isLoading,
+    String? errorMessage,
+  }) {
     return AuthState(
+      account: account ?? this.account,
+      password: password ?? this.password,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
     );
@@ -23,6 +37,14 @@ class AuthState extends BaseState {
 final class AuthViewModel extends BaseVM<AuthState> {
   @override
   AuthState initialState() => const AuthState();
+
+  void updateAccount(String? account) {
+    state = state.copyWith(account: account?.trim() ?? '');
+  }
+
+  void updatePassword(String? password) {
+    state = state.copyWith(password: password ?? '');
+  }
 
   Future<void> login(String username, String password) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
