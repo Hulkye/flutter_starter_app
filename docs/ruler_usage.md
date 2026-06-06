@@ -98,6 +98,25 @@ git status --short --ignored
 - 提交时包含 `.ruler/` 源文件与 `.gitignore` 的 Ruler 管理块。
 - 不提交 Ruler 生成文件。
 
+## 🏗 基建变更后的规则复盘
+
+当项目基建能力发生变化时，需要判断是否同步优化 Ruler 规则，避免 AI 指令与真实工程实践不一致。
+
+典型场景包括：
+
+- 调整项目目录结构、Feature 组织方式或分层边界。
+- 修改路由、状态管理、依赖注入、网络、存储、权限、国际化等基础能力。
+- 修改测试命令、质量门禁、CI 流程或代码生成流程。
+- 修改公共导出入口、资源规范、脚本工具或模板初始化流程。
+- 修改 Ruler 生成文件策略、支持的 AI 工具或 `.gitignore` 管理方式。
+
+判断方式：
+
+1. 先确认本次基建变更是否会影响 AI 后续写代码、建目录、跑命令或更新文档的方式。
+2. 如有影响，优先更新 `.ruler/` 中对应源文件，例如 `architecture.md`、`routing.md`、`testing.md`、`documentation.md` 或相关 Skill。
+3. 更新后运行 `ruler apply --dry-run --verbose` 预览，再运行 `ruler apply` 同步生成文件。
+4. 最后检查文档是否也需要同步更新，例如 `README.md`、`docs/template_usage.md` 或本说明文档。
+
 ## 🧾 任务完成输出约定
 
 AI 完成一次用户任务后，应基于当前实际变动文件给出一条建议的 git commit 文本，便于开发者直接参考。

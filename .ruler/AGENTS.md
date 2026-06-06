@@ -12,6 +12,7 @@
 - 业务页面导航优先使用 `package:flutter_starter_app/header.dart` 中统一导出的路由与 `appRouterProvider`。
 - 修改代码后优先运行 `flutter analyze`；涉及测试逻辑时补充或运行 `flutter test`。
 - 修改项目结构、路由机制、模板用法、资源规范或公共组件后，同步检查并更新相关文档。
+- 修改项目基建能力后，需判断现有 Ruler 规则是否仍准确；如影响 AI 协作方式、目录约定、开发流程、质量门禁或生成物管理，应同步优化 `.ruler/` 源指令。
 - 每次完成用户任务后，基于当前实际变动文件给出一条建议的 git commit 文本。
 
 ## 不要做
