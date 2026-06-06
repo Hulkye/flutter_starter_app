@@ -32,6 +32,6 @@
 
 ## 导出规范
 
-- 业务常用能力优先通过 `lib/header.dart` 暴露。
+- 业务通用/常用能力优先通过 `lib/header.dart` 暴露。
 - Feature route class 通过 `<feature>_feature.dart` export，再由 `features/features.dart` 汇总，最后由 `header.dart` 暴露。
 - 不要为了使用某个业务路由在多个页面重复 import 深层 route 文件。

@@ -98,6 +98,28 @@ git status --short --ignored
 - 提交时包含 `.ruler/` 源文件与 `.gitignore` 的 Ruler 管理块。
 - 不提交 Ruler 生成文件。
 
+## 🧾 任务完成输出约定
+
+AI 完成一次用户任务后，应基于当前实际变动文件给出一条建议的 git commit 文本，便于开发者直接参考。
+
+建议格式：
+
+```text
+<type>: <中文变更说明>
+```
+
+示例：
+
+```text
+docs: 补充Ruler指令管理说明
+```
+
+要求：
+
+- commit 文本主体使用中文。
+- 优先使用简洁的 Conventional Commits 风格。
+- 文案必须匹配当前实际变动文件，不要给出与变更无关的描述。
+
 ## 🧩 技能说明
 
 当前项目内置两个 Ruler Skill：
