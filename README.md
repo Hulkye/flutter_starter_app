@@ -17,7 +17,7 @@
 
 ---
 
-这是一个面向中大型 Flutter 项目的快速启动模板。项目以 **Feature-First** 组织业务模块，在每个 Feature 内落地 **Data / Domain / Presentation** 分层，并通过 **BasePage + BaseVM + Riverpod** 建立职责清晰的 MVVM 开发范式。
+这是一个面向中大型 Flutter 项目的快速启动模板。项目以 **Feature-First** 组织业务模块，在每个 Feature 内落地 **Data / Domain / Presentation** 分层，并通过 **BasePage + PageLogic + BaseVM + Riverpod** 建立职责清晰的 MVVM 开发范式。
 
 模板已内置多环境、网络请求、路由守卫、主题、国际化、本地存储、登录会话、Toast/Loading、刷新、按钮、弹窗等常用基础设施。Clone 后只需要替换业务接口与页面，即可进入功能开发。
 
@@ -58,7 +58,7 @@
 | 能力 | 说明 |
 | --- | --- |
 | 清晰分层 | 每个业务模块按 `data / domain / presentation` 拆分，职责边界明确 |
-| MVVM 开发范式 | `BasePage` 承载页面骨架与 Widget 生命周期，`BaseVM` 只承载状态与业务动作 |
+| MVVM 开发范式 | `BasePage` 承载页面骨架，`PageLogic` 承载页面私有生命周期与局部交互，`BaseVM` 只承载状态与业务动作 |
 | Clean Architecture | 业务依赖抽象而非实现，Repository 接口与实现分离，便于替换数据源 |
 | Feature-First | 业务代码按功能聚合，模块可独立演进，避免按技术层级散落全局 |
 | Riverpod 驱动 | 状态管理、依赖注入、服务组合统一使用 Riverpod，减少框架混用成本 |
@@ -128,7 +128,7 @@ lib/
 │   ├── profile/                   # 个人中心示例
 │   └── todo/                      # Todo 完整分层示例
 ├── shared/                        # 跨 Feature 共享能力
-│   ├── presentation/              # BasePage / BaseVM / BaseState / PresentationHelper
+│   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseState / PresentationHelper
 │   ├── services/                  # AuthSession / AuthStore
 │   └── widgets/                   # Toast、Loading、Button、Dialog 等组件
 ├── header.dart                    # 常用导出
@@ -210,40 +210,52 @@ Presentation  ──────▶  Domain  ◀──────  Data
 | `app/` | 应用启动、环境注入、根组件挂载 | 可组合全局能力 |
 | `core/` | 网络、路由、存储、主题、DI、异常、工具 | 不依赖具体 Feature |
 | `features/` | 业务模块 | 可依赖 `core` 与 `shared` |
-| `shared/` | BasePage、BaseVM、PresentationHelper、认证服务、通用组件 | 提供跨业务复用能力 |
+| `shared/` | BasePage、PageLogic、BaseVM、PresentationHelper、认证服务、通用组件 | 提供跨业务复用能力 |
 
 ---
 
 ## 🧭 MVVM 基础能力
 
-模板通过 `BasePage`、`BaseVM`、`BaseState`、`PresentationHelper` 固化页面开发方式，同时保持 View 与 ViewModel 的职责边界：页面生命周期由 View 层管理，ViewModel 只负责状态与业务动作。
+模板通过 `BasePage`、`PageLogic`、`BaseVM`、`BaseState`、`PresentationHelper` 固化页面开发方式，同时保持 Page、PageLogic 与 ViewModel 的职责边界：Page 负责 UI 结构、Widget 组合、布局、样式；PageLogic 负责页面本地 controller、临时交互状态、生命周期、调用 VM/Provider；ViewModel / Notifier 负责页面可观察状态、业务动作编排，并把领域/服务状态转换成 UI 状态。
 
 ### BasePage
 
-`BasePage` 是纯页面壳，不绑定具体 ViewModel：
+`BasePage` 是纯页面壳，不绑定具体 ViewModel，负责 UI 结构、Widget 组合、布局和样式：
 
 - 标准 `Scaffold` 构建
 - AppBar、背景色、SafeArea、KeepAlive 扩展点
 - 背景点击自动收起键盘
-- App 生命周期监听与页面生命周期 hook：`onPageReady` / `onPageResume` / `onPagePause` / `onPageClose`
+- App 生命周期监听与 `PageLogic` 生命周期分发：`onInit` / `onReady` / `onResume` / `onPause` / `onDispose`
 - Pop 拦截与默认返回能力
-- 通过 `PageScope` 向子类提供 `context` 与 `ref`
+- 通过 `PageScope` 向子类提供 `context`、`ref` 与可选 `PageLogic`
+
+`PageLogic` 用于承载只属于当前页面的本地 controller、临时交互状态、生命周期，以及调用 VM/Provider，不放跨页面业务状态。页面如需使用，覆盖 `createPageLogic()` 并通过 `scope.logic<XxxPageLogic>()` 取得实例：
+
+```dart
+final class OrderPageLogic extends PageLogic {
+  @override
+  void onReady() {
+    ref.read(orderViewModelProvider.notifier).loadOrders();
+  }
+}
+```
 
 页面在 `page(scope)` 中按需桥接状态与 ViewModel：
 
 ```dart
 @override
 Widget page(PageScope scope) {
+  final logic = scope.logic<OrderPageLogic>();
   final state = scope.ref.watch(todoViewModelProvider);
   final vm = scope.ref.read(todoViewModelProvider.notifier);
 
-  return TodoContent(state: state, vm: vm);
+  return TodoContent(state: state, vm: vm, logic: logic);
 }
 ```
 
 ### BaseVM
 
-`BaseVM` 基于 Riverpod `Notifier`，只用于承载页面状态和业务动作：
+`BaseVM` 基于 Riverpod `Notifier`，只用于承载页面可观察状态、业务动作编排，并把领域/服务状态转换成 UI 状态：
 
 - `initialState()` 提供初始状态
 - 通过 `state = state.copyWith(...)` 更新 UI 状态
@@ -267,9 +279,11 @@ Widget page(PageScope scope) {
 推荐页面开发流程：
 
 ```text
-Page 负责 UI 展示
+Page 负责 UI 结构、Widget 组合、布局、样式
   ↓ 用户交互
-ViewModel 负责状态变更与业务动作
+PageLogic 负责页面本地 controller、临时交互状态、生命周期、调用 VM/Provider
+  ↓ 调用动作
+ViewModel / Notifier 负责可观察状态、业务动作编排、领域状态到 UI 状态的转换
   ↓ 调用抽象
 Repository 负责业务数据获取
   ↓ 委托实现

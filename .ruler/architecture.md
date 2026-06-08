@@ -40,8 +40,9 @@
 
 ## MVVM 边界
 
-- Page 负责 UI 展示、生命周期桥接和用户交互入口。
-- ViewModel 负责状态变更与业务动作，不持有 `BuildContext`。
+- Page 负责 UI 结构、Widget 组合、布局、样式。
+- PageLogic 负责页面本地 controller、临时交互状态、生命周期、调用 VM/Provider，不作为跨页面公共 API。
+- ViewModel / Notifier 负责页面可观察状态、业务动作编排、把领域/服务状态转换成 UI 状态，不持有 `BuildContext`。
 - Repository 负责业务数据获取与持久化抽象。
 - DataSource 负责具体 API、本地缓存或 Mock 数据来源。
 - 一次性 UI 反馈使用 `PresentationHelper` 或专门事件机制，不污染长期可渲染状态。

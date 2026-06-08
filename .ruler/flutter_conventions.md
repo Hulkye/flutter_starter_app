@@ -18,8 +18,10 @@
 
 ## 页面与 ViewModel
 
-- 页面优先继承/复用 `BasePage` 体系。
-- ViewModel 优先继承/复用 `BaseVM` 体系。
+- 页面优先继承/复用 `BasePage` 体系，Page 负责 UI 结构、Widget 组合、布局、样式。
+- 页面需要 `TextEditingController`、`FocusNode`、临时交互状态、生命周期或调用 VM/Provider 时，优先覆盖 `createPageLogic()` 并使用 `PageLogic` 承载。
+- 页面中通过 `scope.logic<XxxPageLogic>()` 访问页面逻辑；不要把页面级 `PageLogic` 当作跨模块公共 API。
+- ViewModel / Notifier 优先继承/复用 `BaseVM` 体系，负责页面可观察状态、业务动作编排、把领域/服务状态转换成 UI 状态。
 - State 建模要显式，例如 `loading`、`initialized`、`errorMessage`、`items`。
 - 不要把 Toast、Loading、导航结果等一次性事件长期保存在 State 中。
 

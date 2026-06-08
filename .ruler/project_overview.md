@@ -10,7 +10,7 @@
 - Riverpod 2.x：状态管理与依赖注入
 - GoRouter：底层路由实现，但业务层通过 `core/router` 抽象访问
 - Feature-First + Clean Architecture
-- MVVM：`BasePage` + `BaseVM` + `BaseState` + `PresentationHelper`
+- MVVM：`BasePage` + `PageLogic` + `BaseVM` + `BaseState` + `PresentationHelper`
 
 ## 重要目录
 

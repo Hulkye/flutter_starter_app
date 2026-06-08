@@ -14,9 +14,7 @@ final class TodoPage extends BasePage {
   const TodoPage({super.key});
 
   @override
-  void onPageReady(PageScope scope) {
-    scope.ref.read(todoViewModelProvider.notifier).loadTodos();
-  }
+  PageLogic createPageLogic() => _TodoPageLogic();
 
   @override
   PreferredSizeWidget? appBar(PageScope scope) {
@@ -53,6 +51,13 @@ final class TodoPage extends BasePage {
         ],
       ),
     );
+  }
+}
+
+final class _TodoPageLogic extends PageLogic {
+  @override
+  void onReady() {
+    ref.read(todoViewModelProvider.notifier).loadTodos();
   }
 }
 

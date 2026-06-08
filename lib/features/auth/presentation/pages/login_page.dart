@@ -3,10 +3,7 @@ import '../viewmodels/auth_viewmodel.dart';
 
 /// 登录页（模板演示）。
 class LoginPage extends BasePage {
-  LoginPage({super.key});
-
-  final _accountCtrl = TextEditingController();
-  final _passwordCtrl = TextEditingController();
+  const LoginPage({super.key});
 
   // ── UI ──
 
@@ -16,10 +13,7 @@ class LoginPage extends BasePage {
   bool? get resizeToAvoidBottomInset => true;
 
   @override
-  void onPageClose(PageScope scope) {
-    _accountCtrl.dispose();
-    _passwordCtrl.dispose();
-  }
+  PageLogic createPageLogic() => _LoginPageLogic();
 
   Widget _createInputWidget(
     PageScope scope, {
@@ -59,9 +53,10 @@ class LoginPage extends BasePage {
   }
 
   Widget _accountInput(PageScope scope) {
+    final logic = scope.logic<_LoginPageLogic>();
     Widget child = _createInputWidget(
       scope,
-      ctrl: _accountCtrl,
+      ctrl: logic.accountCtrl,
       icon: Icons.person_outline,
       hintText: '请输入账号',
       onChanged: scope.ref.read(authViewModelProvider.notifier).updateAccount,
@@ -70,15 +65,15 @@ class LoginPage extends BasePage {
   }
 
   Widget _passwordInput(PageScope scope) {
+    final logic = scope.logic<_LoginPageLogic>();
     Widget child = _createInputWidget(
       scope,
-      ctrl: _passwordCtrl,
+      ctrl: logic.passwordCtrl,
       icon: Icons.lock_outline,
       obscureText: true,
       hintText: '请输入密码',
       onChanged: scope.ref.read(authViewModelProvider.notifier).updatePassword,
-      onSubmitted: (_) =>
-          _login(scope, scope.ref.read(authViewModelProvider.notifier)),
+      onSubmitted: (_) => logic.login(),
     );
     return child;
   }
@@ -86,13 +81,13 @@ class LoginPage extends BasePage {
   @override
   Widget page(PageScope scope) {
     final ref = scope.ref;
-    final vm = ref.read(authViewModelProvider.notifier);
+    final logic = scope.logic<_LoginPageLogic>();
     final state = ref.watch(authViewModelProvider);
     final session = ref.watch(authSessionProvider);
     final isLoggedIn = session?.isValid == true;
 
     if (isLoggedIn) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      logic.postFrame(() {
         ref.read(appRouterProvider).replaceAll(const HomeRoute().location);
       });
     }
@@ -124,9 +119,7 @@ class LoginPage extends BasePage {
                       label: state.isLoading
                           ? context.i18n.requesting
                           : context.i18n.login,
-                      onPressed: state.isLoading
-                          ? null
-                          : () => _login(scope, vm),
+                      onPressed: state.isLoading ? null : logic.login,
                       expand: true,
                     ),
                     const SizedBox(height: 20),
@@ -147,12 +140,25 @@ class LoginPage extends BasePage {
       },
     );
   }
+}
 
-  Future<void> _login(PageScope scope, AuthViewModel vm) async {
-    await vm.login(_accountCtrl.text.trim(), _passwordCtrl.text.trim());
-    if (scope.ref.read(authSessionProvider)?.isValid == true) {
-      scope.ref.read(appRouterProvider).replaceAll(const HomeRoute().location);
+final class _LoginPageLogic extends PageLogic {
+  final accountCtrl = TextEditingController();
+  final passwordCtrl = TextEditingController();
+
+  Future<void> login() async {
+    final vm = ref.read(authViewModelProvider.notifier);
+    await vm.login(accountCtrl.text.trim(), passwordCtrl.text.trim());
+    if (!mounted) return;
+    if (ref.read(authSessionProvider)?.isValid == true) {
+      ref.read(appRouterProvider).replaceAll(const HomeRoute().location);
     }
+  }
+
+  @override
+  void onDispose() {
+    accountCtrl.dispose();
+    passwordCtrl.dispose();
   }
 }
 

@@ -3,16 +3,78 @@ import 'package:flutter_starter_app/header.dart';
 
 /// 页面上下文。
 final class PageScope {
-  const PageScope({required this.context, required this.ref});
+  const PageScope({required this.context, required this.ref, this.pageLogic});
 
   final BuildContext context;
   final WidgetRef ref;
+  final PageLogic? pageLogic;
+
+  T logic<T extends PageLogic>() {
+    final logic = pageLogic;
+    if (logic is T) return logic;
+    throw StateError('Page logic is not mounted as $T');
+  }
+}
+
+/// 可挂载到 [BasePage] 的页面逻辑。
+///
+/// 用于承载页面本地 controller、临时交互状态、生命周期，以及调用 VM/Provider。
+/// 页面 UI 结构、Widget 组合、布局和样式仍由 [BasePage] 子类负责。
+abstract class PageLogic {
+  late PageScope _scope;
+  late VoidCallback _markNeedsBuild;
+  bool _mounted = false;
+
+  PageScope get scope => _scope;
+  BuildContext get context => _scope.context;
+  WidgetRef get ref => _scope.ref;
+  bool get mounted => _mounted;
+
+  void onInit() {}
+  void onReady() {}
+  void onResume() {}
+  void onPause() {}
+  void onDispose() {}
+
+  void setState(VoidCallback action) {
+    if (!_mounted) return;
+    action();
+    _markNeedsBuild();
+  }
+
+  void markNeedsBuild() {
+    if (!_mounted) return;
+    _markNeedsBuild();
+  }
+
+  void postFrame(VoidCallback action) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_mounted) return;
+      action();
+    });
+  }
+
+  void _mount(PageScope scope, VoidCallback markNeedsBuild) {
+    _scope = scope;
+    _markNeedsBuild = markNeedsBuild;
+    _mounted = true;
+    onInit();
+  }
+
+  void _updateScope(PageScope scope) {
+    _scope = scope;
+  }
+
+  void _unmount() {
+    if (!_mounted) return;
+    onDispose();
+    _mounted = false;
+  }
 }
 
 /// 页面基类。
 ///
-/// [BasePage] 只负责页面结构：Scaffold、AppBar、SafeArea、背景层、PopScope
-/// 以及 Widget/App 生命周期，不绑定具体 ViewModel。
+/// [BasePage] 只负责 UI 结构、Widget 组合、布局和样式，不绑定具体 ViewModel。
 abstract class BasePage extends ConsumerStatefulWidget {
   const BasePage({super.key});
 
@@ -22,6 +84,9 @@ abstract class BasePage extends ConsumerStatefulWidget {
 
   /// 页面主体。BasePage 自动包裹 Scaffold。
   Widget page(PageScope scope);
+
+  /// 创建页面逻辑。需要 controller/搜索词/临时交互状态或页面生命周期时可覆盖。
+  PageLogic? createPageLogic() => null;
 
   // ===========================================================================
   // Scaffold 配置
@@ -124,15 +189,6 @@ abstract class BasePage extends ConsumerStatefulWidget {
   Future<bool> onPopInvoked(dynamic result) async => true;
 
   // ===========================================================================
-  // 生命周期
-  // ===========================================================================
-
-  void onPageReady(PageScope scope) {}
-  void onPageResume(PageScope scope) {}
-  void onPagePause(PageScope scope) {}
-  void onPageClose(PageScope scope) {}
-
-  // ===========================================================================
   // 其他
   // ===========================================================================
 
@@ -192,6 +248,7 @@ abstract class BasePage extends ConsumerStatefulWidget {
 
 class _BasePageState extends ConsumerState<BasePage>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
+  late final PageLogic? _pageLogic;
   bool _readyCalled = false;
   bool _paused = false;
   PageScope? _scope;
@@ -202,14 +259,18 @@ class _BasePageState extends ConsumerState<BasePage>
   @override
   void initState() {
     super.initState();
+    _pageLogic = widget.createPageLogic();
+    final scope = _createScope();
+    _scope = scope;
+    _pageLogic?._mount(scope, _markNeedsBuild);
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _readyCalled) return;
       final scope = _scope;
       if (scope == null) return;
       _readyCalled = true;
-      widget.onPageReady(scope);
-      widget.onPageResume(scope);
+      _pageLogic?.onReady();
+      _pageLogic?.onResume();
       _paused = false;
     });
   }
@@ -218,12 +279,12 @@ class _BasePageState extends ConsumerState<BasePage>
   void dispose() {
     final scope = _scope;
     if (scope != null) {
-      widget.onPageClose(scope);
       if (!_paused) {
-        widget.onPagePause(scope);
+        _pageLogic?.onPause();
         _paused = true;
       }
     }
+    _pageLogic?._unmount();
     _scope = null;
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -236,7 +297,7 @@ class _BasePageState extends ConsumerState<BasePage>
     switch (state) {
       case AppLifecycleState.resumed:
         if (_paused) {
-          widget.onPageResume(scope);
+          _pageLogic?.onResume();
           _paused = false;
         }
         break;
@@ -244,7 +305,7 @@ class _BasePageState extends ConsumerState<BasePage>
       case AppLifecycleState.hidden:
       case AppLifecycleState.paused:
         if (!_paused) {
-          widget.onPagePause(scope);
+          _pageLogic?.onPause();
           _paused = true;
         }
         break;
@@ -253,12 +314,22 @@ class _BasePageState extends ConsumerState<BasePage>
     }
   }
 
+  PageScope _createScope() {
+    return PageScope(context: context, ref: ref, pageLogic: _pageLogic);
+  }
+
+  void _markNeedsBuild() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    final scope = PageScope(context: context, ref: ref);
+    final scope = _createScope();
     _scope = scope;
+    _pageLogic?._updateScope(scope);
 
     Widget child = widget.wrap(scope, widget.page(scope));
 

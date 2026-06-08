@@ -380,16 +380,21 @@ final class OrderViewModel extends BaseVM<OrderState> {
 }
 ```
 
-由页面决定何时触发首屏加载：
+由页面逻辑决定何时触发首屏加载：
 
 ```dart
+final class OrderPageLogic extends PageLogic {
+  @override
+  void onReady() {
+    ref.read(orderViewModelProvider.notifier).loadOrders();
+  }
+}
+
 final class OrderPage extends BasePage {
   const OrderPage({super.key});
 
   @override
-  void onPageReady(PageScope scope) {
-    scope.ref.read(orderViewModelProvider.notifier).loadOrders();
-  }
+  PageLogic createPageLogic() => OrderPageLogic();
 
   @override
   Widget page(PageScope scope) {
@@ -517,7 +522,9 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 ### 推荐做法
 
 - 一个业务模块对应一个 `Feature` 目录。
-- 页面继承 `BasePage`，在 `page(scope)` 中读取状态并调用 ViewModel。
+- 页面继承 `BasePage`，负责 UI 结构、Widget 组合、布局和样式。
+- 页面本地 `TextEditingController`、`FocusNode`、临时交互状态、生命周期、调用 VM/Provider 放入 `PageLogic`。
+- ViewModel / Notifier 负责页面可观察状态、业务动作编排，以及把领域/服务状态转换成 UI 状态。
 - ViewModel 只依赖 Repository 抽象，不直接依赖 HTTP 客户端，也不管理页面生命周期。
 - RepositoryImpl 负责把接口数据转换成业务实体。
 - 公共 UI 放到 `shared/widgets`。
@@ -530,6 +537,7 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 - 不要在 Page 中直接写接口请求。
 - 不要在 Page 中直接读写 SharedPreferences 或 SecureStorage。
 - 不要让一个 Feature 直接依赖另一个 Feature 的内部实现。
+- 不要把页面级 `PageLogic` 当作跨模块公共 API。
 - 不要把具体业务逻辑放进 `core`。
 - 不要绕过 `AuthStore` 手动管理 token。
 - 不要在多个状态管理方案之间混用。
