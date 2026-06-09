@@ -1,8 +1,11 @@
 /// 应用导航接口。
 ///
-/// Presentation/Page 层依赖该接口，而不是直接依赖 GoRouter。
-/// Widget、测试都可以使用同一套导航协议。
+/// Presentation 层依赖该接口，而不是直接依赖 GoRouter。
+/// ViewModel、Widget、测试都可以使用同一套导航协议。
 abstract interface class BaseNavigator {
+  /// 当前完整 location。
+  String get location;
+
   /// 跳转到目标 location 并替换当前 location（适合 tab 切换/回首页/深链）。
   void go(String location);
 

@@ -11,6 +11,9 @@ final class RouterNavigator implements BaseNavigator {
   final GoRouter _router;
 
   @override
+  String get location => _router.state.uri.toString();
+
+  @override
   void go(String location) {
     _router.go(location);
   }
