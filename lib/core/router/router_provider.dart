@@ -27,14 +27,19 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 /// GoRouter 实例 Provider。
 ///
-/// 依赖 [authSessionProvider] —— 登录态变化时自动重新评估 redirect。
+/// 登录态变化时只刷新 redirect，不重建 Router，避免重新应用 initialLocation。
 final goRouterProvider = Provider<GoRouter>((ref) {
-  ref.watch(authSessionProvider);
+  final refreshNotifier = _RouterRefreshNotifier();
+  ref.onDispose(refreshNotifier.dispose);
+  ref.listen<AuthSession?>(authSessionProvider, (_, _) {
+    refreshNotifier.refresh();
+  });
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: const HomeRoute().location,
     observers: [ToastUtil.navigatorObserver],
+    refreshListenable: refreshNotifier,
     redirect: createAuthGuard(
       loginPath: const LoginRoute().location,
       publicPaths: _allRoutes
@@ -48,7 +53,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
 /// 导航接口 Provider。
 ///
-/// Presentation/Page 层依赖此 Provider 执行导航，不直接引用 [GoRouter]。
+/// 业务层依赖此 Provider 执行导航，不直接引用 [GoRouter]。
 final appRouterProvider = Provider<BaseNavigator>((ref) {
   return RouterNavigator(ref.watch(goRouterProvider));
 });
+
+final class _RouterRefreshNotifier extends ChangeNotifier {
+  void refresh() => notifyListeners();
+}
