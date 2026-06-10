@@ -67,23 +67,25 @@ class RootShellPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget? bottomNavigationBar;
+    if (tabs.length >= 2) {
+      bottomNavigationBar = Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Divider(
+            height: 1,
+            thickness: 0.5,
+            color: context.appColor.compDivider,
+          ),
+          _createBottomNavigationBar(context),
+        ],
+      );
+    }
     return Scaffold(
       backgroundColor: context.appColor.backgroundPrimary,
       body: shellNavigator.child,
-      bottomNavigationBar: tabs.length < 2
-          ? null
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Divider(
-                  height: 1,
-                  thickness: 0.5,
-                  color: context.appColor.compDivider,
-                ),
-                _createBottomNavigationBar(context),
-              ],
-            ),
+      bottomNavigationBar: bottomNavigationBar,
     );
   }
 }
