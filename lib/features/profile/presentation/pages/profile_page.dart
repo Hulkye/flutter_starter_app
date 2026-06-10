@@ -89,17 +89,20 @@ class ProfilePage extends BasePage {
                     style: TextStyle(color: appColor.fontSecondary),
                   ),
                   const SizedBox(height: 20),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.brightness_6_outlined),
-                    title: Text(context.i18n.switchThemeMode),
-                    subtitle: Text(_themeModeLabel(context, themeMode)),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      ref
-                          .read(appThemeModeProvider.notifier)
-                          .setThemeMode(_nextThemeMode(themeMode));
-                    },
+                  Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.brightness_6_outlined),
+                      title: Text(context.i18n.switchThemeMode),
+                      subtitle: Text(_themeModeLabel(context, themeMode)),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        ref
+                            .read(appThemeModeProvider.notifier)
+                            .setThemeMode(_nextThemeMode(themeMode));
+                      },
+                    ),
                   ),
                 ],
               ),
