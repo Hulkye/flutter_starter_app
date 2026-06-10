@@ -243,16 +243,16 @@ final class _TodoListItem extends StatelessWidget {
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(16.w),
         child: ListTile(
-          contentPadding:
-              EdgeInsets.symmetric(horizontal: 14.w, vertical: 4.w),
+          contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 4.w),
           leading: IconButton(
             onPressed: () => vm.toggleTodo(todo.id),
             icon: Icon(
               todo.isCompleted
                   ? Icons.check_circle
                   : Icons.radio_button_unchecked,
-              color:
-                  todo.isCompleted ? appColor.confirm : appColor.iconTertiary,
+              color: todo.isCompleted
+                  ? appColor.confirm
+                  : appColor.iconTertiary,
             ),
           ),
           title: Text(
@@ -260,8 +260,7 @@ final class _TodoListItem extends StatelessWidget {
             style: TextStyle(
               color: textColor,
               fontSize: 16.sp,
-              decoration:
-                  todo.isCompleted ? TextDecoration.lineThrough : null,
+              decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
             ),
           ),
           trailing: IconButton(
