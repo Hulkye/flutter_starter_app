@@ -1,5 +1,6 @@
+import 'package:flutter_starter_app/core/router/definitions/app_page_route.dart';
+
 import '../../core/feature/app_feature.dart';
-import '../../core/router/app_route_define.dart';
 import 'presentation/auth_routes.dart';
 
 export 'presentation/auth_routes.dart';
@@ -11,5 +12,5 @@ final class AuthFeature extends AppFeature {
   String get name => 'auth';
 
   @override
-  List<AppRouteDefine> get routes => const [LoginRoute()];
+  List<AppPageRoute> get routes => const [LoginRoute()];
 }

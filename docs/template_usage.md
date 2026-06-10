@@ -226,10 +226,10 @@ OrderDataSource / HttpClient
 ```dart
 import 'package:flutter/widgets.dart';
 
-import '../../../core/router/app_route_define.dart';
+import '../../../core/router/router.dart';
 import 'pages/order_page.dart';
 
-final class OrderRoute extends AppRouteDefine {
+final class OrderRoute extends AppPageRoute {
   const OrderRoute();
 
   @override
@@ -239,7 +239,7 @@ final class OrderRoute extends AppRouteDefine {
   bool get public => false;
 
   @override
-  Widget buildPage(BuildContext context, RouteState state) {
+  Widget buildPage(BuildContext context, AppRouteState state) {
     return const OrderPage();
   }
 }
@@ -258,7 +258,7 @@ final class OrderRoute extends AppRouteDefine {
 
 ```dart
 import '../../core/feature/app_feature.dart';
-import '../../core/router/app_route_define.dart';
+import '../../core/router/router.dart';
 import 'presentation/order_routes.dart';
 
 export 'presentation/order_routes.dart';
@@ -270,9 +270,11 @@ final class OrderFeature extends AppFeature {
   String get name => 'order';
 
   @override
-  List<AppRouteDefine> get routes => const [OrderRoute()];
+  List<AppPageRoute> get routes => const [OrderRoute()];
 }
 ```
+
+如果该 Feature 需要作为底部 Tab 入口，再额外覆盖 `tabs` 并返回 `AppTabEntry`。默认没有 Tab 的 Feature 只需要暴露 `routes`。
 
 ### 3. 注册到 Feature 汇聚入口
 
@@ -530,7 +532,7 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 - 公共 UI 放到 `shared/widgets`。
 - 公共业务服务放到 `shared/services`。
 - 全局基础设施放到 `core`。
-- 新增页面时先在 Feature 内定义路由，再注册到根路由表。
+- 新增页面时先在 Feature 内定义 `AppPageRoute`，再通过 `XxxFeature` 注册到 `features/features.dart`。
 
 ### 避免做法
 

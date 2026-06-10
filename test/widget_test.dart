@@ -32,8 +32,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(overrides: overrides, child: const App()),
       );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle();
 
       expect(find.text('登录'), findsAtLeastNWidgets(1));
 
@@ -43,9 +42,7 @@ void main() {
       await tester.enterText(inputFields.at(0), 'demo');
       await tester.enterText(inputFields.at(1), 'password');
       await tester.tap(find.widgetWithText(ElevatedButton, '登录'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle();
 
       expect(find.text('首页'), findsOneWidget);
       expect(find.text('前往我的页面'), findsOneWidget);

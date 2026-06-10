@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../core/router/app_route_define.dart';
+import 'package:flutter_starter_app/core/router/router.dart';
 import 'pages/login_page.dart';
 
 /// Auth 路由对象。
-final class LoginRoute extends AppRouteDefine {
+final class LoginRoute extends AppPageRoute {
   const LoginRoute();
 
   @override
@@ -14,7 +14,7 @@ final class LoginRoute extends AppRouteDefine {
   bool get public => true;
 
   @override
-  Widget buildPage(BuildContext context, RouteState state) {
+  Widget buildPage(BuildContext context, AppRouteState state) {
     return LoginPage();
   }
 }

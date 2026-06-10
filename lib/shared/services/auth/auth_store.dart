@@ -65,5 +65,5 @@ class AuthStore {
   }
 }
 
-/// 全局实例（ProviderScope 前由 AppBootstrap 初始化）。
+/// 全局实例（ProviderScope 前由 Application.run 初始化）。
 final authStore = AuthStore();

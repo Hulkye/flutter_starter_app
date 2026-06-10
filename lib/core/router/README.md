@@ -1,239 +1,356 @@
 # Router 模块
 
-业务层与 GoRouter 之间的隔离层。业务代码不直接引用 `go_router`。
+`core/router` 是业务层与 GoRouter 之间的隔离层。业务代码通过项目路由抽象和 `BaseNavigator` 导航，不直接 import `go_router`。
+
+## 当前职责
+
+- 对业务层暴露框架无关的路由定义：`AppPageRoute`、`AppRedirectRoute`、`AppShellRoute`。
+- 对业务层暴露导航接口：`BaseNavigator` 与 `appRouterProvider`。
+- 在基础设施层把 `AppRouteNode` 转换为 GoRouter 的 `RouteBase`。
+- 在 `router_provider.dart` 汇总 App 装配路由、Feature 路由、认证守卫和导航 Provider。
+- App Shell 的 Tab 入口由 Feature 显式声明，Shell 只做装配。
 
 ## 文件清单
 
 | 文件 | 职责 | 引用 GoRouter? |
 |:---|:---|:---:|
-| `router.dart` | Barrel export，对外唯一入口 | — |
-| `app_route_define.dart` | `AppRouteDefine` + `RouteState` — 两个核心类型 | ❌ |
-| `base_navigator.dart` | `BaseNavigator` — 导航抽象接口 | ❌ |
-| `router_navigator.dart` | `RouterNavigator` — `BaseNavigator` 的 GoRouter 实现 | ✅ |
-| `app_router_transfor.dart` | `toGoRoute()` — `AppRouteDefine` → `GoRoute` 适配器 | ✅ |
-| `router_provider.dart` | `goRouterProvider` + `appRouterProvider` + 路由注册表 | ✅ |
-| `router_guard.dart` | `createAuthGuard()` — 可选认证守卫工具 | ✅ |
+| `router.dart` | router 模块对外 barrel export | — |
+| `definitions/router_definitions.dart` | 路由定义类型内部 barrel export | ❌ |
+| `definitions/app_route_node.dart` | `AppRouteNode` 路由节点基类 | ❌ |
+| `definitions/app_page_route.dart` | `AppPageRoute` 普通页面路由 | ❌ |
+| `definitions/app_redirect_route.dart` | `AppRedirectRoute` 重定向路由 | ❌ |
+| `definitions/app_shell_route.dart` | `AppShellRoute` Shell 路由 | ❌ |
+| `definitions/app_shell_branch.dart` | `AppShellBranch` Shell 分支定义 | ❌ |
+| `definitions/app_shell_navigator.dart` | `AppShellNavigator` Shell 分支导航接口 | ❌ |
+| `definitions/app_route_state.dart` | `AppRouteState` 框架无关路由状态 | ❌ |
+| `base_navigator.dart` | `BaseNavigator` 导航抽象接口 | ❌ |
+| `router_navigator.dart` | `RouterNavigator` 的 GoRouter 导航实现 | ✅ |
+| `app_router_transfor.dart` | `AppRouteNode` 到 `RouteBase` 的适配器 | ✅ |
+| `router_provider.dart` | GoRouter、导航接口、路由表、守卫 Provider | ✅ |
+| `router_guard.dart` | `createAuthGuard()` 认证守卫工具 | ✅ |
 
-## 分层架构
+## 分层关系
 
-```
-┌──────────────────────────────────────────────────────────┐
-│  Presentation / Page                                    │
-│                                                          │
-│  import 'router.dart'  ← 唯一依赖                          │
-│                                                          │
-│  ref.read(appRouterProvider).push(const ProfileRoute().location); │
-│  ref.read(appRouterProvider).back();                     │
-└────────────────────────┬─────────────────────────────────┘
-                         │
-                         ▼
-┌──────────────────────────────────────────────────────────┐
-│  接口层 (core/router)                                     │
-│                                                          │
-│  AppRouteDefine   — 路由定义（导航目标 + 页面构建，二合一）   │
-│  RouteState       — 框架无关的路由状态                      │
-│  BaseNavigator    — 导航接口（抽象契约）                     │
-└────────────────────────┬─────────────────────────────────┘
-                         │
-                         ▼
-┌──────────────────────────────────────────────────────────┐
-│  适配层 (core/router)                                     │
-│                                                          │
-│  RouterNavigator  — BaseNavigator 的 GoRouter 适配         │
-│  toGoRoute()      — AppRouteDefine → GoRoute 转换         │
-│  router_provider  — Riverpod Provider + 路由注册表         │
-└──────────────────────────────────────────────────────────┘
+```text
+Feature / App Page
+  import 'package:flutter_starter_app/header.dart'
+  ref.read(appRouterProvider).push(const TodoRoute().location)
+        │
+        ▼
+core/router definitions
+  AppRouteNode / AppPageRoute / AppShellRoute / AppRouteState
+        │
+        ▼
+core/router adapters
+  toRouteBase() / RouterNavigator / createAuthGuard()
+        │
+        ▼
+GoRouter
+  GoRoute / StatefulShellRoute / GoRouterState
 ```
 
-## 核心概念
+## 定义类型
 
-### AppRouteDefine — 路由定义（二合一）
+### AppRouteNode
 
-一个 `AppRouteDefine` 同时表达"去哪"和"怎么构建页面"：
+`AppRouteNode` 是路由注册表的统一节点类型，目前包含三类实现：
+
+- `AppPageRoute`：普通页面路由。
+- `AppRedirectRoute`：只做重定向的路由，例如 `/home -> /home/voice`。
+- `AppShellRoute`：多分支 Shell 路由，例如底部 Tab 的独立导航栈。
+
+### AppPageRoute
+
+`AppPageRoute` 同时描述路由匹配、导航目标和页面构建。
 
 ```dart
-final class ProfileRoute extends AppRouteDefine {
-  const ProfileRoute();
+final class SettingRoute extends AppPageRoute {
+  const SettingRoute();
 
-  @override String get path => '/profile';        // 路由匹配模式
+  @override
+  String get path => '/mine/setting';
 
-  @override Widget buildPage(BuildContext context, RouteState state) {
-    return ProfilePage(controller: ProfilePageController());
+  @override
+  Widget buildPage(BuildContext context, AppRouteState state) {
+    return const SettingPage();
   }
 }
 ```
 
-- `path` — 路由匹配模式，对应 GoRoute 的 path
-- `location` — 实际跳转路径，默认与 `path` 相同；带参数时可覆盖
-- `public` — 是否无需登录，默认 `false`
-- `buildPage()` — 构建页面，接收框架无关的 `RouteState`
+- `path`：GoRouter 匹配模式，例如 `/ptt/member/:memberId`。
+- `location`：实际跳转地址，默认等于 `path`，带参数路由应覆盖。
+- `public`：是否无需登录即可访问，默认 `false`。
+- `buildPage()`：构建页面，只接收框架无关的 `AppRouteState`。
 
-### RouteState — 路由状态
+### AppRouteState
+
+`AppRouteState` 是 GoRouterState 的中立替代，Feature 路由不直接接触 GoRouterState。
 
 ```dart
-class RouteState {
-  final String location;                    // '/profile/42?tab=posts'
-  final Map<String, String> pathParameters; // {userId: '42'}
-  final Map<String, String> queryParameters;// {tab: 'posts'}
+class AppRouteState {
+  final String location;
+  final Map<String, String> pathParameters;
+  final Map<String, String> queryParameters;
   final Object? extra;
 }
 ```
 
-GoRouterState 的中立替代。Feature 路由定义的 `buildPage` 只接触这个类型。
+### AppShellRoute
 
-### BaseNavigator — 导航接口
+`AppShellRoute` 用来表达 App Shell 的分支结构。底层会在 `app_router_transfor.dart` 中转换为 `StatefulShellRoute.indexedStack`。
 
 ```dart
-abstract interface class BaseNavigator {
-  void go(String location);
-  Future<T?> push<T extends Object?>(String location);
-  void replace(String location);
-  void replaceAll(String location);
-  void back<T extends Object?>([T? result]);
-  bool canBack();
+final class RootShellRoute extends AppShellRoute {
+  RootShellRoute()
+    : super(
+        branches: const <AppShellBranch>[
+          AppShellBranch(
+            initialLocation: DemoRoute().location,
+            routes: <AppPageRoute>[DemoRoute()],
+          ),
+        ],
+        builder: _build,
+      );
 }
 ```
 
-Presentation 层依赖这个接口，而非具体 GoRouter 实现。接口接收 location 字符串，`AppRouteDefine` 负责提供类型化的 `location` helper，测试时可直接 mock `BaseNavigator`。
+### AppShellNavigator
 
-## 使用方式
-
-### 在 Widget 中导航
+`AppShellNavigator` 是 Shell 页面切换分支的接口。`RootShellPage` 依赖它，不依赖 GoRouter 的 `StatefulNavigationShell`。
 
 ```dart
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/router/router.dart';
-import '../profile/profile_routes.dart';
+class RootShellPage extends BasePage {
+  const RootShellPage({required this.shellNavigator, super.key});
 
-Consumer(
-  builder: (context, ref, _) {
-    return ElevatedButton(
-      onPressed: () {
-        ref.read(appRouterProvider).push(const ProfileRoute().location);
-      },
-      child: const Text('Go to Profile'),
-    );
-  },
-)
-```
-
-### 返回上一页
-
-```dart
-ref.read(appRouterProvider).back();
-```
-
-在 `BasePage` 中，默认返回按钮和 Pop 拦截也会通过 `appRouterProvider` 执行返回。
-
-### 带参数路由
-
-```dart
-// 路由定义（location 与 path 分离）
-final class ProfileDetailRoute extends AppRouteDefine {
-  const ProfileDetailRoute({required this.userId});
-  final String userId;
-
-  @override String get path => '/profile/:userId';    // GoRoute 匹配模式
-  @override String get location => '/profile/$userId'; // 实际跳转路径
-
-  @override Widget buildPage(BuildContext context, RouteState state) {
-    return ProfileDetailPage(userId: state.pathParameters['userId']!);
-  }
-}
-
-// 导航
-ref.read(appRouterProvider).push(ProfileDetailRoute(userId: '42').location);
-```
-
-### 认证守卫
-
-```dart
-// router_provider.dart 内联守卫
-redirect: (context, state) {
-  final currentPath = state.uri.path;
-  final isPublic = _allRoutes.any((r) => r.public && r.path == currentPath);
-  if (isPublic) return null;
-  if (AuthSessionStore.instance.hasValidSession) return null;
-  return const LoginRoute().location;
-},
-```
-
-或使用独立的 `createAuthGuard()` 工具函数。
-
-## 新增路由
-
-新增业务页面时，由 Feature 自己声明路由，再通过 `AppFeature` 暴露给 App 汇聚入口。
-
-**1. 创建路由类：**
-
-```dart
-// lib/features/settings/presentation/settings_routes.dart
-import 'package:flutter/widgets.dart';
-import '../../../core/router/app_route_define.dart';
-
-final class SettingsRoute extends AppRouteDefine {
-  const SettingsRoute();
-
-  @override String get path => '/settings';
-
-  @override Widget buildPage(BuildContext context, RouteState state) {
-    return const SettingsPage();
-  }
-}
-```
-
-**2. 创建 Feature 声明：**
-
-```dart
-// lib/features/settings/settings_feature.dart
-import '../../core/feature/app_feature.dart';
-import '../../core/router/app_route_define.dart';
-import 'presentation/settings_routes.dart';
-
-export 'presentation/settings_routes.dart';
-
-final class SettingsFeature extends AppFeature {
-  const SettingsFeature();
+  final AppShellNavigator shellNavigator;
 
   @override
-  String get name => 'settings';
-
-  @override
-  List<AppRouteDefine> get routes => const [SettingsRoute()];
+  Widget page(PageScope scope) => shellNavigator.child;
 }
 ```
 
-**3. 注册到 Feature 汇聚入口：**
+## 路由注册流程
+
+`router_provider.dart` 维护应用总路由表：
 
 ```dart
-// lib/features/features.dart
-import 'settings/settings_feature.dart';
-
-export 'settings/settings_feature.dart';
-
-const List<AppFeature> appFeatures = [
-  HomeFeature(),
-  AuthFeature(),
-  ProfileFeature(),
-  TodoFeature(),
-  SettingsFeature(),
+final List<AppRouteNode> _allRouteNodes = <AppRouteNode>[
+  const SplashRoute(),
+  ...buildRootRouteNodes(),
+  ...appFeatureRoutes,
 ];
 ```
 
-完成。业务代码即可导航：
+注册顺序含义：
+
+- `SplashRoute`：启动展示页，属于 `lib/app/splash/`。
+- `RootRoute`：`/` 重定向到默认 Tab。
+- `RootShellRoute`：底部 Tab Shell，属于 `lib/app/shell/`。
+- `appFeatureRoutes`：从 `features/features.dart` 汇聚的普通业务页面路由；已挂到 Shell Tab 的根路由不会重复注册到顶层。
+
+同时，`RootShellRoute` 不再手写 tab 分支，而是从 `features/features.dart` 汇聚的 `appFeatureTabs` 自动装配：
 
 ```dart
-import 'package:flutter_starter_app/header.dart';
-
-ref.read(appRouterProvider).go(const SettingsRoute().location);
+final List<AppTabEntry> appFeatureTabs = [
+  for (final feature in appFeatures) ...feature.tabs,
+];
 ```
 
-## 设计原则
+这样一个 Feature 可以：
 
-- **业务层不 import `go_router`** — 通过 `AppRouteDefine` + `BaseNavigator` 解耦
-- **一个 Route class 表达一个路由** — 导航目标 + 页面构建合并在一个对象中，不再分离
-- **RouterNavigator 是唯一调用 GoRouter 导航 API 的类** — 切换路由框架只需重写此类
-- **Feature 负责暴露路由** — 每个 `XxxFeature` 维护自己的路由列表
-- **Feature 汇聚入口集中管理** — `features/features.dart` 是业务 Feature 注册与路由导出的统一入口
-- **Provider 而非单例** — `goRouterProvider` / `appRouterProvider` 通过 Riverpod 注入，测试可用 `ProviderScope.overrides` 替换
-- **`router.dart` 是对外唯一入口** — 业务代码只 import 这一个文件
+- 提供多个 Tab 入口，例如 `ptt`。
+- 只提供普通页面路由、不提供 Tab，例如 `auth`。
+- 由 App Shell 统一决定展示顺序，而不是把业务页面写死在 Shell 内部。
+
+`goRouterProvider` 负责创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。登录态变化只刷新 redirect，不重建 Router，避免重复应用 `initialLocation`。
+
+## 导航用法
+
+业务层优先从 `package:flutter_starter_app/header.dart` 获取路由与导航 Provider。
+
+```dart
+ref.read(appRouterProvider).push(const TodoRoute().location);
+ref.read(appRouterProvider).go(const RootRoute().location);
+ref.read(appRouterProvider).back();
+```
+
+带参数路由应让 `path` 和 `location` 分离：
+
+```dart
+final class MemberDetailRoute extends AppPageRoute {
+  const MemberDetailRoute({required this.memberId});
+
+  final String memberId;
+
+  @override
+  String get path => '/ptt/member/:memberId';
+
+  @override
+  String get location => '/ptt/member/$memberId';
+
+  @override
+  Widget buildPage(BuildContext context, AppRouteState state) {
+    return MemberDetailPage(memberId: state.pathParameters['memberId']!);
+  }
+}
+```
+
+## 新增业务路由
+
+新增业务页面时，路由由 Feature 自己声明，再通过 `AppFeature` 暴露给 App 汇聚入口。
+
+### 1. 创建 Route
+
+```dart
+// lib/features/demo/presentation/demo_routes.dart
+final class DemoRoute extends AppPageRoute {
+  const DemoRoute();
+
+  @override
+  String get path => '/demo';
+
+  @override
+  Widget buildPage(BuildContext context, AppRouteState state) {
+    return const DemoPage();
+  }
+}
+```
+
+### 2. 创建 Feature 声明
+
+```dart
+// lib/features/demo/demo_feature.dart
+export 'presentation/demo_routes.dart';
+
+final class DemoFeature extends AppFeature {
+  const DemoFeature();
+
+  @override
+  String get name => 'demo';
+
+  @override
+  List<AppPageRoute> get routes => const [DemoRoute()];
+}
+```
+
+如果该 Feature 还需要占用底部 Tab，再额外声明 `tabs`。`AppTabEntry` 是抽象协议，负责声明 tab 的稳定 key、文案、图标和根路由：
+
+```dart
+final class DemoFeature extends AppFeature {
+  const DemoFeature();
+
+  @override
+  String get name => 'demo';
+
+  @override
+  List<AppPageRoute> get routes => const [DemoRoute()];
+
+  @override
+  List<AppTabEntry> get tabs => const [_DemoTabEntry()];
+}
+
+final class _DemoTabEntry extends AppTabEntry {
+  const _DemoTabEntry();
+
+  @override
+  String get key => 'demo.root';
+
+  @override
+  String label(BuildContext context) => '示例';
+
+  @override
+  String icon(BuildContext context) => context.appAsset.navFunction;
+
+  @override
+  String selectedIcon(BuildContext context) {
+    return context.appAsset.navFunctionSelected;
+  }
+
+  @override
+  AppPageRoute get route => const DemoTabRoute();
+}
+```
+
+没有 Tab 的 Feature 保持默认实现即可，不需要额外配置。
+
+### 3. 注册到 Feature 汇聚入口
+
+```dart
+// lib/features/features.dart
+import 'demo/demo_feature.dart';
+
+export 'demo/demo_feature.dart';
+
+const List<AppFeature> appFeatures = [
+  AuthFeature(),
+  HomeFeature(),
+  ProfileFeature(),
+  TodoFeature(),
+  DemoFeature(),
+];
+```
+
+完成后，`appFeatureRoutes` 会自动展开所有 Feature 的普通页面路由，`appFeatureTabs` 会自动汇聚底部 Tab 入口。已作为 Tab 根路由挂到 `RootShellRoute` 的页面不会再重复加入顶层路由表。
+
+## App 装配路由
+
+启动页、根重定向、底部 Tab Shell 属于 App 装配层，不属于某个业务 Feature。
+
+```text
+lib/app/host/
+  app_host.dart
+  app_bootstrap_coordinator.dart
+  app_session_coordinator.dart
+
+lib/app/splash/
+  splash_page.dart
+  splash_route.dart
+
+lib/app/shell/
+  root_shell_page.dart
+  root_shell_route.dart
+```
+
+当前 Shell 结构：
+
+- `/` 由 `RootRoute` 重定向到默认 Feature Tab。
+- `RootShellRoute` 从 `appFeatureTabs` 自动装配底部 Tab 分支；没有 Tab 时不会注册 Shell。
+- GoRouter 的 `StatefulShellRoute` 只存在于 `app_router_transfor.dart`，不会暴露给业务 Feature。
+
+## 认证守卫
+
+`createAuthGuard()` 接收登录页路径和 public path 列表。`router_provider.dart` 会递归扫描 `_allRouteNodes`，收集 `public == true` 的页面或重定向路径。
+
+```dart
+redirect: createAuthGuard(
+  loginPath: const LoginRoute().location,
+  publicPaths: collectPublicPaths(_allRouteNodes),
+),
+```
+
+需要免登录访问的页面在 Route 中覆盖 `public`：
+
+```dart
+@override
+bool get public => true;
+```
+
+## 设计约束
+
+- 业务层不直接 import `go_router`，统一通过 `AppPageRoute`、`AppRouteState`、`BaseNavigator` 解耦。
+- Feature 只暴露稳定 route class，不让一个 Feature 的 presentation 直接依赖另一个 Feature 的 presentation。
+- App Shell、Splash、Root redirect 放在 `lib/app/`，由 App 层组合 Feature 入口。
+- `RouterNavigator` 是唯一调用 GoRouter 导航 API 的类。
+- `app_router_transfor.dart` 是唯一把项目路由定义转换为 GoRouter RouteBase 的适配层。
+- `router.dart` 是 router 模块对外入口；业务常用导出再由 `header.dart` 汇总。
+
+## 修改后验证
+
+路由定义、注册流程或导航行为变更后，优先运行：
+
+```sh
+dart format lib/core/router lib/app lib/features
+flutter analyze
+```
+
+涉及页面跳转行为时，再补充对应页面或集成路径验证。

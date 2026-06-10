@@ -7,6 +7,7 @@ import '../core/l10n/l10n.dart';
 import '../core/l10n/gen/app_localizations.dart';
 import '../core/router/router.dart';
 import '../core/theme/theme.dart';
+import 'host/app_host.dart';
 
 class App extends ConsumerWidget {
   const App({super.key});
@@ -28,6 +29,7 @@ class App extends ConsumerWidget {
         return ToastUtil.initBuilder(context, child);
       },
     );
+    child = AppHost(child: child);
     child = ScreenUtil.screenInit(child, appConfig.uiScreenSize);
     return child;
   }

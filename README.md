@@ -108,10 +108,13 @@ lib/
 ├── app/                           # 应用启动、根组件、环境配置
 │   ├── app.dart                   # MaterialApp.router 根组件
 │   ├── application.dart           # Application.run 启动入口
-│   └── env.dart                   # EnvConfig / EnvTag
+│   ├── env.dart                   # EnvConfig / EnvTag
+│   ├── host/                      # 启动协调、会话协调、AppHost
+│   ├── shell/                     # RootRoute / RootShellRoute / 底部 Tab 容器
+│   └── splash/                    # 启动展示页
 ├── core/                          # 全局基础设施，不承载具体业务
 │   ├── constant/                  # 常量
-│   ├── di/                        # AppBootstrap / Provider overrides
+│   ├── di/                        # Provider overrides / 环境依赖注入
 │   ├── exception/                 # 全局异常捕获
 │   ├── feature/                   # AppFeature 模块协议
 │   ├── l10n/                      # 国际化
@@ -296,23 +299,23 @@ DataSource / HttpClient 负责具体数据来源
 
 ### 🧩 启动引导与依赖注入
 
-应用统一从 `Application.run()` 启动，启动过程集中在 `AppBootstrap` 中：
+应用统一从 `Application.run()` 启动，启动前初始化集中在 `Application.bootstrap()` 中，启动后的首跳由 `AppHost` 协调：
 
 ```text
 main()
   → Application.run(envConfig)
-  → AppBootstrap.create(envConfig)
       → WidgetsFlutterBinding.ensureInitialized()
       → 绑定 PresentationHelper 全局反馈处理
       → 初始化普通存储与安全存储
       → 恢复 AuthSession
-      → 创建 Riverpod overrides
+      → createEnvOverrides(envConfig)
   → AppExceptionCatcher.runAppGuarded()
-  → ProviderScope(overrides: bootstrap.overrides)
+  → ProviderScope(overrides: overrides)
   → MaterialApp.router
+  → AppHost 在 Splash 后根据登录态跳转 RootRoute 或 LoginRoute
 ```
 
-这样可以保证存储、登录会话、环境配置在应用挂载前完成初始化。
+这样可以保证存储、登录会话、环境配置在应用挂载前完成初始化，同时把启动页停留与登录态首跳从业务 Feature 中解耦出来。
 
 ### 🌍 多环境配置
 
@@ -368,16 +371,17 @@ noCache · cacheFirst · networkFirst · cacheOnly · networkOnly · staleWhileR
 路由基于 GoRouter，但 Presentation/Page 层通过模板封装的路由定义与导航抽象使用，减少对第三方路由库的直接依赖。
 
 ```text
-Feature Route Define → AppRouteDefine → GoRoute
-Feature Module       → AppFeature      → appFeatureRoutes
-Page Navigation       → BaseNavigator  → RouterNavigator
+Feature Route Node → AppPageRoute / AppShellRoute → GoRoute / StatefulShellRoute
+Feature Module     → AppFeature / AppTabEntry     → appFeatureRoutes / appFeatureTabs
+Page Navigation    → BaseNavigator                → RouterNavigator
 ```
 
 特点：
 
 - 每个 Feature 自己维护路由定义
-- 每个 Feature 通过 `XxxFeature` 暴露模块路由
+- 每个 Feature 通过 `XxxFeature` 暴露模块路由与可选底部 Tab 入口
 - `features/features.dart` 汇聚所有 Feature，并统一导出业务 Route class
+- App Shell 从 `appFeatureTabs` 自动装配底部 Tab 分支，业务层不直接依赖 GoRouter Shell API
 - 支持公开路由与登录态路由
 - 未登录访问受保护页面时自动跳转登录页
 - 提供 root navigator key，支持非 UI 场景导航

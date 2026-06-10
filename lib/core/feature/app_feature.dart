@@ -1,4 +1,5 @@
-import '../router/app_route_define.dart';
+import 'package:flutter_starter_app/core/router/router.dart';
+import 'app_tab_entry.dart';
 
 /// Feature 对 App 暴露能力的统一协议。
 ///
@@ -10,6 +11,9 @@ abstract class AppFeature {
   /// Feature 标识，用于日志、调试、菜单、权限或埋点。
   String get name;
 
-  /// 当前 Feature 对 App 注册的路由。
-  List<AppRouteDefine> get routes;
+  /// 模块下的路由
+  List<AppPageRoute> get routes;
+
+  /// 模块下的tab入口
+  List<AppTabEntry> get tabs => const [];
 }

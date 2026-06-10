@@ -1,5 +1,5 @@
 import '../../core/feature/app_feature.dart';
-import '../../core/router/app_route_define.dart';
+import 'package:flutter_starter_app/core/router/router.dart';
 import 'presentation/profile_routes.dart';
 
 export 'presentation/profile_routes.dart';
@@ -11,5 +11,5 @@ final class ProfileFeature extends AppFeature {
   String get name => 'profile';
 
   @override
-  List<AppRouteDefine> get routes => const [ProfileRoute()];
+  List<AppPageRoute> get routes => const [ProfileRoute()];
 }

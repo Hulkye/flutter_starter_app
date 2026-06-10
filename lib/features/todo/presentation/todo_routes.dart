@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../core/router/app_route_define.dart';
+import 'package:flutter_starter_app/core/router/router.dart';
 import 'pages/todo_page.dart';
 
-final class TodoRoute extends AppRouteDefine {
+final class TodoRoute extends AppPageRoute {
   const TodoRoute();
 
   @override
@@ -13,7 +13,7 @@ final class TodoRoute extends AppRouteDefine {
   bool get public => true;
 
   @override
-  Widget buildPage(BuildContext context, RouteState state) {
+  Widget buildPage(BuildContext context, AppRouteState state) {
     return const TodoPage();
   }
 }

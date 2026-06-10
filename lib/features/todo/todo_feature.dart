@@ -1,5 +1,6 @@
+import 'package:flutter_starter_app/core/router/router.dart';
+
 import '../../core/feature/app_feature.dart';
-import '../../core/router/app_route_define.dart';
 import 'presentation/todo_routes.dart';
 
 export 'presentation/todo_routes.dart';
@@ -11,5 +12,5 @@ final class TodoFeature extends AppFeature {
   String get name => 'todo';
 
   @override
-  List<AppRouteDefine> get routes => const [TodoRoute()];
+  List<AppPageRoute> get routes => const [TodoRoute()];
 }

@@ -30,11 +30,12 @@ lib/features/<feature>/
 2. 先设计 domain 抽象，再实现 data 层。
 3. 使用 Riverpod 暴露 Repository、Service、ViewModel。
 4. 页面使用 `BasePage` / `PageLogic` / `BaseVM` 项目范式。
-5. 在 `<feature>_routes.dart` 定义 `XxxRoute extends AppRouteDefine`。
+5. 在 `<feature>_routes.dart` 定义 `XxxRoute extends AppPageRoute`。
 6. 在 `<feature>_feature.dart` 定义 `XxxFeature extends AppFeature`，并 export route 文件。
-7. 在 `features/features.dart` 注册并导出该 Feature。
-8. 如该 Feature 是模板示例或公共流程，更新 `README.md` 或 `docs/template_usage.md`。
-9. 运行 `flutter analyze`；涉及逻辑时补充/运行测试。
+7. 如该 Feature 需要底部 Tab，在 `XxxFeature.tabs` 中返回 `AppTabEntry`。
+8. 在 `features/features.dart` 注册并导出该 Feature。
+9. 如该 Feature 是模板示例或公共流程，更新 `README.md` 或 `docs/template_usage.md`。
+10. 运行 `flutter analyze`；涉及逻辑时补充/运行测试。
 
 ## 架构边界
 

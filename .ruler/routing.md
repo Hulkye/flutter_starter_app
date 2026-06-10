@@ -5,18 +5,19 @@
 - 业务层不直接依赖 `go_router`。
 - 业务导航通过 `BaseNavigator` 与 `appRouterProvider` 完成。
 - 一个 Route class 表达一个路由目标和页面构建方式。
-- Route class 继承 `AppRouteDefine`。
+- 页面 Route class 继承 `AppPageRoute`，Shell/Redirect 使用对应的 `AppRouteNode` 子类。
 - Feature 通过 `XxxFeature extends AppFeature` 暴露路由。
-- App 通过 `features/features.dart` 汇聚全部业务路由。
+- App 通过 `features/features.dart` 汇聚普通业务路由与可选底部 Tab 入口。
 
 ## 新增路由流程
 
-1. 在 `lib/features/<feature>/presentation/<feature>_routes.dart` 创建 `XxxRoute extends AppRouteDefine`。
+1. 在 `lib/features/<feature>/presentation/<feature>_routes.dart` 创建 `XxxRoute extends AppPageRoute`。
 2. 在 `lib/features/<feature>/<feature>_feature.dart` 创建 `XxxFeature extends AppFeature`。
 3. 在 `XxxFeature.routes` 中返回当前 Feature 的路由列表。
-4. 在 `XxxFeature` 中 export 当前 Feature 的 route 文件。
-5. 在 `lib/features/features.dart` import/export `XxxFeature` 并加入 `appFeatures`。
-6. 业务页面通过 `package:flutter_starter_app/header.dart` 使用 route class 和 `appRouterProvider`。
+4. 如需底部 Tab，在 `XxxFeature.tabs` 中返回 `AppTabEntry`，由 `RootShellRoute` 自动装配。
+5. 在 `XxxFeature` 中 export 当前 Feature 的 route 文件。
+6. 在 `lib/features/features.dart` import/export `XxxFeature` 并加入 `appFeatures`。
+7. 业务页面通过 `package:flutter_starter_app/header.dart` 使用 route class 和 `appRouterProvider`。
 
 ## 禁止事项
 
