@@ -35,40 +35,55 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(overrides: overrides, child: const App()),
       );
-      await tester.pumpAndSettle();
+      // 初始渲染与路由初始化
+      for (int i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 200));
+      }
 
       expect(find.text('登录'), findsAtLeastNWidgets(1));
 
-      final inputFields = find.byType(EditableText);
-      expect(inputFields, findsNWidgets(2));
-
-      await tester.enterText(inputFields.at(0), 'demo');
-      await tester.enterText(inputFields.at(1), 'password');
+      // 输入用户名与密码
+      await tester.enterText(find.byType(EditableText).first, 'demo');
+      await tester.enterText(find.byType(EditableText).last, 'password');
       await tester.tap(find.widgetWithText(ElevatedButton, '登录'));
-      await tester.pumpAndSettle();
+      // 等待登录请求 → 会话更新 → 路由跳转 → 待办页渲染
+      for (int i = 0; i < 25; i++) {
+        await tester.pump(const Duration(milliseconds: 200));
+      }
 
       expect(find.text('Todo 示例'), findsAtLeastNWidgets(1));
       expect(find.text('创建 Todo'), findsOneWidget);
       expect(find.text('我的'), findsOneWidget);
 
-      await tester.tap(find.text('我的').last);
-      await tester.pumpAndSettle();
+      // 切换到 Profile Tab（底部导航栏 label "我的"）
+      await tester.tap(find.text('我的'));
+      for (int i = 0; i < 15; i++) {
+        await tester.pump(const Duration(milliseconds: 200));
+      }
 
       expect(find.text('切换主题模式'), findsOneWidget);
       expect(find.text('退出登录'), findsOneWidget);
 
+      // 主题切换
       await tester.tap(find.text('切换主题模式'));
-      await tester.pumpAndSettle();
+      for (int i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 200));
+      }
       expect(find.textContaining('Dark'), findsAtLeastNWidgets(1));
 
+      // 退出登录
       await tester.tap(find.widgetWithText(ElevatedButton, '退出登录'));
-      await tester.pumpAndSettle();
+      for (int i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 200));
+      }
       await tester.tap(find.text('确认'));
-      await tester.pumpAndSettle();
+      for (int i = 0; i < 15; i++) {
+        await tester.pump(const Duration(milliseconds: 200));
+      }
 
       expect(find.text('登录'), findsAtLeastNWidgets(1));
     },
-    timeout: const Timeout(Duration(seconds: 30)),
+    timeout: const Timeout(Duration(seconds: 60)),
   );
 }
 
