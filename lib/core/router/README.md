@@ -56,7 +56,7 @@ GoRouter
 `AppRouteNode` 是路由注册表的统一节点类型，目前包含三类实现：
 
 - `AppPageRoute`：普通页面路由。
-- `AppRedirectRoute`：只做重定向的路由，例如 `/home -> /home/voice`。
+- `AppRedirectRoute`：只做重定向的路由，例如 `/ -> /todo`。
 - `AppShellRoute`：多分支 Shell 路由，例如底部 Tab 的独立导航栈。
 
 ### AppPageRoute
@@ -283,9 +283,8 @@ export 'demo/demo_feature.dart';
 
 const List<AppFeature> appFeatures = [
   AuthFeature(),
-  HomeFeature(),
-  ProfileFeature(),
   TodoFeature(),
+  ProfileFeature(),
   DemoFeature(),
 ];
 ```

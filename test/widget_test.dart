@@ -15,9 +15,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   testWidgets(
-    'App redirects to login and logs in to home page smoke test',
+    'App redirects to login and logs in to root todo tab smoke test',
     (WidgetTester tester) async {
-      SharedPreferences.setMockInitialValues({'app_locale_code': 'zh'});
+      SharedPreferences.setMockInitialValues({
+        'app_locale_code': 'zh',
+        'app_theme_mode': 0,
+      });
       bindPresentationHelper();
       await prefsStorage.init();
       authStore.setMemorySession(null);
@@ -44,9 +47,26 @@ void main() {
       await tester.tap(find.widgetWithText(ElevatedButton, '登录'));
       await tester.pumpAndSettle();
 
-      expect(find.text('首页'), findsOneWidget);
-      expect(find.text('前往我的页面'), findsOneWidget);
-      expect(find.text('前往 Todo 示例'), findsOneWidget);
+      expect(find.text('Todo 示例'), findsAtLeastNWidgets(1));
+      expect(find.text('创建 Todo'), findsOneWidget);
+      expect(find.text('我的'), findsOneWidget);
+
+      await tester.tap(find.text('我的').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('切换主题模式'), findsOneWidget);
+      expect(find.text('退出登录'), findsOneWidget);
+
+      await tester.tap(find.text('切换主题模式'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Dark'), findsAtLeastNWidgets(1));
+
+      await tester.tap(find.widgetWithText(ElevatedButton, '退出登录'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('确认'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('登录'), findsAtLeastNWidgets(1));
     },
     timeout: const Timeout(Duration(seconds: 30)),
   );

@@ -70,10 +70,9 @@ flutter run -t lib/main.dart
 
 建议首次运行后先确认：
 
-- 首页是否正常展示
-- Todo 示例是否可进入，并支持新增、切换完成、删除
+- Todo Tab 是否默认展示，并支持新增、切换完成、删除
+- Profile Tab 是否可进入，并支持主题切换与退出登录
 - 登录页是否可进入
-- 主题切换是否正常
 - 国际化切换是否正常
 - 示例网络请求是否符合预期
 
@@ -174,7 +173,7 @@ lib/features/todo/
     └── viewmodels/todo_viewmodel.dart
 ```
 
-该示例演示了本地内存数据源、Repository 抽象、ViewModel 状态管理、页面交互、路由注册和首页导航入口。
+该示例演示了本地内存数据源、Repository 抽象、ViewModel 状态管理、页面交互、路由注册和默认根 Tab 入口。
 
 以 `order` 模块为例：
 
@@ -286,10 +285,9 @@ import 'order/order_feature.dart';
 export 'order/order_feature.dart';
 
 const List<AppFeature> appFeatures = [
-  HomeFeature(),
   AuthFeature(),
-  ProfileFeature(),
   TodoFeature(),
+  ProfileFeature(),
   OrderFeature(),
 ];
 ```

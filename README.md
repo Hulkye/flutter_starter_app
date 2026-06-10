@@ -127,9 +127,8 @@ lib/
 ├── features/                      # 业务功能模块
 │   ├── features.dart              # Feature 汇聚与业务路由统一导出
 │   ├── auth/                      # 登录示例
-│   ├── home/                      # 首页示例
-│   ├── profile/                   # 个人中心示例
-│   └── todo/                      # Todo 完整分层示例
+│   ├── profile/                   # 个人中心与主题/退出登录示例
+│   └── todo/                      # 默认根 Tab 与完整分层示例
 ├── shared/                        # 跨 Feature 共享能力
 │   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseState / PresentationHelper
 │   ├── services/                  # AuthSession / AuthStore

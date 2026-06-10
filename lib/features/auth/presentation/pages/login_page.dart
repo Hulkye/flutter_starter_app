@@ -88,7 +88,7 @@ class LoginPage extends BasePage {
 
     if (isLoggedIn) {
       logic.postFrame(() {
-        ref.read(appRouterProvider).replaceAll(const HomeRoute().location);
+        ref.read(appRouterProvider).replaceAll(RootRoute.pathValue);
       });
     }
 
@@ -151,7 +151,7 @@ final class _LoginPageLogic extends PageLogic {
     await vm.login(accountCtrl.text.trim(), passwordCtrl.text.trim());
     if (!mounted) return;
     if (ref.read(authSessionProvider)?.isValid == true) {
-      ref.read(appRouterProvider).replaceAll(const HomeRoute().location);
+      ref.read(appRouterProvider).replaceAll(RootRoute.pathValue);
     }
   }
 

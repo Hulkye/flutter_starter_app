@@ -9,6 +9,10 @@ Suggested filenames:
 
 - `logo.png`
 - `empty_state.png`
+- `tab_todo.svg`
+- `tab_todo_selected.svg`
+- `tab_profile.svg`
+- `tab_profile_selected.svg`
 
 Both light and dark resources should keep the same filenames to make runtime mapping simple.
 Light assets are placed directly in `assets/images/`; no separate `light/` directory is required.
