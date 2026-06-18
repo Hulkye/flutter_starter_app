@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:swipeable_page_route/swipeable_page_route.dart';
 
 import '../constant/duration_const.dart';
 import 'definitions/router_definitions.dart';
@@ -18,9 +19,10 @@ GoRoute toGoRoute(AppPageRoute route) {
     path: route.path,
     name: route.path,
     pageBuilder: (context, state) {
-      return _slideTransition(
-        state,
-        route.buildPage(context, toAppRouteState(state)),
+      return _swipeablePage(
+        context: context,
+        state: state,
+        builder: (context) => route.buildPage(context, toAppRouteState(state)),
       );
     },
   );
@@ -81,27 +83,31 @@ final class _NavigationShellAdapter implements AppShellNavigator {
   }
 }
 
-/// 统一页面过渡（从右向左滑入）。
-Page<dynamic> _slideTransition(GoRouterState state, Widget child) {
-  return CustomTransitionPage<dynamic>(
+/// 统一路由页面，支持从页面任意位置滑动返回。
+Page<dynamic> _swipeablePage({
+  required BuildContext context,
+  required GoRouterState state,
+  required WidgetBuilder builder,
+}) {
+  final textDirection = Directionality.of(context);
+  // 触发边缘滑动返回的区域宽度
+  const backGestureDetectionWidth = 48.0;
+  // 触发边缘滑动返回的区域起始横坐标
+  double backGestureDetectionStartOffset;
+  if (textDirection == TextDirection.rtl) {
+    backGestureDetectionStartOffset =
+        MediaQuery.of(context).size.width - backGestureDetectionWidth;
+  } else {
+    backGestureDetectionStartOffset = 0.0;
+  }
+  return SwipeablePage<dynamic>(
     key: state.pageKey,
     name: state.name,
-    child: child,
+    backGestureDetectionWidth: backGestureDetectionWidth,
+    backGestureDetectionStartOffset: backGestureDetectionStartOffset,
+    canOnlySwipeFromEdge: true,
     transitionDuration: DurationConst.pageTransition,
     reverseTransitionDuration: DurationConst.pageTransition,
-    transitionsBuilder:
-        (
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child,
-        ) {
-          return SlideTransition(
-            position: animation.drive(
-              Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero),
-            ),
-            child: child,
-          );
-        },
+    builder: builder,
   );
 }
