@@ -250,7 +250,9 @@ class _BasePageState extends ConsumerState<BasePage>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late final PageLogic? _pageLogic;
   bool _readyCalled = false;
-  bool _paused = false;
+  bool _appActive = true;
+  bool _pageVisible = true;
+  bool _logicResumed = false;
   PageScope? _scope;
 
   @override
@@ -259,6 +261,7 @@ class _BasePageState extends ConsumerState<BasePage>
   @override
   void initState() {
     super.initState();
+    _appActive = _isAppActive(WidgetsBinding.instance.lifecycleState);
     _pageLogic = widget.createPageLogic();
     final scope = _createScope();
     _scope = scope;
@@ -270,19 +273,21 @@ class _BasePageState extends ConsumerState<BasePage>
       if (scope == null) return;
       _readyCalled = true;
       _pageLogic?.onReady();
-      _pageLogic?.onResume();
-      _paused = false;
+      _syncPageLifecycle();
     });
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updatePageVisibility();
+  }
+
+  @override
   void dispose() {
-    final scope = _scope;
-    if (scope != null) {
-      if (!_paused) {
-        _pageLogic?.onPause();
-        _paused = true;
-      }
+    if (_logicResumed) {
+      _pageLogic?.onPause();
+      _logicResumed = false;
     }
     _pageLogic?._unmount();
     _scope = null;
@@ -292,25 +297,36 @@ class _BasePageState extends ConsumerState<BasePage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final scope = _scope;
-    if (scope == null) return;
-    switch (state) {
-      case AppLifecycleState.resumed:
-        if (_paused) {
-          _pageLogic?.onResume();
-          _paused = false;
-        }
-        break;
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.hidden:
-      case AppLifecycleState.paused:
-        if (!_paused) {
-          _pageLogic?.onPause();
-          _paused = true;
-        }
-        break;
-      case AppLifecycleState.detached:
-        break;
+    final nextActive = _isAppActive(state);
+    if (_appActive == nextActive) return;
+    _appActive = nextActive;
+    _syncPageLifecycle();
+  }
+
+  bool _isAppActive(AppLifecycleState? state) {
+    return state == null || state == AppLifecycleState.resumed;
+  }
+
+  void _updatePageVisibility() {
+    final route = ModalRoute.of(context);
+    final nextVisible =
+        (route?.isCurrent ?? true) && TickerMode.valuesOf(context).enabled;
+    if (_pageVisible == nextVisible) return;
+    _pageVisible = nextVisible;
+    _syncPageLifecycle();
+  }
+
+  void _syncPageLifecycle() {
+    if (!_readyCalled || _scope == null) return;
+    final shouldResume = _appActive && _pageVisible;
+    if (shouldResume && !_logicResumed) {
+      _pageLogic?.onResume();
+      _logicResumed = true;
+      return;
+    }
+    if (!shouldResume && _logicResumed) {
+      _pageLogic?.onPause();
+      _logicResumed = false;
     }
   }
 
