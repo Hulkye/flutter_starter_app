@@ -320,6 +320,36 @@ abstract class AppLocalizations {
   /// **'登录失败'**
   String get loginFailed;
 
+  /// No description provided for @accountHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入账号'**
+  String get accountHint;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入密码'**
+  String get passwordHint;
+
+  /// No description provided for @lightMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'浅色'**
+  String get lightMode;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'深色'**
+  String get darkMode;
+
+  /// No description provided for @systemMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'跟随系统'**
+  String get systemMode;
+
   /// No description provided for @networkErrorHint.
   ///
   /// In zh, this message translates to:

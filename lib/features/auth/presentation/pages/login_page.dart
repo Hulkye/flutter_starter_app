@@ -58,7 +58,7 @@ class LoginPage extends BasePage {
       scope,
       ctrl: logic.accountCtrl,
       icon: Icons.person_outline,
-      hintText: '请输入账号',
+      hintText: scope.context.i18n.accountHint,
       onChanged: scope.ref.read(authViewModelProvider.notifier).updateAccount,
     );
     return child;
@@ -71,7 +71,7 @@ class LoginPage extends BasePage {
       ctrl: logic.passwordCtrl,
       icon: Icons.lock_outline,
       obscureText: true,
-      hintText: '请输入密码',
+      hintText: scope.context.i18n.passwordHint,
       onChanged: scope.ref.read(authViewModelProvider.notifier).updatePassword,
       onSubmitted: (_) => logic.login(),
     );

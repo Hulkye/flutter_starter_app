@@ -123,6 +123,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginFailed => 'Login failed';
 
   @override
+  String get accountHint => 'Please enter your account';
+
+  @override
+  String get passwordHint => 'Please enter your password';
+
+  @override
+  String get lightMode => 'Light';
+
+  @override
+  String get darkMode => 'Dark';
+
+  @override
+  String get systemMode => 'System';
+
+  @override
   String get networkErrorHint => 'Network error. Please check your connection.';
 
   @override

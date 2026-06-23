@@ -24,11 +24,11 @@ class ProfilePage extends BasePage {
   String _themeModeLabel(BuildContext context, AppThemeMode mode) {
     switch (mode) {
       case AppThemeMode.light:
-        return 'Light';
+        return context.i18n.lightMode;
       case AppThemeMode.dark:
-        return 'Dark';
+        return context.i18n.darkMode;
       case AppThemeMode.system:
-        return 'System';
+        return context.i18n.systemMode;
     }
   }
 

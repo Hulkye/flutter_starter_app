@@ -122,6 +122,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get loginFailed => '登录失败';
 
   @override
+  String get accountHint => '请输入账号';
+
+  @override
+  String get passwordHint => '请输入密码';
+
+  @override
+  String get lightMode => '浅色';
+
+  @override
+  String get darkMode => '深色';
+
+  @override
+  String get systemMode => '跟随系统';
+
+  @override
   String get networkErrorHint => '网络异常，请检查连接';
 
   @override

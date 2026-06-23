@@ -251,6 +251,8 @@ final class OrderRoute extends AppPageRoute {
 | `true` | 公开页面，未登录也可以访问 |
 | `false` | 受保护页面，未登录会跳转到登录页 |
 
+公开路由按 `path` 模式匹配，支持 `/article/:id` 这类动态路径。只要 Route 本身声明 `public = true`，实际访问 `/article/42` 也会被放行。
+
 ### 2. 在 Feature 中暴露路由
 
 新增 `lib/features/order/order_feature.dart`：

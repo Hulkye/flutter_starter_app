@@ -318,12 +318,12 @@ lib/app/shell/
 
 ## 认证守卫
 
-`createAuthGuard()` 接收登录页路径和 public path 列表。`router_provider.dart` 会递归扫描 `_allRouteNodes`，收集 `public == true` 的页面或重定向路径。
+`createAuthGuard()` 接收登录页路径和 public route pattern 列表。`router_provider.dart` 会递归扫描 `_allRouteNodes`，收集 `public == true` 的页面或重定向路径。
 
 ```dart
 redirect: createAuthGuard(
   loginPath: const LoginRoute().location,
-  publicPaths: collectPublicPaths(_allRouteNodes),
+  publicPaths: collectPublicRoutePatterns(_allRouteNodes),
 ),
 ```
 
@@ -333,6 +333,10 @@ redirect: createAuthGuard(
 @override
 bool get public => true;
 ```
+
+公开路由支持动态路径片段匹配。例如 `path = '/article/:id'` 时，实际访问 `/article/42` 也会被识别为公开路由。
+
+模板默认保留根路径 `/` 作为重定向入口，但未登录访问 `/` 时会先进入登录页。需要根路径免登录访问时，应显式将对应重定向路由标记为 `public`。
 
 ## 设计约束
 

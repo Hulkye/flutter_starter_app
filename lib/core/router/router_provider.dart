@@ -49,30 +49,30 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshNotifier,
     redirect: createAuthGuard(
       loginPath: const LoginRoute().location,
-      publicPaths: collectPublicPaths(_allRouteNodes),
+      publicPaths: collectPublicRoutePatterns(_allRouteNodes),
     ),
     routes: _allRouteNodes.map(toRouteBase).toList(),
   );
 });
 
-List<String> collectPublicPaths(List<AppRouteNode> nodes) {
-  final publicPaths = <String>[];
+List<String> collectPublicRoutePatterns(List<AppRouteNode> nodes) {
+  final publicRoutePatterns = <String>[];
   for (final node in nodes) {
     if (node is AppPageRoute && node.public) {
-      publicPaths.add(node.path);
+      publicRoutePatterns.add(node.path);
       continue;
     }
     if (node is AppRedirectRoute && node.public) {
-      publicPaths.add(node.path);
+      publicRoutePatterns.add(node.path);
       continue;
     }
     if (node is AppShellRoute) {
       for (final branch in node.branches) {
-        publicPaths.addAll(collectPublicPaths(branch.routes));
+        publicRoutePatterns.addAll(collectPublicRoutePatterns(branch.routes));
       }
     }
   }
-  return publicPaths;
+  return publicRoutePatterns;
 }
 
 /// 导航接口 Provider。

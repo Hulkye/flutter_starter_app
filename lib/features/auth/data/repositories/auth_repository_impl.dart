@@ -27,11 +27,15 @@ final class AuthRepositoryImpl implements AuthRepository {
       );
     }
     final data = response.data;
+    final token = data?['token']?.toString().trim() ?? '';
+    if (token.isEmpty) {
+      throw ApiException(code: response.code, message: fallbackErrorMessage);
+    }
     await _ref
         .read(authSessionProvider.notifier)
         .setSession(
           AuthSession(
-            token: data?['token']?.toString() ?? '',
+            token: token,
             payload: <String, dynamic>{'username': username},
           ),
         );

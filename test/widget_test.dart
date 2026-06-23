@@ -72,7 +72,7 @@ void main() {
       // 主题切换
       await tester.tap(find.text('切换主题模式'));
       await _pumpMs(tester, 3000);
-      expect(find.textContaining('Dark'), findsAtLeastNWidgets(1));
+      expect(find.textContaining('深色'), findsAtLeastNWidgets(1));
 
       // 退出登录
       await tester.tap(find.widgetWithText(ElevatedButton, '退出登录'));

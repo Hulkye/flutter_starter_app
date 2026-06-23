@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:exception_catcher/exception_catcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_starter_app/app/env.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class AppExceptionCatcher {
   AppExceptionCatcher._();
@@ -18,15 +19,18 @@ class AppExceptionCatcher {
           if (kDebugMode && appConfig.envTag != EnvTag.prod)
             ConsoleExceptionHandler(includeStackTrace: true),
         ],
-        contextProvider:
-            contextProvider ??
-            () async => <String, Object?>{
-              'env': appConfig.envTag.name,
-              'appVersion': '', // TODO
-              'buildNumber': '', // TODO
-            },
+        contextProvider: contextProvider ?? _defaultContextProvider,
       ),
     );
+  }
+
+  static Future<Map<String, Object?>> _defaultContextProvider() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    return <String, Object?>{
+      'env': appConfig.envTag.name,
+      'appVersion': packageInfo.version,
+      'buildNumber': packageInfo.buildNumber,
+    };
   }
 
   /// 释放处理器资源并清理运行状态
