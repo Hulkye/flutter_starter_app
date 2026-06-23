@@ -231,7 +231,7 @@ Presentation  ──────▶  Domain  ◀──────  Data
 - Pop 拦截与默认返回能力
 - 通过 `PageScope` 向子类提供 `context`、`ref` 与可选 `PageLogic`
 
-`PageLogic` 用于承载只属于当前页面的本地 controller、临时交互状态、生命周期，以及调用 VM/Provider，不放跨页面业务状态。页面如需使用，覆盖 `createPageLogic()` 并通过 `scope.logic<XxxPageLogic>()` 取得实例：
+`PageLogic` 是按需使用的页面本地逻辑层，用于承载只属于当前页面的 controller、FocusNode、临时交互状态、生命周期、首帧副作用，以及页面级导航/弹窗编排，不放跨页面业务状态。页面如需使用，覆盖 `createPageLogic()` 并通过 `scope.logic<XxxPageLogic>()` 取得实例：
 
 ```dart
 final class OrderPageLogic extends PageLogic {
@@ -241,6 +241,21 @@ final class OrderPageLogic extends PageLogic {
   }
 }
 ```
+
+推荐使用 `PageLogic` 的场景：
+
+- 页面持有 `TextEditingController`、`FocusNode`、`ScrollController` 或动画控制器。
+- 页面需要 `onReady`、`onResume`、`onPause`、首帧加载或可见性相关副作用。
+- 页面存在不适合进入 ViewModel 的临时 UI 状态。
+- 页面需要编排登录后跳转、确认弹窗、输入框提交等 UI 副作用。
+
+可以不使用 `PageLogic` 的场景：
+
+- 纯展示页面。
+- 只通过 `ref.watch` 渲染 Provider 状态的简单页面。
+- 只有少量点击回调，且不需要 controller、生命周期或页面私有状态。
+
+`PageLogic` 可以调用 VM/Provider，但不要承载可观察业务状态、接口编排、跨页面状态或领域逻辑；这些职责应放入 ViewModel、Service、Repository 或稳定 Provider。
 
 页面在 `page(scope)` 中按需桥接状态与 ViewModel：
 

@@ -525,7 +525,8 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 
 - 一个业务模块对应一个 `Feature` 目录。
 - 页面继承 `BasePage`，负责 UI 结构、Widget 组合、布局和样式。
-- 页面本地 `TextEditingController`、`FocusNode`、临时交互状态、生命周期、调用 VM/Provider 放入 `PageLogic`。
+- `PageLogic` 是按需页面逻辑层；页面本地 `TextEditingController`、`FocusNode`、`ScrollController`、临时交互状态、生命周期、首帧副作用和页面级 UI 副作用可放入 `PageLogic`。
+- 纯展示页面、简单 Provider 渲染页面或只有少量点击回调的页面，可以不创建 `PageLogic`。
 - ViewModel / Notifier 负责页面可观察状态、业务动作编排，以及把领域/服务状态转换成 UI 状态。
 - ViewModel 只依赖 Repository 抽象，不直接依赖 HTTP 客户端，也不管理页面生命周期。
 - RepositoryImpl 负责把接口数据转换成业务实体。
@@ -540,6 +541,7 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 - 不要在 Page 中直接读写 SharedPreferences 或 SecureStorage。
 - 不要让一个 Feature 直接依赖另一个 Feature 的内部实现。
 - 不要把页面级 `PageLogic` 当作跨模块公共 API。
+- 不要用 `PageLogic` 替代 ViewModel 承载可观察业务状态、接口编排、跨页面状态或领域逻辑。
 - 不要把具体业务逻辑放进 `core`。
 - 不要绕过 `AuthStore` 手动管理 token。
 - 不要在多个状态管理方案之间混用。

@@ -29,7 +29,7 @@ lib/features/<feature>/
 1. 明确 Feature 的业务边界，避免把多个无关业务塞进同一模块。
 2. 先设计 domain 抽象，再实现 data 层。
 3. 使用 Riverpod 暴露 Repository、Service、ViewModel。
-4. 页面使用 `BasePage` / `PageLogic` / `BaseVM` 项目范式。
+4. 页面使用 `BasePage` / `BaseVM` 项目范式，并按需使用 `PageLogic`。
 5. 在 `<feature>_routes.dart` 定义 `XxxRoute extends AppPageRoute`。
 6. 在 `<feature>_feature.dart` 定义 `XxxFeature extends AppFeature`，并 export route 文件。
 7. 如该 Feature 需要底部 Tab，在 `XxxFeature.tabs` 中返回 `AppTabEntry`。
@@ -42,7 +42,9 @@ lib/features/<feature>/
 - 不要直接依赖其他 Feature 的 ViewModel。
 - 跨 Feature 能力通过 Service、Repository 抽象、Controller、Provider 或 route class 暴露。
 - Page 负责 UI 结构、Widget 组合、布局、样式。
-- PageLogic 负责页面本地 controller、FocusNode、临时交互状态、生命周期、调用 VM/Provider。
+- PageLogic 是按需页面逻辑层，负责页面私有 controller、FocusNode、临时交互状态、生命周期、首帧副作用和页面级 UI 副作用。
+- 纯展示页面、简单 Provider 渲染页面或只有少量点击回调的页面，不要机械创建空 PageLogic。
+- PageLogic 可以调用 VM/Provider，但不承载可观察业务状态、接口编排、跨页面状态或领域逻辑。
 - ViewModel / Notifier 负责页面可观察状态、业务动作编排、把领域/服务状态转换成 UI 状态。
 - ViewModel 不持有 `BuildContext`，不直接依赖 GoRouter。
 

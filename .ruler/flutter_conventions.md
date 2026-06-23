@@ -19,8 +19,9 @@
 ## 页面与 ViewModel
 
 - 页面优先继承/复用 `BasePage` 体系，Page 负责 UI 结构、Widget 组合、布局、样式。
-- 页面需要 `TextEditingController`、`FocusNode`、临时交互状态、生命周期或调用 VM/Provider 时，优先覆盖 `createPageLogic()` 并使用 `PageLogic` 承载。
-- 页面中通过 `scope.logic<XxxPageLogic>()` 访问页面逻辑；不要把页面级 `PageLogic` 当作跨模块公共 API。
+- `PageLogic` 是可选页面逻辑层；仅当页面需要 `TextEditingController`、`FocusNode`、`ScrollController`、临时交互状态、页面生命周期、首帧副作用或页面级导航/弹窗编排时，才覆盖 `createPageLogic()`。
+- 纯展示页面、简单 Provider 渲染页面或只有少量点击回调的页面，可以直接在 `page(scope)` 中使用 `ref.watch` / `ref.read`，不要机械创建空 PageLogic。
+- 页面中通过 `scope.logic<XxxPageLogic>()` 访问页面逻辑；PageLogic 应保持页面私有，不要作为跨模块公共 API，也不要替代 ViewModel 承载可观察业务状态。
 - ViewModel / Notifier 优先继承/复用 `BaseVM` 体系，负责页面可观察状态、业务动作编排、把领域/服务状态转换成 UI 状态。
 - State 建模要显式，例如 `loading`、`initialized`、`errorMessage`、`items`。
 - 不要把 Toast、Loading、导航结果等一次性事件长期保存在 State 中。
