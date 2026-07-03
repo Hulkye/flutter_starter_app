@@ -39,6 +39,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get currentLogoAsset => '当前Logo资源';
 
   @override
+  String get privacyPolicy => '隐私政策';
+
+  @override
+  String get serviceAgreement => '服务协议';
+
+  @override
   String get confirm => '确认';
 
   @override

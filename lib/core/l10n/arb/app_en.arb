@@ -10,6 +10,8 @@
   "switchThemeMode": "Switch theme mode",
   "currentThemeMode": "Current theme mode",
   "currentLogoAsset": "Current logo asset",
+  "privacyPolicy": "Privacy Policy",
+  "serviceAgreement": "Service Agreement",
   "confirm": "Confirm",
   "cancel": "Cancel",
   "login": "Log in",

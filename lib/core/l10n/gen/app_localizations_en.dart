@@ -39,6 +39,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentLogoAsset => 'Current logo asset';
 
   @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get serviceAgreement => 'Service Agreement';
+
+  @override
   String get confirm => 'Confirm';
 
   @override

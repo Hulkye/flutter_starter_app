@@ -10,6 +10,8 @@
   "switchThemeMode": "切换主题模式",
   "currentThemeMode": "当前主题模式",
   "currentLogoAsset": "当前Logo资源",
+  "privacyPolicy": "隐私政策",
+  "serviceAgreement": "服务协议",
   "confirm": "确认",
   "cancel": "取消",
   "login": "登录",

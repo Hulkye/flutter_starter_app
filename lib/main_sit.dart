@@ -7,8 +7,8 @@ Future<void> main() async {
       envTag: EnvTag.sit,
       baseUrl: 'https://sit.example.com',
       apiPathPrefix: '/api',
-      privacyPolicyUrl: 'https://example.com/privacy',
-      userAgreementUrl: 'https://example.com/agreement',
+      privacyPolicyUrl: 'https://flutter.dev',
+      userAgreementUrl: 'https://flutter.dev',
     ),
   );
 }

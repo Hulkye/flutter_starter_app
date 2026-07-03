@@ -1,11 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../../../../core/l10n/l10n.dart';
-import '../../../../core/theme/theme.dart';
-import '../../../../shared/presentation/presentation.dart';
-import '../../../../shared/services/auth/auth.dart';
-import '../../../../shared/widgets/button/primary_round_button.dart';
-import '../../../../shared/widgets/sheet/common_confirm_sheet.dart';
+import 'package:flutter_starter_app/header.dart';
 
 class ProfilePage extends BasePage {
   const ProfilePage({super.key});
@@ -41,6 +34,20 @@ class ProfilePage extends BasePage {
         scope.ref.read(authSessionProvider.notifier).clear();
       },
     );
+  }
+
+  void _openWebPage(
+    PageScope scope, {
+    required String url,
+    required String title,
+  }) {
+    if (WebPageConfig.normalizeWebUri(url) == null) {
+      PresentationHelper.emitHint(scope.context.i18n.webInvalidUrl);
+      return;
+    }
+    scope.ref
+        .read(appRouterProvider)
+        .push(WebPageRoute(url: url, title: title).location);
   }
 
   // ── AppBar ──
@@ -103,6 +110,51 @@ class ProfilePage extends BasePage {
                             .setThemeMode(_nextThemeMode(themeMode));
                       },
                     ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: appColor.compBackgroundPrimary,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: appColor.compDivider),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.privacy_tip_outlined),
+                    title: Text(context.i18n.privacyPolicy),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      _openWebPage(
+                        scope,
+                        url: appConfig.privacyPolicyUrl,
+                        title: context.i18n.privacyPolicy,
+                      );
+                    },
+                  ),
+                  Divider(
+                    height: 1,
+                    thickness: 0.5,
+                    indent: 56,
+                    color: appColor.compDivider,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.description_outlined),
+                    title: Text(context.i18n.serviceAgreement),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      _openWebPage(
+                        scope,
+                        url: appConfig.userAgreementUrl,
+                        title: context.i18n.serviceAgreement,
+                      );
+                    },
                   ),
                 ],
               ),

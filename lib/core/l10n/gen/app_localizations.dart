@@ -158,6 +158,18 @@ abstract class AppLocalizations {
   /// **'当前Logo资源'**
   String get currentLogoAsset;
 
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In zh, this message translates to:
+  /// **'隐私政策'**
+  String get privacyPolicy;
+
+  /// No description provided for @serviceAgreement.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务协议'**
+  String get serviceAgreement;
+
   /// No description provided for @confirm.
   ///
   /// In zh, this message translates to:
