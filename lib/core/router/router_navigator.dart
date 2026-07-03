@@ -14,23 +14,23 @@ final class RouterNavigator implements BaseNavigator {
   String get location => _router.state.uri.toString();
 
   @override
-  void go(String location) {
-    _router.go(location);
+  void go(String location, {Object? extra}) {
+    _router.go(location, extra: extra);
   }
 
   @override
-  Future<T?> push<T extends Object?>(String location) {
-    return _router.push<T>(location);
+  Future<T?> push<T extends Object?>(String location, {Object? extra}) {
+    return _router.push<T>(location, extra: extra);
   }
 
   @override
-  void replace(String location) {
-    _router.replace(location);
+  void replace(String location, {Object? extra}) {
+    _router.replace(location, extra: extra);
   }
 
   @override
-  void replaceAll(String location) {
-    _router.go(location);
+  void replaceAll(String location, {Object? extra}) {
+    _router.go(location, extra: extra);
   }
 
   @override

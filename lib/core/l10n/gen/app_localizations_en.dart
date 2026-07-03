@@ -75,6 +75,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
+  String get back => 'Back';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get more => 'More';
+
+  @override
+  String get reload => 'Reload';
+
+  @override
+  String get forward => 'Forward';
+
+  @override
+  String get copyLink => 'Copy link';
+
+  @override
+  String get copied => 'Copied';
+
+  @override
+  String get clearWebCache => 'Clear cache';
+
+  @override
   String get logout => 'Log out';
 
   @override
@@ -127,6 +151,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordHint => 'Please enter your password';
+
+  @override
+  String get webPage => 'Web Page';
+
+  @override
+  String get webInvalidUrl => 'Invalid web address';
+
+  @override
+  String get webBlockedUrl => 'This web address has been blocked';
+
+  @override
+  String get webLoadFailed =>
+      'Failed to load the page. Please try again later.';
+
+  @override
+  String get webCacheCleared => 'Web cache cleared';
 
   @override
   String get lightMode => 'Light';

@@ -519,6 +519,50 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 
 ---
 
+## 🌐 打开通用网页
+
+模板内置通用 WebView 页面，已注册为普通业务路由：
+
+| 路由 | 登录要求 | 适用场景 |
+| --- | --- | --- |
+| `WebPageRoute` | 无需登录 | 隐私政策、用户协议、帮助页 |
+| `AuthWebPageRoute` | 需要登录 | 业务 H5、会员页、订单页 |
+
+快速打开网页：
+
+```dart
+ref.read(appRouterProvider).push(
+  const WebPageRoute(
+    url: 'https://example.com/privacy',
+    title: '隐私政策',
+  ).location,
+);
+```
+
+复杂配置通过 `extra` 传入 `WebPageConfig`：
+
+```dart
+ref.read(appRouterProvider).push(
+  const AuthWebPageRoute().location,
+  extra: const WebPageConfig(
+    url: 'https://example.com/member',
+    title: '会员中心',
+    allowedHosts: ['example.com'],
+    headers: {'X-App-Source': 'flutter'},
+    showToolbarActions: true,
+  ),
+);
+```
+
+安全策略：
+
+- 仅允许 `http/https` 地址。
+- 未传 `allowedHosts` 时允许任意 `http/https`。
+- 传入 `allowedHosts` 后只允许匹配白名单 host。
+- `tel:`、`mailto:`、支付或地图等三方 scheme 默认拦截；如需外部 App 唤起，可后续接入 `url_launcher`。
+
+---
+
 ## ✅ 常见开发约定
 
 ### 推荐做法

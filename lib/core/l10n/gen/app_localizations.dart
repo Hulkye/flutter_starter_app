@@ -230,6 +230,54 @@ abstract class AppLocalizations {
   /// **'设置'**
   String get settings;
 
+  /// No description provided for @back.
+  ///
+  /// In zh, this message translates to:
+  /// **'后退'**
+  String get back;
+
+  /// No description provided for @close.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get close;
+
+  /// No description provided for @more.
+  ///
+  /// In zh, this message translates to:
+  /// **'更多'**
+  String get more;
+
+  /// No description provided for @reload.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新'**
+  String get reload;
+
+  /// No description provided for @forward.
+  ///
+  /// In zh, this message translates to:
+  /// **'前进'**
+  String get forward;
+
+  /// No description provided for @copyLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'复制链接'**
+  String get copyLink;
+
+  /// No description provided for @copied.
+  ///
+  /// In zh, this message translates to:
+  /// **'已复制'**
+  String get copied;
+
+  /// No description provided for @clearWebCache.
+  ///
+  /// In zh, this message translates to:
+  /// **'清理缓存'**
+  String get clearWebCache;
+
   /// No description provided for @logout.
   ///
   /// In zh, this message translates to:
@@ -331,6 +379,36 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'请输入密码'**
   String get passwordHint;
+
+  /// No description provided for @webPage.
+  ///
+  /// In zh, this message translates to:
+  /// **'网页'**
+  String get webPage;
+
+  /// No description provided for @webInvalidUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'网页地址无效'**
+  String get webInvalidUrl;
+
+  /// No description provided for @webBlockedUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'网页地址已被拦截'**
+  String get webBlockedUrl;
+
+  /// No description provided for @webLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'网页加载失败，请稍后重试'**
+  String get webLoadFailed;
+
+  /// No description provided for @webCacheCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'网页缓存已清理'**
+  String get webCacheCleared;
 
   /// No description provided for @lightMode.
   ///

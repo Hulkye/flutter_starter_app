@@ -75,6 +75,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings => '设置';
 
   @override
+  String get back => '后退';
+
+  @override
+  String get close => '关闭';
+
+  @override
+  String get more => '更多';
+
+  @override
+  String get reload => '刷新';
+
+  @override
+  String get forward => '前进';
+
+  @override
+  String get copyLink => '复制链接';
+
+  @override
+  String get copied => '已复制';
+
+  @override
+  String get clearWebCache => '清理缓存';
+
+  @override
   String get logout => '退出登录';
 
   @override
@@ -126,6 +150,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get passwordHint => '请输入密码';
+
+  @override
+  String get webPage => '网页';
+
+  @override
+  String get webInvalidUrl => '网页地址无效';
+
+  @override
+  String get webBlockedUrl => '网页地址已被拦截';
+
+  @override
+  String get webLoadFailed => '网页加载失败，请稍后重试';
+
+  @override
+  String get webCacheCleared => '网页缓存已清理';
 
   @override
   String get lightMode => '浅色';

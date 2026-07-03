@@ -9,8 +9,8 @@ Future<void> main() async {
       apiPathPrefix: '/api',
       proxyEnable: false,
       caughtAddress: '127.0.0.1:8888',
-      privacyPolicyUrl: 'https://example.com/privacy',
-      userAgreementUrl: 'https://example.com/agreement',
+      privacyPolicyUrl: 'https://flutter.dev',
+      userAgreementUrl: 'https://flutter.dev',
     ),
   );
 }

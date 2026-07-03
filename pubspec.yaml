@@ -79,6 +79,8 @@ dependencies:
   swipeable_page_route: 0.4.8
   # SVG展示
   flutter_svg: 2.3.0
+  # WebView
+  webview_flutter: 4.14.0
 
 dev_dependencies:
   flutter_test:

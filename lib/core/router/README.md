@@ -174,6 +174,15 @@ ref.read(appRouterProvider).go(const RootRoute().location);
 ref.read(appRouterProvider).back();
 ```
 
+需要传递无法放入 query 的高级配置时，可通过 `extra` 传入类型化对象。`AppRouteState.extra` 会在 Route 的 `buildPage()` 中暴露给页面：
+
+```dart
+ref.read(appRouterProvider).push(
+  const AuthWebPageRoute().location,
+  extra: const WebPageConfig(url: 'https://example.com/member'),
+);
+```
+
 带参数路由应让 `path` 和 `location` 分离：
 
 ```dart

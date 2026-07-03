@@ -7,16 +7,16 @@ abstract interface class BaseNavigator {
   String get location;
 
   /// 跳转到目标 location 并替换当前 location（适合 tab 切换/回首页/深链）。
-  void go(String location);
+  void go(String location, {Object? extra});
 
   /// 压栈打开目标 location，可返回结果。
-  Future<T?> push<T extends Object?>(String location);
+  Future<T?> push<T extends Object?>(String location, {Object? extra});
 
   /// 替换当前页。
-  void replace(String location);
+  void replace(String location, {Object? extra});
 
   /// 清空当前栈并跳转。
-  void replaceAll(String location);
+  void replaceAll(String location, {Object? extra});
 
   /// 返回上一页。
   void back<T extends Object?>([T? result]);

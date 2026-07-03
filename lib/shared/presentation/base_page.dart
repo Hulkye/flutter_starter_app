@@ -187,6 +187,9 @@ abstract class BasePage extends ConsumerStatefulWidget {
 
   bool get canPop => true;
   Future<bool> onPopInvoked(dynamic result) async => true;
+  Future<bool> onPopInvokedWithScope(PageScope scope, dynamic result) {
+    return onPopInvoked(result);
+  }
 
   // ===========================================================================
   // 其他
@@ -359,7 +362,7 @@ class _BasePageState extends ConsumerState<BasePage>
       canPop: widget.canPop,
       onPopInvokedWithResult: (bool didPop, dynamic result) async {
         if (didPop) return;
-        final ok = await widget.onPopInvoked(result);
+        final ok = await widget.onPopInvokedWithScope(scope, result);
         if (ok && mounted) {
           ref.read(appRouterProvider).back(result);
         }

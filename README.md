@@ -19,7 +19,7 @@
 
 这是一个面向中大型 Flutter 项目的快速启动模板。项目以 **Feature-First** 组织业务模块，在每个 Feature 内落地 **Data / Domain / Presentation** 分层，并通过 **BasePage + PageLogic + BaseVM + Riverpod** 建立职责清晰的 MVVM 开发范式。
 
-模板已内置多环境、网络请求、路由守卫、主题、国际化、本地存储、登录会话、Toast/Loading、刷新、按钮、弹窗等常用基础设施。Clone 后只需要替换业务接口与页面，即可进入功能开发。
+模板已内置多环境、网络请求、路由守卫、主题、国际化、本地存储、登录会话、通用 WebView 页面、Toast/Loading、刷新、按钮、弹窗等常用基础设施。Clone 后只需要替换业务接口与页面，即可进入功能开发。
 
 > 📘 第一次使用模板请先阅读：[模板使用说明](docs/template_usage.md)。
 >
@@ -43,6 +43,7 @@
   - [网络层](#-网络层)
   - [路由系统](#-路由系统)
   - [登录会话](#-登录会话)
+  - [通用 WebView 页面](#-通用-webview-页面)
   - [主题与资源](#-主题与资源)
   - [国际化](#-国际化)
   - [存储层](#-存储层)
@@ -128,7 +129,8 @@ lib/
 │   ├── features.dart              # Feature 汇聚与业务路由统一导出
 │   ├── auth/                      # 登录示例
 │   ├── profile/                   # 个人中心与主题/退出登录示例
-│   └── todo/                      # 默认根 Tab 与完整分层示例
+│   ├── todo/                      # 默认根 Tab 与完整分层示例
+│   └── webview/                   # 通用 WebView 页面与路由
 ├── shared/                        # 跨 Feature 共享能力
 │   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseState / PresentationHelper
 │   ├── services/                  # AuthSession / AuthStore
@@ -415,6 +417,44 @@ Router Guard / AuthInterceptor / UI
 ```
 
 `AuthSession` 以 `token`、`refreshToken` 与可扩展 payload 为核心，适配不同后端登录协议。登录 Feature 中提供了完整示例：页面表单、ViewModel、Repository、DataSource、会话落盘与退出登录。
+
+### 🌐 通用 WebView 页面
+
+模板内置 `webview_flutter` 驱动的通用网页容器，适合隐私政策、用户协议、帮助中心和业务 H5。
+
+快速打开公开网页：
+
+```dart
+ref.read(appRouterProvider).push(
+  const WebPageRoute(
+    url: 'https://example.com/privacy',
+    title: '隐私政策',
+  ).location,
+);
+```
+
+需要登录的业务 H5 使用 `AuthWebPageRoute`：
+
+```dart
+ref.read(appRouterProvider).push(
+  const AuthWebPageRoute(url: 'https://example.com/member').location,
+);
+```
+
+需要 headers、白名单或 WebView 行为开关时，通过 `extra` 传入 `WebPageConfig`：
+
+```dart
+ref.read(appRouterProvider).push(
+  const AuthWebPageRoute().location,
+  extra: const WebPageConfig(
+    url: 'https://example.com/member',
+    allowedHosts: ['example.com'],
+    headers: {'X-Source': 'app'},
+  ),
+);
+```
+
+未传 `allowedHosts` 时允许任意 `http/https`；传入后仅允许白名单 host。非 `http/https` 地址会被拦截，不会尝试外部 App 唤起。
 
 ### 🎨 主题与资源
 
