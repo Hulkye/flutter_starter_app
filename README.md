@@ -111,6 +111,7 @@ lib/
 │   ├── application.dart           # Application.run 启动入口
 │   ├── env.dart                   # EnvConfig / EnvTag
 │   ├── host/                      # 启动协调、会话协调、AppHost
+│   ├── router/                    # App 路由图组合与 core/router 配置注入
 │   ├── shell/                     # RootRoute / RootShellRoute / 底部 Tab 容器
 │   └── splash/                    # 启动展示页
 ├── core/                          # 全局基础设施，不承载具体业务
@@ -389,6 +390,7 @@ noCache · cacheFirst · networkFirst · cacheOnly · networkOnly · staleWhileR
 ```text
 Feature Route Node → AppPageRoute / AppShellRoute → GoRoute / StatefulShellRoute
 Feature Module     → AppFeature / AppTabEntry     → appFeatureRoutes / appFeatureTabs
+App Composition     → AppRouterConfig              → goRouterProvider
 Page Navigation    → BaseNavigator                → RouterNavigator
 ```
 
@@ -397,6 +399,7 @@ Page Navigation    → BaseNavigator                → RouterNavigator
 - 每个 Feature 自己维护路由定义
 - 每个 Feature 通过 `XxxFeature` 暴露模块路由与可选底部 Tab 入口
 - `features/features.dart` 汇聚所有 Feature，并统一导出业务 Route class
+- `lib/app/router/app_router_config.dart` 组合 Splash、Root/Shell 与 Feature 路由，并注入 `core/router`
 - App Shell 从 `appFeatureTabs` 自动装配底部 Tab 分支，业务层不直接依赖 GoRouter Shell API
 - 支持公开路由与登录态路由
 - 未登录访问受保护页面时自动跳转登录页
@@ -531,7 +534,7 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 6. 在 `presentation/pages` 中继承 `BasePage` 编写 UI，并在 `page(scope)` 中读取状态、调用 ViewModel。
 7. 在 `<feature>_routes.dart` 中声明路由。
 8. 在 `<feature>_feature.dart` 中继承 `AppFeature` 并暴露路由。
-9. 在 `features/features.dart` 中注册 `XxxFeature()`，并导出该 Feature。
+9. 在 `features/features.dart` 中注册 `XxxFeature()`，并导出该 Feature；App 路由配置会自动消费 `appFeatures`。
 
 推荐最小结构：
 

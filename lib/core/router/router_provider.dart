@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/splash/splash_route.dart';
-import '../../app/shell/root_shell_route.dart';
-import '../../features/features.dart';
 import '../../shared/services/auth/auth.dart';
 import '../../shared/widgets/toast/toast_util.dart';
 import 'app_router_transfor.dart';
@@ -14,15 +11,38 @@ import 'router_guard.dart';
 import 'router_navigator.dart';
 
 // =============================================================================
-// 路由注册表 —— 由各 Feature 汇聚生成
+// 路由配置 —— 由 App 组合层注入
 // =============================================================================
 
-/// 所有应用路由节点。
-final List<AppRouteNode> _allRouteNodes = <AppRouteNode>[
-  const SplashRoute(),
-  ...buildRootRouteNodes(),
-  ...appFeatureRoutes,
-];
+/// GoRouter 所需的应用路由配置。
+///
+/// core/router 只消费这份配置，不直接 import app 或 features。
+final class AppRouterConfig {
+  const AppRouterConfig({
+    required this.routeNodes,
+    required this.initialLocation,
+    required this.loginLocation,
+  });
+
+  /// 完整应用路由节点。
+  final List<AppRouteNode> routeNodes;
+
+  /// GoRouter 初始 location。
+  final String initialLocation;
+
+  /// 未登录访问受保护页面时跳转的登录页 location。
+  final String loginLocation;
+}
+
+/// 应用路由配置 Provider。
+///
+/// 由 app 组合层通过 ProviderScope.overrides 注入，保持 core/router
+/// 不依赖具体业务 Feature。
+final appRouterConfigProvider = Provider<AppRouterConfig>((ref) {
+  throw StateError(
+    'appRouterConfigProvider must be overridden by the app composition layer.',
+  );
+});
 
 // =============================================================================
 // Provider
@@ -36,6 +56,7 @@ final GlobalKey<NavigatorState> routerNavigatorKey =
 ///
 /// 登录态变化时只刷新 redirect，不重建 Router，避免重新应用 initialLocation。
 final goRouterProvider = Provider<GoRouter>((ref) {
+  final routerConfig = ref.watch(appRouterConfigProvider);
   final refreshNotifier = _RouterRefreshNotifier();
   ref.onDispose(refreshNotifier.dispose);
   ref.listen<AuthSession?>(authSessionProvider, (_, _) {
@@ -44,15 +65,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: routerNavigatorKey,
-    initialLocation: const SplashRoute().location,
+    initialLocation: routerConfig.initialLocation,
     observers: [ToastUtil.navigatorObserver],
     refreshListenable: refreshNotifier,
     redirect: createAuthGuard(
-      loginPath: const LoginRoute().location,
+      loginPath: routerConfig.loginLocation,
       isAuthenticated: () => ref.read(authSessionProvider)?.isValid == true,
-      publicPaths: collectPublicRoutePatterns(_allRouteNodes),
+      publicPaths: collectPublicRoutePatterns(routerConfig.routeNodes),
     ),
-    routes: _allRouteNodes.map(toRouteBase).toList(),
+    routes: routerConfig.routeNodes.map(toRouteBase).toList(),
   );
 });
 

@@ -17,6 +17,7 @@ description: "Use when: adding, changing, reviewing, or documenting app routes, 
 6. 在 `<feature>_feature.dart` 的 `routes` 中暴露该路由。
 7. 如果该路由是底部 Tab 根路由，在 `<feature>_feature.dart` 的 `tabs` 中暴露 `AppTabEntry`。
 8. 在 `features/features.dart` 注册并导出 Feature。
+9. App 层 `lib/app/router/app_router_config.dart` 会从 `appFeatures` 组合路由图并注入 `core/router`；不要为新增 Feature 修改 `core/router/router_provider.dart`。
 
 ## 导航使用
 
@@ -32,6 +33,7 @@ ref.read(appRouterProvider).push(const LoginRoute().location);
 
 - 业务代码不要直接 import `go_router`。
 - `router_provider.dart` 不要逐个 import 业务 route 文件。
+- `core/router` 不要 import `app/` 或 `features/` 来装配具体路由。
 - 不要让业务页面重复 import 深层 route 文件。
 - 不要把 `path` 当作带真实参数的跳转地址。
 

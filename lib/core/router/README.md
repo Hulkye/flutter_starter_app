@@ -7,7 +7,8 @@
 - 对业务层暴露框架无关的路由定义：`AppPageRoute`、`AppRedirectRoute`、`AppShellRoute`。
 - 对业务层暴露导航接口：`BaseNavigator` 与 `appRouterProvider`。
 - 在基础设施层把 `AppRouteNode` 转换为 GoRouter 的 `RouteBase`。
-- 在 `router_provider.dart` 汇总 App 装配路由、Feature 路由、认证守卫和导航 Provider。
+- 通过 `AppRouterConfig` 接收 App 组合层注入的路由图、初始页和登录页 location。
+- 在 `router_provider.dart` 创建 GoRouter、认证守卫和导航 Provider。
 - App Shell 的 Tab 入口由 Feature 显式声明，Shell 只做装配。
 
 ## 文件清单
@@ -26,7 +27,7 @@
 | `base_navigator.dart` | `BaseNavigator` 导航抽象接口 | ❌ |
 | `router_navigator.dart` | `RouterNavigator` 的 GoRouter 导航实现 | ✅ |
 | `app_router_transfor.dart` | `AppRouteNode` 到 `RouteBase` 的适配器 | ✅ |
-| `router_provider.dart` | GoRouter、导航接口、路由表、守卫 Provider | ✅ |
+| `router_provider.dart` | `AppRouterConfig`、GoRouter、导航接口、守卫 Provider | ✅ |
 | `router_guard.dart` | `createAuthGuard()` 认证守卫工具 | ✅ |
 
 ## 分层关系
@@ -131,14 +132,20 @@ class RootShellPage extends BasePage {
 
 ## 路由注册流程
 
-`router_provider.dart` 维护应用总路由表：
+`core/router` 不维护具体应用路由表；应用总路由图由 `lib/app/router/app_router_config.dart` 在 App 组合层创建，并通过 `appRouterConfigProvider` 注入：
 
 ```dart
-final List<AppRouteNode> _allRouteNodes = <AppRouteNode>[
-  const SplashRoute(),
-  ...buildRootRouteNodes(),
-  ...appFeatureRoutes,
-];
+AppRouterConfig createAppRouterConfig() {
+  return AppRouterConfig(
+    routeNodes: <AppRouteNode>[
+      const SplashRoute(),
+      ...buildRootRouteNodes(),
+      ...appFeatureRoutes,
+    ],
+    initialLocation: const SplashRoute().location,
+    loginLocation: const LoginRoute().location,
+  );
+}
 ```
 
 注册顺序含义：
@@ -162,7 +169,7 @@ final List<AppTabEntry> appFeatureTabs = [
 - 只提供普通页面路由、不提供 Tab，例如 `auth`。
 - 由 App Shell 统一决定展示顺序，而不是把业务页面写死在 Shell 内部。
 
-`goRouterProvider` 负责创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。登录态统一来自 `authSessionProvider`；登录态变化只刷新 redirect，不重建 Router，避免重复应用 `initialLocation`。
+`Application.run()` 会把 `createAppRouterOverrides()` 加入 `ProviderScope.overrides`。`goRouterProvider` 只消费注入后的 `AppRouterConfig` 创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。登录态统一来自 `authSessionProvider`；登录态变化只刷新 redirect，不重建 Router，避免重复应用 `initialLocation`。
 
 ## 导航用法
 
@@ -310,6 +317,9 @@ lib/app/host/
   app_bootstrap_coordinator.dart
   app_session_coordinator.dart
 
+lib/app/router/
+  app_router_config.dart
+
 lib/app/splash/
   splash_page.dart
   splash_route.dart
@@ -323,18 +333,19 @@ lib/app/shell/
 
 - `/` 由 `RootRoute` 重定向到默认 Feature Tab。
 - `RootShellRoute` 从 `appFeatureTabs` 自动装配底部 Tab 分支；没有 Tab 时不会注册 Shell。
+- `app_router_config.dart` 负责把 Splash、Root/Shell 与 Feature 路由组合成 `AppRouterConfig` 并注入 core/router。
 - GoRouter 的 `StatefulShellRoute` 只存在于 `app_router_transfor.dart`，不会暴露给业务 Feature。
 
 ## 认证守卫
 
-`createAuthGuard()` 接收登录页路径、登录态读取函数和 public route pattern 列表。`router_provider.dart` 会递归扫描 `_allRouteNodes`，收集 `public == true` 的页面或重定向路径。
+`createAuthGuard()` 接收登录页路径、登录态读取函数和 public route pattern 列表。`router_provider.dart` 会递归扫描 `AppRouterConfig.routeNodes`，收集 `public == true` 的页面或重定向路径。
 
 ```dart
 redirect: createAuthGuard(
-  loginPath: const LoginRoute().location,
+  loginPath: routerConfig.loginLocation,
   isAuthenticated: () =>
       ref.read(authSessionProvider)?.isValid == true,
-  publicPaths: collectPublicRoutePatterns(_allRouteNodes),
+  publicPaths: collectPublicRoutePatterns(routerConfig.routeNodes),
 ),
 ```
 
@@ -354,6 +365,7 @@ bool get public => true;
 - 业务层不直接 import `go_router`，统一通过 `AppPageRoute`、`AppRouteState`、`BaseNavigator` 解耦。
 - Feature 只暴露稳定 route class，不让一个 Feature 的 presentation 直接依赖另一个 Feature 的 presentation。
 - App Shell、Splash、Root redirect 放在 `lib/app/`，由 App 层组合 Feature 入口。
+- `core/router` 不 import `app/` 或 `features/`；应用路由图只能通过 `AppRouterConfig` 注入。
 - `RouterNavigator` 是唯一调用 GoRouter 导航 API 的类。
 - `app_router_transfor.dart` 是唯一把项目路由定义转换为 GoRouter RouteBase 的适配层。
 - `router.dart` 是 router 模块对外入口；业务常用导出再由 `header.dart` 汇总。

@@ -1,5 +1,6 @@
 import 'package:flutter_starter_app/app/app.dart';
 import 'package:flutter_starter_app/app/env.dart';
+import 'package:flutter_starter_app/app/router/app_router_config.dart';
 import 'package:flutter_starter_app/core/di/di_overrides.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_starter_app/features/auth/data/repositories/auth_repository_impl.dart';
@@ -38,6 +39,7 @@ void main() {
       appConfig = const EnvConfig();
       final overrides = [
         ...createEnvOverrides(appConfig),
+        ...createAppRouterOverrides(),
         authSessionProvider.overrideWith(_TestAuthSessionNotifier.new),
         authRepositoryProvider.overrideWith(_FakeAuthRepository.new),
       ];

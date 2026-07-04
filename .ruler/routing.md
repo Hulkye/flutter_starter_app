@@ -7,7 +7,9 @@
 - 一个 Route class 表达一个路由目标和页面构建方式。
 - 页面 Route class 继承 `AppPageRoute`，Shell/Redirect 使用对应的 `AppRouteNode` 子类。
 - Feature 通过 `XxxFeature extends AppFeature` 暴露路由。
-- App 通过 `features/features.dart` 汇聚普通业务路由与可选底部 Tab 入口。
+- `features/features.dart` 汇聚普通业务路由与可选底部 Tab 入口。
+- App 组合层通过 `lib/app/router/app_router_config.dart` 组装 Splash、Root/Shell 与 Feature 路由，并以 `AppRouterConfig` 注入 `core/router`。
+- `core/router` 只提供路由定义、GoRouter 适配、守卫和导航 Provider，不 import `app/` 或 `features/`。
 
 ## 新增路由流程
 
@@ -17,11 +19,13 @@
 4. 如需底部 Tab，在 `XxxFeature.tabs` 中返回 `AppTabEntry`，由 `RootShellRoute` 自动装配。
 5. 在 `XxxFeature` 中 export 当前 Feature 的 route 文件。
 6. 在 `lib/features/features.dart` import/export `XxxFeature` 并加入 `appFeatures`。
-7. 业务页面通过 `package:flutter_starter_app/header.dart` 使用 route class 和 `appRouterProvider`。
+7. `lib/app/router/app_router_config.dart` 会从 `appFeatures` 自动组合到 App 路由图，通常无需修改 `core/router/router_provider.dart`。
+8. 业务页面通过 `package:flutter_starter_app/header.dart` 使用 route class 和 `appRouterProvider`。
 
 ## 禁止事项
 
 - 不要在 `core/router/router_provider.dart` 中逐个 import 业务 route 文件。
+- 不要在 `core/router` 中 import `app/` 或 `features/` 来装配具体路由；应用路由图必须由 App 组合层注入。
 - 不要在业务页面直接 import `go_router`。
 - 不要把 `path` 和 `location` 混用：
   - `path` 用于路由匹配，例如 `/profile/:userId`；

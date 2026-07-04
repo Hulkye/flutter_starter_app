@@ -7,6 +7,7 @@
 ///
 /// - [Application.bootstrap] — 启动引导（Pre-ProviderScope 初始化编排）
 /// - [createEnvOverrides] — 环境 Provider 覆盖工厂（可插拔入口）
+/// - App 组合层可追加其他 overrides，例如路由图配置
 ///
 /// ## 架构
 ///
@@ -16,7 +17,7 @@
 ///   │     ├── prefsStorage.init()
 ///   │     ├── secureStorage.init()
 ///   │     └── authStore.init()
-///   └── Phase 2: createEnvOverrides(env)
+///   └── Phase 2: createEnvOverrides(env) + App composition overrides
 ///         └── List<Override> → ProviderScope.overrides
 ///
 /// 之后的一切由 Riverpod 接管：
@@ -28,7 +29,10 @@
 /// ```dart
 /// import 'core/di/di.dart';
 ///
-/// final overrides = createEnvOverrides(envConfig);
+/// final overrides = [
+///   ...createEnvOverrides(envConfig),
+///   ...createAppRouterOverrides(),
+/// ];
 /// runApp(ProviderScope(
 ///   overrides: overrides,
 ///   child: const App(),

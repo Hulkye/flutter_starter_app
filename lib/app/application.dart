@@ -8,6 +8,7 @@ import 'package:flutter_starter_app/shared/services/auth/auth_store.dart';
 import '../core/exception/app_exception_catcher.dart';
 import 'app.dart';
 import 'env.dart';
+import 'router/app_router_config.dart';
 
 class Application {
   static Future<void> bootstrap() async {
@@ -28,7 +29,10 @@ class Application {
       appRunner: () async {
         WidgetsFlutterBinding.ensureInitialized();
         await bootstrap();
-        final overrides = createEnvOverrides(envConfig);
+        final overrides = [
+          ...createEnvOverrides(envConfig),
+          ...createAppRouterOverrides(),
+        ];
         runApp(ProviderScope(overrides: overrides, child: const App()));
       },
     );

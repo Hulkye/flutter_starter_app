@@ -294,6 +294,8 @@ const List<AppFeature> appFeatures = [
 ];
 ```
 
+`lib/app/router/app_router_config.dart` 会从 `appFeatures` 读取 `appFeatureRoutes` 与 `appFeatureTabs`，并通过 `AppRouterConfig` 注入 `core/router`。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart`。
+
 ### 4. 在页面中导航
 
 Presentation/Page 层建议依赖 `BaseNavigator` 抽象，并传入 route 的 `location`，而不是直接依赖 GoRouter：
@@ -578,6 +580,7 @@ ref.read(appRouterProvider).push(
 - 公共业务服务放到 `shared/services`。
 - 全局基础设施放到 `core`。
 - 新增页面时先在 Feature 内定义 `AppPageRoute`，再通过 `XxxFeature` 注册到 `features/features.dart`。
+- App 级路由组合放在 `lib/app/router/app_router_config.dart`，不要在 `core/router` 中 import 具体 Feature。
 
 ### 避免做法
 
@@ -587,7 +590,7 @@ ref.read(appRouterProvider).push(
 - 不要把页面级 `PageLogic` 当作跨模块公共 API。
 - 不要用 `PageLogic` 替代 ViewModel 承载可观察业务状态、接口编排、跨页面状态或领域逻辑。
 - 不要把具体业务逻辑放进 `core`。
-- 不要绕过 `AuthStore` 手动管理 token。
+- 不要绕过 `authSessionProvider` 手动管理 token。
 - 不要在多个状态管理方案之间混用。
 
 ---

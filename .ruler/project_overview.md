@@ -15,9 +15,10 @@
 ## 重要目录
 
 - `lib/app/`：应用启动、根组件、环境配置。
+- `lib/app/router/`：App 路由图组合与 `AppRouterConfig` 注入。
 - `lib/core/`：全局基础设施，不承载具体业务。
 - `lib/core/feature/`：`AppFeature` 模块协议。
-- `lib/core/router/`：路由抽象、GoRouter 适配、Provider、守卫。
+- `lib/core/router/`：路由抽象、GoRouter 适配、Provider、守卫；不装配具体 App/Feature 路由。
 - `lib/features/`：业务功能模块，按 Feature 聚合。
 - `lib/features/features.dart`：业务 Feature 注册与业务 Route class 统一导出入口。
 - `lib/shared/`：跨 Feature 共享的基础表现层、服务与组件。

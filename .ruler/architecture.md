@@ -6,6 +6,7 @@
 - 每个 Feature 内部优先保持 `data / domain / presentation` 三层结构。
 - Clean Architecture 依赖方向为：`presentation -> domain <- data`。
 - `core` 提供全局基础设施，不依赖具体 Feature。
+- `core/router` 不装配具体 App/Feature 路由；App 层通过 `AppRouterConfig` 注入路由图。
 - `shared` 提供跨 Feature 可复用能力，不承载具体业务流程。
 
 ## Feature 内部分层
