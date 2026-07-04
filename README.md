@@ -323,7 +323,7 @@ main()
       → WidgetsFlutterBinding.ensureInitialized()
       → 绑定 PresentationHelper 全局反馈处理
       → 初始化普通存储与安全存储
-      → 恢复 AuthSession
+      → 恢复 AuthSession 到 authSessionProvider
       → createEnvOverrides(envConfig)
   → AppExceptionCatcher.runAppGuarded()
   → ProviderScope(overrides: overrides)
@@ -409,14 +409,12 @@ Page Navigation    → BaseNavigator                → RouterNavigator
 ```text
 AuthSession
   ↓
-AuthStore
-  ↓
 authSessionProvider
   ↓
 Router Guard / AuthInterceptor / UI
 ```
 
-`AuthSession` 以 `token`、`refreshToken` 与可扩展 payload 为核心，适配不同后端登录协议。登录 Feature 中提供了完整示例：页面表单、ViewModel、Repository、DataSource、会话落盘与退出登录。
+`AuthSession` 以 `token`、`refreshToken` 与可扩展 payload 为核心，适配不同后端登录协议。`authSessionProvider` 是 App 内登录态读取、更新、守卫判断和 HTTP token 注入的唯一入口；`AuthStore` 只作为其安全存储后端。登录 Feature 中提供了完整示例：页面表单、ViewModel、Repository、DataSource、会话落盘与退出登录。
 
 ### 🌐 通用 WebView 页面
 

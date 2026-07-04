@@ -428,9 +428,9 @@ AuthRepositoryImpl
   ↓
 AuthRemoteDataSource
   ↓
-AuthStore.setSession()
+authSessionProvider.notifier.setSession()
   ↓
-authSessionProvider 更新
+AuthStore 持久化
   ↓
 RouterGuard / AuthInterceptor 生效
 ```

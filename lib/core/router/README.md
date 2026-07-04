@@ -162,7 +162,7 @@ final List<AppTabEntry> appFeatureTabs = [
 - 只提供普通页面路由、不提供 Tab，例如 `auth`。
 - 由 App Shell 统一决定展示顺序，而不是把业务页面写死在 Shell 内部。
 
-`goRouterProvider` 负责创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。登录态变化只刷新 redirect，不重建 Router，避免重复应用 `initialLocation`。
+`goRouterProvider` 负责创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。登录态统一来自 `authSessionProvider`；登录态变化只刷新 redirect，不重建 Router，避免重复应用 `initialLocation`。
 
 ## 导航用法
 
@@ -327,11 +327,13 @@ lib/app/shell/
 
 ## 认证守卫
 
-`createAuthGuard()` 接收登录页路径和 public route pattern 列表。`router_provider.dart` 会递归扫描 `_allRouteNodes`，收集 `public == true` 的页面或重定向路径。
+`createAuthGuard()` 接收登录页路径、登录态读取函数和 public route pattern 列表。`router_provider.dart` 会递归扫描 `_allRouteNodes`，收集 `public == true` 的页面或重定向路径。
 
 ```dart
 redirect: createAuthGuard(
   loginPath: const LoginRoute().location,
+  isAuthenticated: () =>
+      ref.read(authSessionProvider)?.isValid == true,
   publicPaths: collectPublicRoutePatterns(_allRouteNodes),
 ),
 ```

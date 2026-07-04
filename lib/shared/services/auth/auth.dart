@@ -4,8 +4,8 @@
 ///
 /// ```
 /// AuthSession          — session 模型（token + payload）
-/// AuthStore            — 会话存储（同步访问 + 持久化）
-/// authSessionProvider  — 响应式认证状态与业务写入口
+/// AuthStore            — 会话持久化后端
+/// authSessionProvider  — 唯一登录态读取与业务写入口
 /// ```
 ///
 /// ## 使用
@@ -16,9 +16,6 @@
 ///
 /// // UI 响应式
 /// ref.watch(authSessionProvider);
-///
-/// // 拦截器同步读
-/// authStore.bearerToken;
 ///
 /// // 登录/登出
 /// ref.read(authSessionProvider.notifier).setSession(session);

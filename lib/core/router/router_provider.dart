@@ -49,6 +49,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshNotifier,
     redirect: createAuthGuard(
       loginPath: const LoginRoute().location,
+      isAuthenticated: () => ref.read(authSessionProvider)?.isValid == true,
       publicPaths: collectPublicRoutePatterns(_allRouteNodes),
     ),
     routes: _allRouteNodes.map(toRouteBase).toList(),

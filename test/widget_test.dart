@@ -6,7 +6,6 @@ import 'package:flutter_starter_app/features/auth/data/repositories/auth_reposit
 import 'package:flutter_starter_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
-import 'package:flutter_starter_app/shared/services/auth/auth_store.dart';
 import 'package:flutter_starter_app/shared/presentation/presentation_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,7 +34,6 @@ void main() {
       });
       bindPresentationHelper();
       await prefsStorage.init();
-      authStore.setMemorySession(null);
 
       appConfig = const EnvConfig();
       final overrides = [
@@ -92,13 +90,11 @@ final class _TestAuthSessionNotifier extends AuthSessionNotifier {
 
   @override
   Future<void> setSession(AuthSession session) async {
-    authStore.setMemorySession(session);
     state = session;
   }
 
   @override
   Future<void> clear() async {
-    authStore.setMemorySession(null);
     state = null;
   }
 }

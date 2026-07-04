@@ -9,7 +9,6 @@ import 'package:flutter_starter_app/features/webview/webview_feature.dart';
 import 'package:flutter_starter_app/shared/presentation/presentation_helper.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
-import 'package:flutter_starter_app/shared/services/auth/auth_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,7 +27,6 @@ Future<void> _pumpApp(WidgetTester tester, {AuthSession? session}) async {
   });
   bindPresentationHelper();
   await prefsStorage.init();
-  authStore.setMemorySession(session);
   appConfig = const EnvConfig();
 
   await tester.pumpWidget(
@@ -94,13 +92,11 @@ final class _TestAuthSessionNotifier extends AuthSessionNotifier {
 
   @override
   Future<void> setSession(AuthSession session) async {
-    authStore.setMemorySession(session);
     state = session;
   }
 
   @override
   Future<void> clear() async {
-    authStore.setMemorySession(null);
     state = null;
   }
 }

@@ -14,7 +14,8 @@ class AppBootstrapCoordinator {
   final AppReader ref;
 
   Future<AppBootstrapTarget> start() async {
-    if (!authStore.isAuthenticated) {
+    final session = ref(authSessionProvider);
+    if (session?.isValid != true) {
       return AppBootstrapTarget.login;
     }
 

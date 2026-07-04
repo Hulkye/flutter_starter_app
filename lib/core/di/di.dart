@@ -15,7 +15,7 @@
 ///   ├── Phase 1: 核心服务初始化
 ///   │     ├── prefsStorage.init()
 ///   │     ├── secureStorage.init()
-///   │     └── AuthSessionStore.restore()
+///   │     └── authStore.init()
 ///   └── Phase 2: createEnvOverrides(env)
 ///         └── List<Override> → ProviderScope.overrides
 ///

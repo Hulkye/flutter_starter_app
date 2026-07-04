@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../shared/services/auth/auth_store.dart';
-
 bool _matchesRoutePattern(String pattern, String currentPath) {
   if (pattern == currentPath) return true;
 
@@ -36,6 +34,7 @@ bool _matchesRoutePattern(String pattern, String currentPath) {
 /// `/article/42`。
 GoRouterRedirect createAuthGuard({
   required String loginPath,
+  required bool Function() isAuthenticated,
   List<String> publicPaths = const <String>['/'],
 }) {
   return (BuildContext context, GoRouterState state) {
@@ -47,7 +46,7 @@ GoRouterRedirect createAuthGuard({
     }
 
     // 已登录 → 放行
-    if (authStore.isAuthenticated) {
+    if (isAuthenticated()) {
       return null;
     }
 
@@ -59,6 +58,13 @@ GoRouterRedirect createAuthGuard({
 /// 未登录时禁止访问的便捷守卫。
 ///
 /// 与 [createAuthGuard] 相同，但 publicPaths 默认为空（所有路径都需要登录）。
-GoRouterRedirect createStrictAuthGuard({required String loginPath}) {
-  return createAuthGuard(loginPath: loginPath, publicPaths: const <String>[]);
+GoRouterRedirect createStrictAuthGuard({
+  required String loginPath,
+  required bool Function() isAuthenticated,
+}) {
+  return createAuthGuard(
+    loginPath: loginPath,
+    isAuthenticated: isAuthenticated,
+    publicPaths: const <String>[],
+  );
 }

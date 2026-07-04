@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/env.dart';
-import '../../../shared/services/auth/auth_store.dart';
+import '../../../shared/services/auth/auth_provider.dart';
 import '../../constant/duration_const.dart';
 import '../../l10n/l10n.dart';
 import 'config/http_auth_config.dart';
@@ -69,11 +69,14 @@ final httpConfigProvider = Provider<HttpConfig>((ref) {
           'X-App-Channel': 'flutter_starter_app',
           'X-App-Env': appConfig.envTag.name,
         };
-        final token = authStore.bearerToken;
+        final token = ref.read(authSessionProvider)?.bearerToken;
         if (token != null) {
           headers['Authorization'] = token;
         }
         return headers;
+      },
+      onAuthFailed: () async {
+        await ref.read(authSessionProvider.notifier).clear();
       },
     ),
   );
@@ -83,7 +86,7 @@ final httpConfigProvider = Provider<HttpConfig>((ref) {
 ///
 /// ## 依赖
 /// - [httpConfigProvider] — 连接、超时、日志、重试等配置
-/// - [AuthSessionStore] — 请求头中的 token 由 [AuthInterceptor] 在拦截器中懒读取
+/// - [authSessionProvider] — 请求头中的 token 由 [AuthInterceptor] 在请求时懒读取
 ///
 /// ## 覆盖
 /// 在 [ProviderScope.overrides] 中注入 env 专属配置或 Mock：
@@ -92,8 +95,10 @@ final httpConfigProvider = Provider<HttpConfig>((ref) {
 /// ```
 final httpClientProvider = Provider<HttpClient>((ref) {
   final config = ref.watch(httpConfigProvider);
-  // 注意：AuthSessionStore 在请求时由 AuthInterceptor 懒读取，不在此处 watch
-  return HttpClient(config: config);
+  // 注意：会话在请求时由 AuthInterceptor 懒读取，不在此处 watch。
+  final client = HttpClient(config: config);
+  ref.onDispose(client.dispose);
+  return client;
 });
 
 // ---------------------------------------------------------------------------

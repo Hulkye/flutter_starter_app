@@ -5,9 +5,12 @@ import 'auth_session.dart';
 ///
 /// ## 职责
 ///
-/// - 内存中持有当前会话（供拦截器/守卫同步读取 token）
+/// - 持久化当前会话，并在启动阶段恢复到内存
+/// - 作为 authSessionProvider 的存储后端
 /// - 与 SecureStorage 交互实现持久化
-/// - 启动阶段恢复本地会话
+///
+/// App 内判断登录态、注入 token、处理登出时，应统一通过
+/// `authSessionProvider`，不要把本类作为业务侧登录态入口。
 ///
 /// ## 使用
 ///
@@ -15,8 +18,8 @@ import 'auth_session.dart';
 /// // 启动恢复
 /// await authStore.init();
 ///
-/// // 拦截器同步读 token
-/// authStore.bearerToken;
+/// // 业务读写
+/// ref.read(authSessionProvider.notifier).setSession(session);
 /// ```
 class AuthStore {
   AuthStore({String storageKey = 'auth_session'}) : _storageKey = storageKey;
