@@ -24,6 +24,7 @@ flutter test
 - 单元测试：纯 Dart 逻辑、实体转换、参数校验、工具类。
 - Provider 测试：Riverpod 状态、依赖替换、ViewModel 状态流转。
 - Widget 测试：页面 smoke test、关键交互、空态/错误态展示。
+- 架构测试：静态扫描关键依赖方向，例如 Feature presentation 不直接 import data。
 
 ## 新增 Feature 建议测试
 

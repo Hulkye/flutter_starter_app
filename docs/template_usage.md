@@ -197,7 +197,7 @@ lib/features/order/
 | 层级 | 职责 |
 | --- | --- |
 | `presentation` | 页面、ViewModel、路由定义、UI 状态 |
-| `domain` | 业务实体、Repository 抽象 |
+| `domain` | 业务实体、Repository 抽象与抽象 Provider |
 | `data` | DataSource、Repository 实现、接口数据转换 |
 
 简单页面可以只保留页面与路由：
@@ -217,7 +217,7 @@ OrderPage
   ↓ 用户交互
 OrderViewModel
   ↓ 调用抽象
-OrderRepository
+orderRepositoryProvider / OrderRepository
   ↓ 具体实现
 OrderRepositoryImpl
   ↓ 委托数据源
@@ -287,6 +287,20 @@ final class OrderFeature extends AppFeature {
 
 如果该 Feature 需要作为底部 Tab 入口，再额外覆盖 `tabs` 并返回 `AppTabEntry`。默认没有 Tab 的 Feature 只需要暴露 `routes`。
 
+Repository 的默认 data 实现在 App 组合层装配。新增 Feature 后，在 `lib/app/di/app_feature_provider_overrides.dart` 补充：
+
+```dart
+List<Override> createOrderFeatureProviderOverrides() {
+  return <Override>[
+    orderRepositoryBindingProvider.overrideWith(
+      (ref) => OrderRepositoryImpl(ref.watch(orderDataSourceProvider)),
+    ),
+  ];
+}
+```
+
+并在 `createAppFeatureProviderOverrides()` 中追加 `...createOrderFeatureProviderOverrides()`。
+
 ### 3. 注册到 Feature 汇聚入口
 
 打开 `lib/features/features.dart`，补充 import、export 与 `appFeatures` 注册项：
@@ -305,6 +319,8 @@ const List<AppFeature> appFeatures = [
 ```
 
 `lib/app/router/app_router_config.dart` 会从 `appFeatures` 读取 `appFeatureRoutes` 与 `appFeatureTabs`，并通过 `AppRouterConfig` 注入 `core/router`。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart`。
+
+`Application.run()` 同时会把 `createAppFeatureProviderOverrides()` 加入根 `ProviderScope`。因此 Repository 抽象 Provider 放在 `domain/repositories`，data 实现放在 `data/repositories`，再由 App 组合层装配。ViewModel 只 import domain 抽象，不直接 import data 层 Provider。
 
 ### 4. 在页面中导航
 
@@ -344,6 +360,10 @@ final class OrderDataSource {
     return response.data as List<dynamic>;
   }
 }
+
+final orderDataSourceProvider = Provider<OrderDataSource>((ref) {
+  return OrderDataSource(ref.watch(httpClientProvider));
+});
 ```
 
 ### 3. 在 RepositoryImpl 中转换业务实体
@@ -364,9 +384,23 @@ final class OrderRepositoryImpl implements OrderRepository {
 }
 ```
 
+Repository 抽象 Provider 建议定义在 domain 层：
+
+```dart
+final orderRepositoryProvider = Provider<OrderRepository>((ref) {
+  return ref.watch(orderRepositoryBindingProvider);
+});
+
+final orderRepositoryBindingProvider = Provider<OrderRepository>((ref) {
+  throw StateError('orderRepositoryBindingProvider must be overridden by OrderFeature.');
+});
+```
+
 ### 4. 在 ViewModel 中更新页面状态
 
 ```dart
+import '../../domain/repositories/order_repository.dart';
+
 final class OrderState extends BaseState {
   const OrderState({this.initialized = false, this.orders = const []});
 
@@ -473,6 +507,8 @@ RouterGuard / AuthInterceptor 生效
 ```dart
 await ref.read(authRepositoryProvider).logout();
 ```
+
+`authRepositoryProvider` 位于 Auth domain 层，默认由 App 组合层注入 `AuthRepositoryImpl`。页面或 ViewModel 使用该 Provider 时不需要 import data 层实现。
 
 登录成功后，模板会自动完成：
 

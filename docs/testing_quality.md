@@ -23,11 +23,13 @@ flutter test
 | 单元测试 | 纯 Dart 逻辑，例如 `EnvConfig`、Todo 数据源、Repository |
 | Provider 测试 | Riverpod 状态与持久化，例如语言、主题、Todo ViewModel |
 | Widget 测试 | App smoke test，验证核心页面可正常渲染 |
+| 架构测试 | 静态扫描关键依赖方向，例如 Feature presentation 不直接 import data |
 
 ## 📁 测试目录
 
 ```text
 test/
+├── architecture/                # 架构依赖方向测试
 ├── app/                         # 应用配置测试
 ├── core/                        # 核心能力测试：l10n、theme、router
 ├── features/                    # 业务 Feature 测试

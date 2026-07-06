@@ -14,6 +14,7 @@
 - ViewModel 不持有 `BuildContext`。
 - ViewModel 不直接操作 Navigator；需要导航时通常由 Page 响应状态或事件后调用 `appRouterProvider`。
 - ViewModel 调用 Repository 抽象或 Service，不直接堆积底层请求细节。
+- ViewModel 不直接 import data 层 Provider；Repository 抽象 Provider 应放在 domain 层，默认 data 实现由 App 组合层通过 binding Provider 注入。
 
 ## State 建模
 

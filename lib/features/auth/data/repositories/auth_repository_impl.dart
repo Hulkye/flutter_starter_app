@@ -45,8 +45,3 @@ final class AuthRepositoryImpl implements AuthRepository {
     await _ref.read(authSessionProvider.notifier).clear();
   }
 }
-
-/// AuthRepository Provider。
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepositoryImpl(ref, ref.watch(authDataSourceProvider));
-});

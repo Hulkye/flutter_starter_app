@@ -31,7 +31,7 @@ lib/features/<feature>/
 
 1. 明确 Feature 的业务边界，避免把多个无关业务塞进同一模块。
 2. 先设计 domain 抽象，再实现 data 层。
-3. 使用 Riverpod 暴露 Repository、Service、ViewModel。
+3. 在 domain 层暴露 Repository 抽象 Provider 与 binding Provider，在 App 组合层注入 data 实现，再暴露 Service、ViewModel。
 4. 页面使用 `BasePage` / `BaseVM` 项目范式，并按需使用 `PageLogic`。
 5. 在 `<feature>_routes.dart` 定义 `XxxRoute extends AppPageRoute`。
 6. 在 `<feature>_feature.dart` 定义 `XxxFeature extends AppFeature`，并 export route 文件。
@@ -51,11 +51,13 @@ lib/features/<feature>/
 - PageLogic 可以调用 VM/Provider，但不承载可观察业务状态、接口编排、跨页面状态或领域逻辑。
 - ViewModel / Notifier 负责页面可观察状态、业务动作编排、把领域/服务状态转换成 UI 状态。
 - ViewModel 不持有 `BuildContext`，不直接依赖 GoRouter。
+- ViewModel 不直接 import `data/repositories` 或 `data/datasources`；presentation 只能依赖 domain 抽象 Provider、shared/core 服务或稳定 Provider。
 
 ## 输出检查
 
 - Feature 目录是否符合分层。
 - 是否注册到 `features/features.dart`。
+- Repository 抽象 Provider 是否位于 domain，data 实现是否通过 App 组合层 override domain binding Provider 装配。
 - 是否通过 `header.dart` 间接可用。
 - 是否存在无用 import。
 - 是否完成文档和测试检查。

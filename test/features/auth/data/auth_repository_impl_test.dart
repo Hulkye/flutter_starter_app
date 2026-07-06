@@ -1,7 +1,8 @@
+import 'package:flutter_starter_app/app/di/app_feature_provider_overrides.dart';
 import 'package:flutter_starter_app/core/network/http/response/api_response.dart';
 import 'package:flutter_starter_app/features/auth/data/datasources/auth_datasource.dart';
-import 'package:flutter_starter_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:flutter_starter_app/features/auth/domain/exceptions/auth_exception.dart';
+import 'package:flutter_starter_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,6 +14,7 @@ void main() {
     test('sets auth session after successful login', () async {
       final container = createTestContainer(
         overrides: [
+          ...createAuthFeatureProviderOverrides(),
           authSessionProvider.overrideWith(_TestAuthSessionNotifier.new),
           authDataSourceProvider.overrideWith(
             (ref) => const _FakeAuthDataSource(
@@ -38,6 +40,7 @@ void main() {
       () async {
         final container = createTestContainer(
           overrides: [
+            ...createAuthFeatureProviderOverrides(),
             authSessionProvider.overrideWith(_TestAuthSessionNotifier.new),
             authDataSourceProvider.overrideWith(
               (ref) => const _FakeAuthDataSource(
@@ -69,6 +72,7 @@ void main() {
     test('throws typed invalid response exception when token is missing', () {
       final container = createTestContainer(
         overrides: [
+          ...createAuthFeatureProviderOverrides(),
           authSessionProvider.overrideWith(_TestAuthSessionNotifier.new),
           authDataSourceProvider.overrideWith(
             (ref) => const _FakeAuthDataSource(

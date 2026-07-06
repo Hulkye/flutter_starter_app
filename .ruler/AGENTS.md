@@ -10,6 +10,7 @@
 - 跨 Feature 复用能力时，优先通过 `core`、`shared`、domain 抽象、application/service、Repository 抽象或稳定 Provider 暴露。
 - 业务页面路由通过 `AppPageRoute` 定义，底部 Tab 入口通过 `AppTabEntry` 声明，并由 `XxxFeature extends AppFeature` 暴露到 `features/features.dart` 汇聚。
 - App 级路由图由 `lib/app/router/app_router_config.dart` 组合并以 `AppRouterConfig` 注入 `core/router`；不要在 `core/router` 中 import `app/` 或 `features/` 装配具体路由。
+- ViewModel 只依赖 domain repository 抽象 Provider，不直接 import data 层 Provider；data 实现由 App 组合层装配。
 - 业务页面导航优先使用 `package:flutter_starter_app/header.dart` 中统一导出的路由与 `appRouterProvider`。
 - `header.dart` 是业务页面便捷入口；`app/`、`core/`、`shared/` 内部必须使用精确 import，避免经由 `header.dart -> features/features.dart` 形成隐式反向依赖。
 - 模板使用者的业务背景、业务术语和项目特殊约束优先维护在 `.ruler/project_profile.md`；不要为了补充业务介绍而改动模板通用规则。

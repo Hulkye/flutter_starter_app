@@ -15,11 +15,12 @@
 - `data/repositories/`：Repository 实现，负责数据转换、异常处理、数据源组合。
 - `domain/entities/`：业务实体和值对象。
 - `domain/exceptions/`：领域异常，表达业务失败语义，不携带 UI 文案兜底逻辑。
-- `domain/repositories/`：Repository 抽象。
+- `domain/repositories/`：Repository 抽象与抽象 Provider；公开 Provider 只暴露抽象，默认 data 实现通过 binding Provider 由 App 组合层注入。
 - `presentation/pages/`：页面与 UI 组合。
 - `presentation/viewmodels/`：页面状态与业务动作。
 - `presentation/<feature>_routes.dart`：当前 Feature 的路由定义。
 - `<feature>_feature.dart`：当前 Feature 对 App 暴露的模块声明与路由导出。
+- `lib/app/di/app_feature_provider_overrides.dart`：App 组合层装配 Feature 默认 data 实现，override domain binding Provider。
 - 简单页面不要为了保持目录形式统一而创建空 ViewModel、空 State、空 Repository、空 DataSource 或空目录。
 
 ## 跨 Feature 依赖边界
@@ -49,6 +50,7 @@
 - PageLogic 可以调用 VM/Provider，但不承载可观察业务状态、接口编排、跨页面状态或领域逻辑；这些职责应放入 ViewModel、Service、Repository 或稳定 Provider。
 - ViewModel / Notifier 负责页面可观察状态、业务动作编排、把领域/服务状态转换成 UI 状态，不持有 `BuildContext`，不直接调用一次性 UI 反馈服务。
 - 没有可观察业务状态或动作编排的简单页面，不需要创建空 ViewModel / State。
+- ViewModel 只 import domain 抽象、shared/core 服务或稳定 Provider，不直接 import `data/repositories` 或 `data/datasources`。
 - Repository 负责业务数据获取与持久化抽象。
 - DataSource 负责具体 API、本地缓存或 Mock 数据来源。
 - 一次性 UI 反馈使用注入式 `PresentationFeedbackService`（`presentationFeedbackProvider`、`PageScope.presentation`、`PageLogic.presentation`）或专门事件机制，不污染长期可渲染状态。

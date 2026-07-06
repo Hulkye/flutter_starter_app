@@ -1,4 +1,10 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../domain/entities/todo_item.dart';
+
+final todoLocalDataSourceProvider = Provider<TodoLocalDataSource>((ref) {
+  return TodoLocalDataSource();
+});
 
 final class TodoLocalDataSource {
   final List<TodoItem> _todos = [

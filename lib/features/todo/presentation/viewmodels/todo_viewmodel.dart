@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/presentation/presentation.dart';
-import '../../data/repositories/todo_repository_impl.dart';
 import '../../domain/entities/todo_item.dart';
+import '../../domain/repositories/todo_repository.dart';
 
 final class TodoState extends BaseState {
   const TodoState({

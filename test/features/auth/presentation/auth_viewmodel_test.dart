@@ -1,7 +1,6 @@
 import 'package:flutter_starter_app/core/l10n/app_locale.dart';
 import 'package:flutter_starter_app/core/l10n/l10n_provider.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
-import 'package:flutter_starter_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:flutter_starter_app/features/auth/domain/exceptions/auth_exception.dart';
 import 'package:flutter_starter_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_starter_app/features/auth/presentation/viewmodels/auth_viewmodel.dart';

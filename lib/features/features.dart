@@ -1,6 +1,7 @@
 import 'package:flutter_starter_app/core/feature/app_tab_entry.dart';
-import '../core/feature/app_feature.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
+
+import '../core/feature/app_feature.dart';
 import 'auth/auth_feature.dart';
 import 'profile/profile_feature.dart';
 import 'todo/todo_feature.dart';

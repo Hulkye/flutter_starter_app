@@ -7,7 +7,7 @@
 ///
 /// - [Application.bootstrap] — 启动引导（Pre-ProviderScope 初始化编排）
 /// - [createEnvOverrides] — 环境 Provider 覆盖工厂（可插拔入口）
-/// - App 组合层可追加其他 overrides，例如路由图配置
+/// - App 组合层可追加其他 overrides，例如 Feature 默认依赖装配、路由图配置
 ///
 /// ## 架构
 ///
@@ -17,7 +17,9 @@
 ///   │     ├── prefsStorage.init()
 ///   │     ├── secureStorage.init()
 ///   │     └── authStore.init()
-///   └── Phase 2: createEnvOverrides(env) + App composition overrides
+///   └── Phase 2: createAppFeatureProviderOverrides()
+///                + createEnvOverrides(env)
+///                + App composition overrides
 ///         └── List<Override> → ProviderScope.overrides
 ///
 /// 之后的一切由 Riverpod 接管：
@@ -30,6 +32,7 @@
 /// import 'core/di/di.dart';
 ///
 /// final overrides = [
+///   ...createAppFeatureProviderOverrides(),
 ///   ...createEnvOverrides(envConfig),
 ///   ...createAppRouterOverrides(),
 /// ];
@@ -45,6 +48,5 @@ export 'di_overrides.dart';
 // 核心 Provider
 export '../network/http/http_provider.dart';
 
-// Feature Provider（后续按 Feature 添加）
-// export '../../features/home/di/home_providers.dart';
-// export '../../features/auth/di/auth_providers.dart';
+// Feature Repository 抽象 Provider 放在各 Feature domain 层；
+// data 实现通过 app/di/app_feature_provider_overrides.dart 在 App 组合层注入。

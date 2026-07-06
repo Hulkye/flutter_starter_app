@@ -333,6 +333,7 @@ main()
       → WidgetsFlutterBinding.ensureInitialized()
       → 初始化普通存储与安全存储
       → 恢复 AuthSession 到 authSessionProvider
+      → createAppFeatureProviderOverrides() 注入 Feature 默认 data 实现
       → createEnvOverrides(envConfig)
   → AppExceptionCatcher.runAppGuarded()
   → ProviderScope(overrides: overrides)
@@ -398,6 +399,7 @@ noCache · cacheFirst · networkFirst · cacheOnly · networkOnly · staleWhileR
 ```text
 Feature Route Node → AppPageRoute / AppShellRoute → GoRoute / StatefulShellRoute
 Feature Module     → AppFeature / AppTabEntry     → appFeatureRoutes / appFeatureTabs
+App DI             → domain binding Provider       → data RepositoryImpl
 App Composition     → AppRouterConfig              → goRouterProvider
 Page Navigation    → BaseNavigator                → RouterNavigator
 ```
@@ -408,6 +410,7 @@ Page Navigation    → BaseNavigator                → RouterNavigator
 - 每个 Feature 通过 `XxxFeature` 暴露模块路由与可选底部 Tab 入口
 - `features/features.dart` 汇聚所有 Feature，并统一导出业务 Route class
 - `lib/app/router/app_router_config.dart` 组合 Splash、Root/Shell 与 Feature 路由，并注入 `core/router`
+- `lib/app/di/app_feature_provider_overrides.dart` 装配 Feature 默认 data 实现，ViewModel 只依赖 domain Provider
 - `header.dart` 只作为业务页面便捷入口，App/Core/Shared 内部使用精确 import，避免隐式依赖 Feature
 - App Shell 从 `appFeatureTabs` 自动装配底部 Tab 分支，业务层不直接依赖 GoRouter Shell API
 - 支持公开路由与登录态路由
@@ -538,12 +541,15 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 1. 在 `lib/features/` 下创建模块目录。
 2. 按 `data / domain / presentation` 创建分层文件。
 3. 在 `domain/repositories` 中定义 Repository 抽象。
-4. 在 `data/repositories` 中实现 Repository。
+4. 在 `domain/repositories` 中定义 Repository 抽象 Provider，在 `data/repositories` 中实现 Repository。
 5. 如页面存在可观察业务状态或动作编排，在 `presentation/viewmodels` 中继承 `BaseVM` 管理 UI 状态与业务动作。
 6. 在 `presentation/pages` 中继承 `BasePage` 编写 UI，并在 `page(scope)` 中读取状态、调用 ViewModel 或稳定 Provider。
 7. 在 `<feature>_routes.dart` 中声明路由。
 8. 在 `<feature>_feature.dart` 中继承 `AppFeature` 并暴露路由。
-9. 在 `features/features.dart` 中注册 `XxxFeature()`，并导出该 Feature；App 路由配置会自动消费 `appFeatures`。
+9. 在 `lib/app/di/app_feature_provider_overrides.dart` 中装配默认 data 实现。
+10. 在 `features/features.dart` 中注册 `XxxFeature()`，并导出该 Feature；App 路由配置会自动消费 `appFeatures`。
+
+ViewModel 只依赖 domain 抽象 Provider，不直接 import `data/repositories` 或 `data/datasources`。
 
 推荐最小结构：
 

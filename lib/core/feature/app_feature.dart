@@ -1,10 +1,11 @@
 import 'package:flutter_starter_app/core/router/router.dart';
+
 import 'app_tab_entry.dart';
 
 /// Feature 对 App 暴露能力的统一协议。
 ///
-/// 当前主要用于集中注册 Feature 路由；后续可按需扩展初始化、菜单、权限、
-/// Provider overrides 等模块级能力。
+/// 当前主要用于集中注册 Feature 路由；后续可按需扩展初始化、菜单、权限等
+/// 模块级能力。
 abstract class AppFeature {
   const AppFeature();
 

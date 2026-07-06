@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/l10n.dart';
 import '../../../../shared/presentation/presentation.dart';
-import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/exceptions/auth_exception.dart';
+import '../../domain/repositories/auth_repository.dart';
 
 /// Auth 页面状态。
 class AuthState extends BaseState {

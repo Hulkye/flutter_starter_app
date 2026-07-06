@@ -6,6 +6,7 @@ import 'package:flutter_starter_app/shared/services/auth/auth_store.dart';
 
 import '../core/exception/app_exception_catcher.dart';
 import 'app.dart';
+import 'di/app_feature_provider_overrides.dart';
 import 'env.dart';
 import 'router/app_router_config.dart';
 
@@ -28,6 +29,7 @@ class Application {
         WidgetsFlutterBinding.ensureInitialized();
         await bootstrap();
         final overrides = [
+          ...createAppFeatureProviderOverrides(),
           ...createEnvOverrides(envConfig),
           ...createAppRouterOverrides(),
         ];
