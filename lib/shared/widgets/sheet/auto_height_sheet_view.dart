@@ -1,4 +1,6 @@
-import '../../../header.dart';
+import '../../../core/theme/theme_context_ext.dart';
+import '../../../core/util/screen_util.dart';
+import 'auto_height_sheet.dart';
 
 double get maxTopPadding => 88.w;
 

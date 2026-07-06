@@ -1,3 +1,7 @@
+/// 业务页面常用聚合导出。
+///
+/// `app`、`core`、`shared` 内部请使用精确 import，避免经由
+/// `features/features.dart` 形成反向依赖。
 library;
 
 export 'package:flutter/material.dart';

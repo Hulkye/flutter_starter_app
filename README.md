@@ -136,7 +136,7 @@ lib/
 │   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseState / PresentationFeedbackService
 │   ├── services/                  # AuthSession / AuthStore
 │   └── widgets/                   # Toast、Loading、Button、Dialog 等组件
-├── header.dart                    # 常用导出
+├── header.dart                    # 业务页面常用导出，app/core/shared 内部不使用
 ├── main_dev.dart                  # 开发环境入口
 ├── main_sit.dart                  # SIT 环境入口
 ├── main_prod.dart                 # 生产环境入口
@@ -408,6 +408,7 @@ Page Navigation    → BaseNavigator                → RouterNavigator
 - 每个 Feature 通过 `XxxFeature` 暴露模块路由与可选底部 Tab 入口
 - `features/features.dart` 汇聚所有 Feature，并统一导出业务 Route class
 - `lib/app/router/app_router_config.dart` 组合 Splash、Root/Shell 与 Feature 路由，并注入 `core/router`
+- `header.dart` 只作为业务页面便捷入口，App/Core/Shared 内部使用精确 import，避免隐式依赖 Feature
 - App Shell 从 `appFeatureTabs` 自动装配底部 Tab 分支，业务层不直接依赖 GoRouter Shell API
 - 支持公开路由与登录态路由
 - 未登录访问受保护页面时自动跳转登录页

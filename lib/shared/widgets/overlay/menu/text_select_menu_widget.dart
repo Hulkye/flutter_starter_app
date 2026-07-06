@@ -1,6 +1,7 @@
-import 'package:flutter_starter_app/header.dart';
-import 'package:flutter_starter_app/shared/widgets/overlay/context_popup_wrap.dart';
-import 'package:flutter_starter_app/shared/widgets/overlay/menu/text_menu_panel.dart';
+import '../../../../core/theme/theme_context_ext.dart';
+import '../../../../core/util/screen_util.dart';
+import '../context_popup_wrap.dart';
+import 'text_menu_panel.dart';
 
 typedef TextSelectMenuTriggerBuilder = Widget Function(BuildContext context);
 

@@ -37,5 +37,6 @@
 ## 导出规范
 
 - 业务通用/常用能力优先通过 `lib/header.dart` 暴露。
+- `lib/header.dart` 只作为业务页面便捷导入入口；`lib/app/`、`lib/core/`、`lib/shared/` 内部不要 import `header.dart`。
 - Feature route class 通过 `<feature>_feature.dart` export，再由 `features/features.dart` 汇总，最后由 `header.dart` 暴露。
 - 不要为了使用某个业务路由在多个页面重复 import 深层 route 文件。

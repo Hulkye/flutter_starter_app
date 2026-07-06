@@ -1,7 +1,9 @@
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+import 'package:flutter_starter_app/core/theme/theme_context_ext.dart';
+import 'package:flutter_starter_app/core/util/screen_util.dart';
 import 'package:flutter_starter_app/shared/widgets/toast/controller/loading_controller.dart';
 import 'package:flutter_starter_app/shared/widgets/toast/toast_util.dart';
-import 'package:flutter_starter_app/header.dart';
 
 class BaseLoading extends StatelessWidget {
   /// 打开轻提示

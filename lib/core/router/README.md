@@ -174,6 +174,7 @@ final List<AppTabEntry> appFeatureTabs = [
 ## 导航用法
 
 业务层优先从 `package:flutter_starter_app/header.dart` 获取路由与导航 Provider。
+App/Core/Shared 内部不要通过 `header.dart` 获取依赖，应直接 import 所需模块。
 
 ```dart
 ref.read(appRouterProvider).push(const TodoRoute().location);
@@ -366,6 +367,7 @@ bool get public => true;
 - Feature 只暴露稳定 route class，不让一个 Feature 的 presentation 直接依赖另一个 Feature 的 presentation。
 - App Shell、Splash、Root redirect 放在 `lib/app/`，由 App 层组合 Feature 入口。
 - `core/router` 不 import `app/` 或 `features/`；应用路由图只能通过 `AppRouterConfig` 注入。
+- `header.dart` 只服务业务页面便捷导入，App/Core/Shared 内部使用精确 import，避免形成 `shared -> header -> features`。
 - `RouterNavigator` 是唯一调用 GoRouter 导航 API 的类。
 - `app_router_transfor.dart` 是唯一把项目路由定义转换为 GoRouter RouteBase 的适配层。
 - `router.dart` 是 router 模块对外入口；业务常用导出再由 `header.dart` 汇总。

@@ -1,4 +1,8 @@
-import 'package:flutter_starter_app/header.dart';
+import 'package:flutter/widgets.dart';
+
+import '../../../core/theme/theme_context_ext.dart';
+import '../../../core/util/screen_util.dart';
+import '../image_view/image_view.dart';
 
 /// 基础的标签行组件
 class LabelRow extends StatelessWidget {

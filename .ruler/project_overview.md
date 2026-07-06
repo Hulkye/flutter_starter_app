@@ -22,7 +22,7 @@
 - `lib/features/`：业务功能模块，按 Feature 聚合。
 - `lib/features/features.dart`：业务 Feature 注册与业务 Route class 统一导出入口。
 - `lib/shared/`：跨 Feature 共享的基础表现层、服务与组件。
-- `lib/header.dart`：业务常用统一导出。
+- `lib/header.dart`：业务页面常用统一导出，App/Core/Shared 内部不通过它导入依赖。
 - `docs/`：模板使用、测试与质量保障文档。
 
 ## 常用命令

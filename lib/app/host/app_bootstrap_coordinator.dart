@@ -1,4 +1,6 @@
-import '../../header.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../shared/services/auth/auth.dart';
 
 enum AppBootstrapTarget { root, login }
 

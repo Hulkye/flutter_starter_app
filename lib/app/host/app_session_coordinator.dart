@@ -1,4 +1,5 @@
-import '../../header.dart';
+import 'package:flutter/widgets.dart';
+
 import 'app_bootstrap_coordinator.dart';
 
 class AppSessionCoordinator {

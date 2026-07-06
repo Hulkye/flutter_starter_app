@@ -1,4 +1,8 @@
-import 'package:flutter_starter_app/header.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../core/l10n/l10n_context_ext.dart';
+import '../../../../core/theme/theme_context_ext.dart';
+import '../../../../core/util/screen_util.dart';
 
 enum DialogBtnType { normal, primary, warning }
 

@@ -1,4 +1,6 @@
-import 'package:flutter_starter_app/header.dart';
+import '../../../../core/theme/theme_context_ext.dart';
+import '../../../../core/util/screen_util.dart';
+import '../../image_view/image_view.dart';
 
 /// 弹窗卡片
 class TipsCard extends StatelessWidget {

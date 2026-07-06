@@ -1,4 +1,8 @@
-import 'package:flutter_starter_app/header.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../core/theme/theme_context_ext.dart';
+import '../../../../core/util/screen_util.dart';
+import '../../image_view/image_view.dart';
 
 class TextMenuPanel extends StatelessWidget {
   final List<Widget> items;

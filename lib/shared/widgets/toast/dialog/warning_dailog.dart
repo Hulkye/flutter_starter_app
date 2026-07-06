@@ -1,7 +1,8 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_starter_app/core/theme/theme_context_ext.dart';
 import 'package:flutter_starter_app/shared/widgets/toast/dialog/common_dialog.dart';
 import 'package:flutter_starter_app/shared/widgets/toast/dialog/dialog_unit.dart';
 import 'package:flutter_starter_app/shared/widgets/toast/controller/dialog_controller.dart';
-import 'package:flutter_starter_app/header.dart';
 
 class WarningDialog extends CommonDialog {
   const WarningDialog({

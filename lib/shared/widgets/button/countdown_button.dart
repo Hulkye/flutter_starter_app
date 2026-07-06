@@ -1,5 +1,9 @@
 import 'dart:async';
-import 'package:flutter_starter_app/header.dart';
+
+import 'package:flutter/widgets.dart';
+
+import '../../../core/util/screen_util.dart';
+import 'primary_round_button.dart';
 
 /// 基于 [PrimaryRoundButton] 的验证码发送按钮。
 ///

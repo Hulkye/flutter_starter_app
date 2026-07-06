@@ -27,6 +27,7 @@
 - 不要在 `core/router/router_provider.dart` 中逐个 import 业务 route 文件。
 - 不要在 `core/router` 中 import `app/` 或 `features/` 来装配具体路由；应用路由图必须由 App 组合层注入。
 - 不要在业务页面直接 import `go_router`。
+- 不要在 `app/`、`core/`、`shared/` 内部通过 `header.dart` 获取路由或公共能力；这些层应使用精确 import。
 - 不要把 `path` 和 `location` 混用：
   - `path` 用于路由匹配，例如 `/profile/:userId`；
   - `location` 用于实际跳转，例如 `/profile/42`。
