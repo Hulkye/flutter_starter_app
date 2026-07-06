@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_starter_app/features/features.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_store.dart';
 
 import '../core/exception/app_exception_catcher.dart';
 import 'app.dart';
-import 'env.dart';
 import 'router/app_router_config.dart';
 
 class Application {

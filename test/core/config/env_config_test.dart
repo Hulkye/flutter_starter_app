@@ -1,4 +1,4 @@
-import 'package:flutter_starter_app/app/env.dart';
+import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

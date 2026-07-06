@@ -1,5 +1,5 @@
 import 'package:flutter_starter_app/app/app.dart';
-import 'package:flutter_starter_app/app/env.dart';
+import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/app/router/app_router_config.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_starter_app/features/auth/domain/repositories/auth_repository.dart';

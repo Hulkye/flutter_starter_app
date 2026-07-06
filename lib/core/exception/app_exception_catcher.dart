@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:exception_catcher/exception_catcher.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_starter_app/app/env.dart';
+import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class AppExceptionCatcher {

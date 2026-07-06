@@ -7,7 +7,7 @@ library;
 export 'package:flutter/material.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 
-export 'app/env.dart';
+export 'core/config/env_config.dart';
 export 'app/splash/splash_route.dart';
 export 'app/shell/root_shell_route.dart';
 export 'core/feature/app_tab_entry.dart';

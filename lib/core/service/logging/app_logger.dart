@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../../../app/env.dart';
+import '../../config/env_config.dart';
 
 /// 轻量日志服务，模板默认输出到 debug console。
 ///

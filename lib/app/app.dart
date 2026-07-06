@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_starter_app/app/env.dart';
+import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/util/screen_util.dart';
 import 'package:flutter_starter_app/shared/widgets/toast/toast_util.dart';
 

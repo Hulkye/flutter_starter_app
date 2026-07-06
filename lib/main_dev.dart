@@ -1,5 +1,5 @@
 import 'app/application.dart';
-import 'app/env.dart';
+import 'core/config/env_config.dart';
 
 Future<void> main() async {
   await Application.run(

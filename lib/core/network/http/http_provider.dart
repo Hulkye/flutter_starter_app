@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/env.dart';
+import '../../config/env_config.dart';
 import '../../../shared/services/auth/auth_provider.dart';
 import '../../../shared/services/auth/auth_session_controller.dart';
 import '../../constant/duration_const.dart';

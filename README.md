@@ -106,15 +106,15 @@ await Application.run(
 
 ```text
 lib/
-├── app/                           # 应用启动、根组件、环境配置
+├── app/                           # 应用启动、根组件、App 路由装配
 │   ├── app.dart                   # MaterialApp.router 根组件
 │   ├── application.dart           # Application.run 启动入口
-│   ├── env.dart                   # EnvConfig / EnvTag
 │   ├── host/                      # 启动协调、会话协调、AppHost
 │   ├── router/                    # App 路由图组合与 core/router 配置注入
 │   ├── shell/                     # RootRoute / RootShellRoute / 底部 Tab 容器
 │   └── splash/                    # 启动展示页
 ├── core/                          # 全局基础设施，不承载具体业务
+│   ├── config/                    # EnvConfig / EnvTag / appConfig
 │   ├── constant/                  # 常量
 │   ├── exception/                 # 全局异常捕获
 │   ├── feature/                   # AppFeature 模块协议
@@ -126,7 +126,7 @@ lib/
 │   ├── theme/                     # 主题、色值、主题资源
 │   └── util/                      # 工具类
 ├── features/                      # 业务功能模块
-│   ├── exports.dart       # 业务页面可用的 Route / 公开类型导出
+│   ├── exports.dart               # 业务页面可用的 Route / 公开类型导出
 │   ├── features.dart              # App Feature 注册与路由/Tab/Provider 汇聚
 │   ├── auth/                      # 登录示例
 │   ├── profile/                   # 个人中心与主题/退出登录示例
@@ -190,15 +190,15 @@ lib/features/<feature>/
 ┌──────────────────────────────────────────────┐
 │                Presentation                  │
 │       Page · ViewModel · Route · Widget      │
-│             UI 展示、状态管理、交互            │
+│             UI 展示、状态管理、交互             │
 ├──────────────────────────────────────────────┤
 │                   Domain                     │
-│            Entity · Repository 接口          │
-│              业务模型、业务抽象               │
+│            Entity · Repository 接口           │
+│              业务模型、业务抽象                 │
 ├──────────────────────────────────────────────┤
 │                    Data                      │
-│        DataSource · Repository 实现          │
-│              接口请求、缓存、数据转换          │
+│        DataSource · Repository 实现           │
+│              接口请求、缓存、数据转换            │
 └──────────────────────────────────────────────┘
 ```
 

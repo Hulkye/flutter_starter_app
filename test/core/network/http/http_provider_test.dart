@@ -1,4 +1,4 @@
-import 'package:flutter_starter_app/app/env.dart';
+import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/network/http/http_provider.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
