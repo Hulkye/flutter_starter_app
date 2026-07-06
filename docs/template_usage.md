@@ -268,11 +268,14 @@ final class OrderRoute extends AppPageRoute {
 新增 `lib/features/order/order_feature.dart`：
 
 ```dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/feature/app_feature.dart';
 import '../../core/router/router.dart';
+import 'data/datasources/order_datasource.dart';
+import 'data/repositories/order_repository_impl.dart';
+import 'domain/repositories/order_repository.dart';
 import 'presentation/order_routes.dart';
-
-export 'presentation/order_routes.dart';
 
 final class OrderFeature extends AppFeature {
   const OrderFeature();
@@ -282,33 +285,26 @@ final class OrderFeature extends AppFeature {
 
   @override
   List<AppPageRoute> get routes => const [OrderRoute()];
+
+  @override
+  List<Override> get providerOverrides {
+    return <Override>[
+      orderRepositoryBindingProvider.overrideWith(
+        (ref) => OrderRepositoryImpl(ref.watch(orderDataSourceProvider)),
+      ),
+    ];
+  }
 }
 ```
 
-如果该 Feature 需要作为底部 Tab 入口，再额外覆盖 `tabs` 并返回 `AppTabEntry`。默认没有 Tab 的 Feature 只需要暴露 `routes`。
-
-Repository 的默认 data 实现在 App 组合层装配。新增 Feature 后，在 `lib/app/di/app_feature_provider_overrides.dart` 补充：
-
-```dart
-List<Override> createOrderFeatureProviderOverrides() {
-  return <Override>[
-    orderRepositoryBindingProvider.overrideWith(
-      (ref) => OrderRepositoryImpl(ref.watch(orderDataSourceProvider)),
-    ),
-  ];
-}
-```
-
-并在 `createAppFeatureProviderOverrides()` 中追加 `...createOrderFeatureProviderOverrides()`。
+如果该 Feature 需要作为底部 Tab 入口，再额外覆盖 `tabs` 并返回 `AppTabEntry`。默认没有 Tab 的 Feature 只需要暴露 `routes`。Repository 的默认 data 实现在 `XxxFeature.providerOverrides` 中装配，ViewModel 仍只依赖 domain 抽象 Provider，不直接 import data 层。
 
 ### 3. 注册到 Feature 汇聚入口
 
-打开 `lib/features/features.dart`，补充 import、export 与 `appFeatures` 注册项：
+打开 `lib/features/features.dart`，补充 import 与 `appFeatures` 注册项：
 
 ```dart
 import 'order/order_feature.dart';
-
-export 'order/order_feature.dart';
 
 const List<AppFeature> appFeatures = [
   AuthFeature(),
@@ -318,11 +314,15 @@ const List<AppFeature> appFeatures = [
 ];
 ```
 
-`lib/app/router/app_router_config.dart` 会从 `appFeatures` 读取 `appFeatureRoutes` 与 `appFeatureTabs`，并通过 `AppRouterConfig` 注入 `core/router`。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart`。
+`lib/app/router/app_router_config.dart` 会从 `appFeatures` 读取 `appFeatureRoutes` 与 `appFeatureTabs`，并通过 `AppRouterConfig` 注入 `core/router`。`Application.run()` 会把 `appFeatureProviderOverrides` 加入根 `ProviderScope`。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart` 或 App 启动入口。
+
+如果 route class 或公开类型需要给业务页面通过 `header.dart` 使用，在 `lib/features/exports.dart` 补充导出：
+
+```dart
+export 'order/presentation/order_routes.dart';
+```
 
 如果项目删除所有底部 Tab，模板不会创建 `/` 的 Root redirect 和 Shell；此时需要保留一个明确首页路由，或在 App 启动跳转逻辑中指定登录后的目标页。
-
-`Application.run()` 同时会把 `createAppFeatureProviderOverrides()` 加入根 `ProviderScope`。因此 Repository 抽象 Provider 放在 `domain/repositories`，data 实现放在 `data/repositories`，再由 App 组合层装配。ViewModel 只 import domain 抽象，不直接 import data 层 Provider。
 
 ### 4. 在页面中导航
 
@@ -638,6 +638,7 @@ ref.read(appRouterProvider).push(
 - 公共业务服务放到 `shared/services`。
 - 全局基础设施放到 `core`。
 - 新增页面时先在 Feature 内定义 `AppPageRoute`，再通过 `XxxFeature` 注册到 `features/features.dart`。
+- 业务页面需要使用的 route class 或公开类型通过 `features/exports.dart` 导出，再由 `header.dart` 汇总。
 - App 级路由组合放在 `lib/app/router/app_router_config.dart`，不要在 `core/router` 中 import 具体 Feature。
 
 ### 避免做法

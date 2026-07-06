@@ -1,7 +1,7 @@
 /// 业务页面常用聚合导出。
 ///
 /// `app`、`core`、`shared` 内部请使用精确 import，避免经由
-/// `features/features.dart` 形成反向依赖。
+/// Feature 注册表形成反向依赖。
 library;
 
 export 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ export 'core/theme/theme.dart';
 export 'core/util/image_util.dart';
 export 'core/util/permission_util.dart';
 export 'core/util/screen_util.dart';
-export 'features/features.dart';
+export 'features/exports.dart';
 export 'shared/presentation/presentation.dart';
 export 'shared/services/auth/auth.dart';
 export 'shared/widgets/button/countdown_button.dart';

@@ -31,12 +31,12 @@ lib/features/<feature>/
 
 1. 明确 Feature 的业务边界，避免把多个无关业务塞进同一模块。
 2. 先设计 domain 抽象，再实现 data 层。
-3. 在 domain 层暴露 Repository 抽象 Provider 与 binding Provider，在 App 组合层注入 data 实现，再暴露 ViewModel；跨模块或 App 级状态写入优先使用 shared/core 的 Controller 或 Service。
+3. 在 domain 层暴露 Repository 抽象 Provider 与 binding Provider，在 `XxxFeature.providerOverrides` 中声明默认 data 实现，由 App 组合层汇聚注入，再暴露 ViewModel；跨模块或 App 级状态写入优先使用 shared/core 的 Controller 或 Service。
 4. 页面使用 `BasePage` / `BaseVM` 项目范式，并按需使用 `PageLogic`。
 5. 在 `<feature>_routes.dart` 定义 `XxxRoute extends AppPageRoute`。
-6. 在 `<feature>_feature.dart` 定义 `XxxFeature extends AppFeature`，并 export route 文件。
+6. 在 `<feature>_feature.dart` 定义 `XxxFeature extends AppFeature`，暴露 routes、tabs 与 providerOverrides。
 7. 如该 Feature 需要底部 Tab，在 `XxxFeature.tabs` 中返回 `AppTabEntry`。
-8. 在 `features/features.dart` 注册并导出该 Feature。
+8. 在 `features/features.dart` 注册该 Feature；如 route class 或公开类型需要给业务页面使用，在 `features/exports.dart` 导出。
 9. 如该 Feature 是模板示例或公共流程，更新 `README.md` 或 `docs/template_usage.md`。
 10. 运行 `flutter analyze`；涉及逻辑时补充/运行测试。
 
@@ -57,7 +57,7 @@ lib/features/<feature>/
 
 - Feature 目录是否符合分层。
 - 是否注册到 `features/features.dart`。
-- Repository 抽象 Provider 是否位于 domain，data 实现是否通过 App 组合层 override domain binding Provider 装配。
+- Repository 抽象 Provider 是否位于 domain，默认 data 实现是否通过 `XxxFeature.providerOverrides` override domain binding Provider 装配。
 - 是否通过 `header.dart` 间接可用。
 - 是否存在无用 import。
 - 是否完成文档和测试检查。

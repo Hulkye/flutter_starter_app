@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/router/router.dart';
+import '../../features/auth/presentation/auth_routes.dart';
 import '../../features/features.dart';
 import '../shell/root_shell_route.dart';
 import '../splash/splash_route.dart';

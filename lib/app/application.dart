@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_starter_app/core/di/di.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
+import 'package:flutter_starter_app/features/features.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_store.dart';
 
 import '../core/exception/app_exception_catcher.dart';
 import 'app.dart';
-import 'di/app_feature_provider_overrides.dart';
 import 'env.dart';
 import 'router/app_router_config.dart';
 
@@ -29,8 +28,7 @@ class Application {
         WidgetsFlutterBinding.ensureInitialized();
         await bootstrap();
         final overrides = [
-          ...createAppFeatureProviderOverrides(),
-          ...createEnvOverrides(envConfig),
+          ...appFeatureProviderOverrides,
           ...createAppRouterOverrides(),
         ];
         runApp(ProviderScope(overrides: overrides, child: const App()));

@@ -167,9 +167,10 @@ final List<AppTabEntry> appFeatureTabs = [
 
 - 提供多个 Tab 入口，例如 `ptt`。
 - 只提供普通页面路由、不提供 Tab，例如 `auth`。
+- 通过 `providerOverrides` 提供默认 data 实现装配，例如 Repository binding。
 - 由 App Shell 统一决定展示顺序，而不是把业务页面写死在 Shell 内部。
 
-`Application.run()` 会把 `createAppRouterOverrides()` 加入 `ProviderScope.overrides`。`goRouterProvider` 只消费注入后的 `AppRouterConfig` 创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。登录态统一来自 `authSessionProvider`；登录态变化只刷新 redirect，不重建 Router，避免重复应用 `initialLocation`。
+`Application.run()` 会把 `appFeatureProviderOverrides` 与 `createAppRouterOverrides()` 加入 `ProviderScope.overrides`。`goRouterProvider` 只消费注入后的 `AppRouterConfig` 创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。登录态统一来自 `authSessionProvider`；登录态变化只刷新 redirect，不重建 Router，避免重复应用 `initialLocation`。
 
 ## 导航用法
 
@@ -236,9 +237,6 @@ final class DemoRoute extends AppPageRoute {
 ### 2. 创建 Feature 声明
 
 ```dart
-// lib/features/demo/demo_feature.dart
-export 'presentation/demo_routes.dart';
-
 final class DemoFeature extends AppFeature {
   const DemoFeature();
 
@@ -296,8 +294,6 @@ final class _DemoTabEntry extends AppTabEntry {
 // lib/features/features.dart
 import 'demo/demo_feature.dart';
 
-export 'demo/demo_feature.dart';
-
 const List<AppFeature> appFeatures = [
   AuthFeature(),
   TodoFeature(),
@@ -307,6 +303,13 @@ const List<AppFeature> appFeatures = [
 ```
 
 完成后，`appFeatureRoutes` 会自动展开所有 Feature 的普通页面路由，`appFeatureTabs` 会自动汇聚底部 Tab 入口。已作为 Tab 根路由挂到 `RootShellRoute` 的页面不会再重复加入顶层路由表。
+
+如果业务页面需要通过 `header.dart` 使用新 route class，再把它加入公共导出文件：
+
+```dart
+// lib/features/exports.dart
+export 'demo/presentation/demo_routes.dart';
+```
 
 ## App 装配路由
 
@@ -368,6 +371,7 @@ bool get public => true;
 - Feature 只暴露稳定 route class，不让一个 Feature 的 presentation 直接依赖另一个 Feature 的 presentation。
 - App Shell、Splash、Root redirect 放在 `lib/app/`，由 App 层组合 Feature 入口；无 Tab 时不注册 Root redirect。
 - `core/router` 不 import `app/` 或 `features/`；应用路由图只能通过 `AppRouterConfig` 注入。
+- `features/features.dart` 是 App 注册表，`features/exports.dart` 是业务公共导出入口；不要让 `header.dart` 间接导出 Feature 默认 data 装配。
 - `header.dart` 只服务业务页面便捷导入，App/Core/Shared 内部使用精确 import，避免形成 `shared -> header -> features`。
 - `RouterNavigator` 是唯一调用 GoRouter 导航 API 的类。
 - `app_router_transfor.dart` 是唯一把项目路由定义转换为 GoRouter RouteBase 的适配层。

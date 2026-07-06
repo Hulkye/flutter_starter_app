@@ -7,8 +7,6 @@ import 'package:flutter_starter_app/core/router/router.dart';
 import '../../core/theme/theme.dart';
 import 'presentation/profile_routes.dart';
 
-export 'presentation/profile_routes.dart';
-
 final class ProfileFeature extends AppFeature {
   const ProfileFeature();
 

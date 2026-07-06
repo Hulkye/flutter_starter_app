@@ -29,7 +29,7 @@
 ///
 /// 1. `features/xxx/presentation/xxx_routes.dart` — 创建 `XxxRoute extends AppPageRoute`
 /// 2. `features/xxx/xxx_feature.dart` — 创建 `XxxFeature extends AppFeature`
-/// 3. `features/features.dart` — 注册 `XxxFeature()` 并导出该 Feature
+/// 3. `features/features.dart` — 注册 `XxxFeature()`
 /// 4. App 层 `app_router_config.dart` 会通过 `appFeatures` 自动组合到路由图
 library;
 

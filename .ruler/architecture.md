@@ -15,12 +15,13 @@
 - `data/repositories/`：Repository 实现，负责数据转换、异常处理、数据源组合。
 - `domain/entities/`：业务实体和值对象。
 - `domain/exceptions/`：领域异常，表达业务失败语义，不携带 UI 文案兜底逻辑。
-- `domain/repositories/`：Repository 抽象与抽象 Provider；公开 Provider 只暴露抽象，默认 data 实现通过 binding Provider 由 App 组合层注入。
+- `domain/repositories/`：Repository 抽象与抽象 Provider；公开 Provider 只暴露抽象，默认 data 实现通过 binding Provider 由 `XxxFeature.providerOverrides` 声明并由 App 组合层汇聚注入。
 - `presentation/pages/`：页面与 UI 组合。
 - `presentation/viewmodels/`：页面状态与业务动作。
 - `presentation/<feature>_routes.dart`：当前 Feature 的路由定义。
-- `<feature>_feature.dart`：当前 Feature 对 App 暴露的模块声明与路由导出。
-- `lib/app/di/app_feature_provider_overrides.dart`：App 组合层装配 Feature 默认 data 实现，override domain binding Provider。
+- `<feature>_feature.dart`：当前 Feature 对 App 暴露的模块声明，包括路由、Tab 入口和默认 Provider 覆盖项。
+- `lib/features/features.dart`：App Feature 注册表，汇聚 `appFeatures`、`appFeatureRoutes`、`appFeatureTabs` 与 `appFeatureProviderOverrides`。
+- `lib/features/exports.dart`：业务页面公共导出入口，只导出 route class 和明确需要跨模块使用的公开类型，避免通过 `header.dart` 暴露默认 data 装配。
 - 简单页面不要为了保持目录形式统一而创建空 ViewModel、空 State、空 Repository、空 DataSource 或空目录。
 
 ## 跨 Feature 依赖边界

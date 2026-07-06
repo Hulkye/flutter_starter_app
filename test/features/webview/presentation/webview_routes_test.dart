@@ -1,4 +1,4 @@
-import 'package:flutter_starter_app/features/webview/webview_feature.dart';
+import 'package:flutter_starter_app/features/exports.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

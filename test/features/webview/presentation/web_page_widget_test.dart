@@ -3,10 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_starter_app/app/app.dart';
 import 'package:flutter_starter_app/app/env.dart';
 import 'package:flutter_starter_app/app/router/app_router_config.dart';
-import 'package:flutter_starter_app/core/di/di_overrides.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
-import 'package:flutter_starter_app/features/webview/webview_feature.dart';
+import 'package:flutter_starter_app/features/exports.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -31,7 +30,6 @@ Future<void> _pumpApp(WidgetTester tester, {AuthSession? session}) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        ...createEnvOverrides(appConfig),
         ...createAppRouterOverrides(),
         authSessionProvider.overrideWith(
           () => _TestAuthSessionNotifier(session),

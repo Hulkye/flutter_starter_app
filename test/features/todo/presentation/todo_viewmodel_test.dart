@@ -1,5 +1,5 @@
-import 'package:flutter_starter_app/app/di/app_feature_provider_overrides.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
+import 'package:flutter_starter_app/features/todo/todo_feature.dart';
 import 'package:flutter_starter_app/features/todo/presentation/viewmodels/todo_viewmodel.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,7 +15,7 @@ void main() {
 
     test('loads seeded todos and marks state initialized', () async {
       final container = createTestContainer(
-        overrides: [...createTodoFeatureProviderOverrides()],
+        overrides: [...const TodoFeature().providerOverrides],
       );
       final vm = container.read(todoViewModelProvider.notifier);
 
@@ -30,7 +30,7 @@ void main() {
 
     test('adds, toggles, and deletes todos', () async {
       final container = createTestContainer(
-        overrides: [...createTodoFeatureProviderOverrides()],
+        overrides: [...const TodoFeature().providerOverrides],
       );
       final vm = container.read(todoViewModelProvider.notifier);
       await vm.loadTodos();
@@ -58,7 +58,7 @@ void main() {
 
     test('ignores empty todo title', () async {
       final container = createTestContainer(
-        overrides: [...createTodoFeatureProviderOverrides()],
+        overrides: [...const TodoFeature().providerOverrides],
       );
       final vm = container.read(todoViewModelProvider.notifier);
 

@@ -7,7 +7,8 @@
 - 一个 Route class 表达一个路由目标和页面构建方式。
 - 页面 Route class 继承 `AppPageRoute`，Shell/Redirect 使用对应的 `AppRouteNode` 子类。
 - Feature 通过 `XxxFeature extends AppFeature` 暴露路由。
-- `features/features.dart` 汇聚普通业务路由与可选底部 Tab 入口。
+- `features/features.dart` 汇聚普通业务路由、可选底部 Tab 入口与 Feature Provider 覆盖项。
+- `features/exports.dart` 汇聚业务页面需要通过 `header.dart` 使用的 route class 和公开类型。
 - App 组合层通过 `lib/app/router/app_router_config.dart` 组装 Splash、Root/Shell 与 Feature 路由，并以 `AppRouterConfig` 注入 `core/router`。
 - `core/router` 只提供路由定义、GoRouter 适配、守卫和导航 Provider，不 import `app/` 或 `features/`。
 - 无底部 Tab 时不要创建 `/` 的 Root redirect 或 Root Shell；应提供明确首页路由或自定义登录后的目标页。
@@ -18,10 +19,11 @@
 2. 在 `lib/features/<feature>/<feature>_feature.dart` 创建 `XxxFeature extends AppFeature`。
 3. 在 `XxxFeature.routes` 中返回当前 Feature 的路由列表。
 4. 如需底部 Tab，在 `XxxFeature.tabs` 中返回 `AppTabEntry`，由 `RootShellRoute` 自动装配。
-5. 在 `XxxFeature` 中 export 当前 Feature 的 route 文件。
-6. 在 `lib/features/features.dart` import/export `XxxFeature` 并加入 `appFeatures`。
+5. 如存在默认 data 实现，在 `XxxFeature.providerOverrides` 中装配 domain binding Provider。
+6. 在 `lib/features/features.dart` import `XxxFeature` 并加入 `appFeatures`。
 7. `lib/app/router/app_router_config.dart` 会从 `appFeatures` 自动组合到 App 路由图，通常无需修改 `core/router/router_provider.dart`。
-8. 业务页面通过 `package:flutter_starter_app/header.dart` 使用 route class 和 `appRouterProvider`。
+8. 如 route class 需要给业务页面使用，在 `lib/features/exports.dart` 导出。
+9. 业务页面通过 `package:flutter_starter_app/header.dart` 使用 route class 和 `appRouterProvider`。
 
 ## 禁止事项
 
