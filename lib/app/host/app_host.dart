@@ -49,7 +49,7 @@ class _AppHostState extends ConsumerState<AppHost> {
     if (!mounted) return;
 
     final targetLocation = switch (target) {
-      AppBootstrapTarget.root => RootRoute().location,
+      AppBootstrapTarget.root => RootRoute.location,
       AppBootstrapTarget.login => const LoginRoute().location,
     };
     if (appRouter.location == targetLocation) return;

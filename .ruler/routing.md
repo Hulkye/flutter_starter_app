@@ -10,6 +10,7 @@
 - `features/features.dart` 汇聚普通业务路由与可选底部 Tab 入口。
 - App 组合层通过 `lib/app/router/app_router_config.dart` 组装 Splash、Root/Shell 与 Feature 路由，并以 `AppRouterConfig` 注入 `core/router`。
 - `core/router` 只提供路由定义、GoRouter 适配、守卫和导航 Provider，不 import `app/` 或 `features/`。
+- 无底部 Tab 时不要创建 `/` 的 Root redirect 或 Root Shell；应提供明确首页路由或自定义登录后的目标页。
 
 ## 新增路由流程
 

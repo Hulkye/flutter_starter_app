@@ -320,6 +320,8 @@ const List<AppFeature> appFeatures = [
 
 `lib/app/router/app_router_config.dart` 会从 `appFeatures` 读取 `appFeatureRoutes` 与 `appFeatureTabs`，并通过 `AppRouterConfig` 注入 `core/router`。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart`。
 
+如果项目删除所有底部 Tab，模板不会创建 `/` 的 Root redirect 和 Shell；此时需要保留一个明确首页路由，或在 App 启动跳转逻辑中指定登录后的目标页。
+
 `Application.run()` 同时会把 `createAppFeatureProviderOverrides()` 加入根 `ProviderScope`。因此 Repository 抽象 Provider 放在 `domain/repositories`，data 实现放在 `data/repositories`，再由 App 组合层装配。ViewModel 只 import domain 抽象，不直接 import data 层 Provider。
 
 ### 4. 在页面中导航

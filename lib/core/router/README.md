@@ -151,8 +151,8 @@ AppRouterConfig createAppRouterConfig() {
 注册顺序含义：
 
 - `SplashRoute`：启动展示页，属于 `lib/app/splash/`。
-- `RootRoute`：`/` 重定向到默认 Tab。
-- `RootShellRoute`：底部 Tab Shell，属于 `lib/app/shell/`。
+- `RootRoute`：有 Tab 时才注册，`/` 重定向到默认 Tab。
+- `RootShellRoute`：有 Tab 时才注册的底部 Tab Shell，属于 `lib/app/shell/`。
 - `appFeatureRoutes`：从 `features/features.dart` 汇聚的普通业务页面路由；已挂到 Shell Tab 的根路由不会重复注册到顶层。
 
 同时，`RootShellRoute` 不再手写 tab 分支，而是从 `features/features.dart` 汇聚的 `appFeatureTabs` 自动装配：
@@ -178,7 +178,7 @@ App/Core/Shared 内部不要通过 `header.dart` 获取依赖，应直接 import
 
 ```dart
 ref.read(appRouterProvider).push(const TodoRoute().location);
-ref.read(appRouterProvider).go(const RootRoute().location);
+ref.read(appRouterProvider).go(RootRoute.location);
 ref.read(appRouterProvider).back();
 ```
 
@@ -332,8 +332,9 @@ lib/app/shell/
 
 当前 Shell 结构：
 
-- `/` 由 `RootRoute` 重定向到默认 Feature Tab。
-- `RootShellRoute` 从 `appFeatureTabs` 自动装配底部 Tab 分支；没有 Tab 时不会注册 Shell。
+- 有 Tab 时，`/` 由 `RootRoute` 重定向到默认 Feature Tab。
+- `RootShellRoute` 从 `appFeatureTabs` 自动装配底部 Tab 分支。
+- 没有 Tab 时，不注册 `RootRoute` 和 `RootShellRoute`，避免 `/` 自重定向；模板使用者应提供明确的首页路由或自定义启动后的目标页。
 - `app_router_config.dart` 负责把 Splash、Root/Shell 与 Feature 路由组合成 `AppRouterConfig` 并注入 core/router。
 - GoRouter 的 `StatefulShellRoute` 只存在于 `app_router_transfor.dart`，不会暴露给业务 Feature。
 
@@ -359,13 +360,13 @@ bool get public => true;
 
 公开路由支持动态路径片段匹配。例如 `path = '/article/:id'` 时，实际访问 `/article/42` 也会被识别为公开路由。
 
-模板默认保留根路径 `/` 作为重定向入口，但未登录访问 `/` 时会先进入登录页。需要根路径免登录访问时，应显式将对应重定向路由标记为 `public`。
+模板在存在底部 Tab 时保留根路径 `/` 作为重定向入口，但未登录访问 `/` 时会先进入登录页。无 Tab 时不会创建 Root redirect，需要由业务显式提供首页路由或自定义启动后的目标页。
 
 ## 设计约束
 
 - 业务层不直接 import `go_router`，统一通过 `AppPageRoute`、`AppRouteState`、`BaseNavigator` 解耦。
 - Feature 只暴露稳定 route class，不让一个 Feature 的 presentation 直接依赖另一个 Feature 的 presentation。
-- App Shell、Splash、Root redirect 放在 `lib/app/`，由 App 层组合 Feature 入口。
+- App Shell、Splash、Root redirect 放在 `lib/app/`，由 App 层组合 Feature 入口；无 Tab 时不注册 Root redirect。
 - `core/router` 不 import `app/` 或 `features/`；应用路由图只能通过 `AppRouterConfig` 注入。
 - `header.dart` 只服务业务页面便捷导入，App/Core/Shared 内部使用精确 import，避免形成 `shared -> header -> features`。
 - `RouterNavigator` 是唯一调用 GoRouter 导航 API 的类。

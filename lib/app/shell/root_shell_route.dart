@@ -1,47 +1,40 @@
-import 'package:flutter/widgets.dart';
-
+import '../../core/feature/app_tab_entry.dart';
 import '../../core/router/router.dart';
 import '../../features/features.dart';
 import 'root_shell_page.dart';
 
-List<AppRouteNode> buildRootRouteNodes() {
+List<AppRouteNode> buildRootRouteNodes({List<AppTabEntry>? tabs}) {
+  final entries = tabs ?? appFeatureTabs;
+  if (entries.isEmpty) return const <AppRouteNode>[];
+
   return <AppRouteNode>[
-    RootRoute(),
-    if (appFeatureTabs.isNotEmpty) RootShellRoute(),
+    RootRoute(redirectTo: entries.first.initialLocation),
+    RootShellRoute(tabs: entries),
   ];
 }
 
 final class RootRoute extends AppRedirectRoute {
-  RootRoute() : super(path: pathValue, redirectTo: _defaultLocation);
+  const RootRoute({required super.redirectTo}) : super(path: pathValue);
 
   static const String pathValue = '/';
-
-  static String get _defaultLocation {
-    if (appFeatureTabs.isNotEmpty) {
-      return appFeatureTabs.first.initialLocation;
-    }
-    return pathValue;
-  }
-
-  String get location => path;
+  static const String location = pathValue;
 }
 
 final class RootShellRoute extends AppShellRoute {
-  RootShellRoute() : super(branches: _branches, builder: _build);
+  RootShellRoute({required List<AppTabEntry> tabs})
+    : super(
+        branches: _buildBranches(tabs),
+        builder: (context, state, shellNavigator) =>
+            RootShellPage(shellNavigator: shellNavigator, tabs: tabs),
+      );
 
-  static final List<AppShellBranch> _branches = [
-    for (final tab in appFeatureTabs)
-      AppShellBranch(
-        initialLocation: tab.initialLocation,
-        routes: <AppPageRoute>[tab.route],
-      ),
-  ];
-
-  static Widget _build(
-    BuildContext context,
-    AppRouteState state,
-    AppShellNavigator shellNavigator,
-  ) {
-    return RootShellPage(shellNavigator: shellNavigator, tabs: appFeatureTabs);
+  static List<AppShellBranch> _buildBranches(List<AppTabEntry> tabs) {
+    return <AppShellBranch>[
+      for (final tab in tabs)
+        AppShellBranch(
+          initialLocation: tab.initialLocation,
+          routes: <AppPageRoute>[tab.route],
+        ),
+    ];
   }
 }

@@ -412,7 +412,7 @@ Page Navigation    → BaseNavigator                → RouterNavigator
 - `lib/app/router/app_router_config.dart` 组合 Splash、Root/Shell 与 Feature 路由，并注入 `core/router`
 - `lib/app/di/app_feature_provider_overrides.dart` 装配 Feature 默认 data 实现，ViewModel 只依赖 domain Provider
 - `header.dart` 只作为业务页面便捷入口，App/Core/Shared 内部使用精确 import，避免隐式依赖 Feature
-- App Shell 从 `appFeatureTabs` 自动装配底部 Tab 分支，业务层不直接依赖 GoRouter Shell API
+- App Shell 从 `appFeatureTabs` 自动装配底部 Tab 分支；无 Tab 时不创建 Root redirect / Shell
 - 支持公开路由与登录态路由
 - 未登录访问受保护页面时自动跳转登录页
 - 提供 root navigator key，支持非 UI 场景导航
