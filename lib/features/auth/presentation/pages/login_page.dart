@@ -83,14 +83,6 @@ class LoginPage extends BasePage {
     final ref = scope.ref;
     final logic = scope.logic<_LoginPageLogic>();
     final state = ref.watch(authViewModelProvider);
-    final session = ref.watch(authSessionProvider);
-    final isLoggedIn = session?.isValid == true;
-
-    if (isLoggedIn) {
-      logic.postFrame(() {
-        ref.read(appRouterProvider).replaceAll(RootRoute.pathValue);
-      });
-    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -145,14 +137,25 @@ class LoginPage extends BasePage {
 final class _LoginPageLogic extends PageLogic {
   final accountCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
+  bool _redirecting = false;
+
+  @override
+  void onReady() {
+    _redirectIfAuthenticated();
+  }
 
   Future<void> login() async {
     final vm = ref.read(authViewModelProvider.notifier);
     await vm.login(accountCtrl.text.trim(), passwordCtrl.text.trim());
     if (!mounted) return;
-    if (ref.read(authSessionProvider)?.isValid == true) {
-      ref.read(appRouterProvider).replaceAll(RootRoute.pathValue);
-    }
+    _redirectIfAuthenticated();
+  }
+
+  void _redirectIfAuthenticated() {
+    if (_redirecting) return;
+    if (ref.read(authSessionProvider)?.isValid != true) return;
+    _redirecting = true;
+    ref.read(appRouterProvider).replaceAll(RootRoute().location);
   }
 
   @override
