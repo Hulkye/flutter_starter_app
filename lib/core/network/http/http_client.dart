@@ -231,6 +231,71 @@ class HttpClient implements BaseHttpClient {
     );
   }
 
+  RequestOptions _buildRequestOptions(HttpRequest<dynamic> request) {
+    final requestOptions = _buildOptions(request).compose(
+      _dio.options,
+      request.path,
+      data: request.data,
+      queryParameters: request.queryParameters,
+      cancelToken: request.cancelToken,
+      onSendProgress: request.onSendProgress,
+      onReceiveProgress: request.onReceiveProgress,
+    );
+    requestOptions.connectTimeout =
+        request.connectTimeout ?? _config.connectTimeout;
+    return requestOptions;
+  }
+
+  Future<({ResponseBody body, RequestOptions requestOptions})>
+  _fetchDownloadBody(HttpRequest<dynamic> request) async {
+    final requestOptions = _buildRequestOptions(
+      request.copyWith(responseType: ResponseType.stream),
+    );
+    requestOptions.onReceiveProgress = null;
+    final response = await _dio.fetch<ResponseBody>(requestOptions);
+    return (body: response.data!, requestOptions: requestOptions);
+  }
+
+  Future<void> _writeDownloadBody({
+    required ResponseBody body,
+    required String savePath,
+    required RequestOptions requestOptions,
+    CancelToken? cancelToken,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final file = io.File(savePath);
+    await file.create(recursive: true);
+
+    final total = int.tryParse(
+      body.headers[Headers.contentLengthHeader]?.first ?? '',
+    );
+    var received = 0;
+    final sink = file.openWrite();
+
+    try {
+      await for (final chunk in body.stream) {
+        if (cancelToken?.isCancelled ?? false) {
+          throw cancelToken!.cancelError!;
+        }
+        sink.add(chunk);
+        received += chunk.length;
+        onReceiveProgress?.call(received, total ?? -1);
+      }
+      await sink.close();
+    } catch (error) {
+      await sink.close().catchError((_) {});
+      if (await file.exists()) {
+        await file.delete();
+      }
+      if (error is DioException) rethrow;
+      throw DioException(
+        requestOptions: requestOptions,
+        type: DioExceptionType.unknown,
+        error: error,
+      );
+    }
+  }
+
   // =======================================================================
   // 日志辅助
   // =======================================================================
@@ -262,6 +327,7 @@ class HttpClient implements BaseHttpClient {
     required Duration elapsed,
     int? statusCode,
   }) {
+    if (!_isLoggingEnabled(request)) return;
     if (_logger case final DefaultHttpLogger logger) {
       logger.logRetry(
         request,
@@ -391,14 +457,8 @@ class HttpClient implements BaseHttpClient {
     try {
       final networkReq = request.copyWith(cachePolicy: CachePolicy.networkOnly);
       final resp = await _executeRawWith(networkReq, () async {
-        final dioResp = await _dio.request<dynamic>(
-          networkReq.path,
-          data: networkReq.data,
-          queryParameters: networkReq.queryParameters,
-          options: _buildOptions(networkReq),
-          cancelToken: networkReq.cancelToken,
-          onSendProgress: networkReq.onSendProgress,
-          onReceiveProgress: networkReq.onReceiveProgress,
+        final dioResp = await _dio.fetch<dynamic>(
+          _buildRequestOptions(networkReq),
         );
         return HttpResponse<dynamic>(
           data: dioResp.data,
@@ -516,8 +576,10 @@ class HttpClient implements BaseHttpClient {
         request: request,
       );
     }
-    if (_logger case final DefaultHttpLogger logger) {
-      logger.logCacheHit(request, statusCode: cached.statusCode);
+    if (_isLoggingEnabled(request)) {
+      if (_logger case final DefaultHttpLogger logger) {
+        logger.logCacheHit(request, statusCode: cached.statusCode);
+      }
     }
     return _decodeResponse(
       request,
@@ -692,14 +754,8 @@ class HttpClient implements BaseHttpClient {
     // 4. 网络请求
     try {
       final raw = await _executeRawWith(normalized, () async {
-        final dioResp = await _dio.request<dynamic>(
-          normalized.path,
-          data: normalized.data,
-          queryParameters: normalized.queryParameters,
-          options: _buildOptions(normalized),
-          cancelToken: normalized.cancelToken,
-          onSendProgress: normalized.onSendProgress,
-          onReceiveProgress: normalized.onReceiveProgress,
+        final dioResp = await _dio.fetch<dynamic>(
+          _buildRequestOptions(normalized),
         );
         return HttpResponse<dynamic>(
           data: dioResp.data,
@@ -1020,23 +1076,24 @@ class HttpClient implements BaseHttpClient {
       loggingEnabled: loggingEnabled,
       retryPolicy: retryPolicy,
       parser: parser,
+      onReceiveProgress: onReceiveProgress,
       responseType: ResponseType.bytes,
     );
     final normalized = await _applyRequestInterceptors(_normalizeRequest(req));
     final raw = await _executeRawWith(normalized, () async {
-      final dioResp = await _dio.download(
-        path,
-        savePath,
-        queryParameters: queryParameters,
-        options: _buildOptions(normalized),
-        cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
+      final download = await _fetchDownloadBody(normalized);
+      await _writeDownloadBody(
+        body: download.body,
+        savePath: savePath,
+        requestOptions: download.requestOptions,
+        cancelToken: normalized.cancelToken,
+        onReceiveProgress: normalized.onReceiveProgress,
       );
       return HttpResponse<dynamic>(
         data: savePath,
-        statusCode: dioResp.statusCode,
-        headers: dioResp.headers.map.map((k, v) => MapEntry(k, v.toList())),
-        extra: dioResp.extra,
+        statusCode: download.body.statusCode,
+        headers: download.body.headers,
+        extra: download.body.extra,
         requestOptions: normalized,
       );
     }, allowMock: false);

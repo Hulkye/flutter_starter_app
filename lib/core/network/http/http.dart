@@ -20,13 +20,13 @@
 ///     baseUrl: 'https://api.example.com',
 ///     defaultRetryPolicy: RetryPolicy(maxAttempts: 3),
 ///     defaultCachePolicy: CachePolicy.cacheFirst,
-///   ),
-///   authConfig: HttpAuthConfig(
-///     headerMapProvider: () async => {'Authorization': 'Bearer $token'},
-///     onAuthFailed: () async => logout(),
-///   ),
-///   responseConfig: HttpResponseConfig(
-///     defaultSuccessCode: 0,
+///     authConfig: HttpAuthConfig(
+///       headerMapProvider: () async => {'Authorization': 'Bearer $token'},
+///       onAuthFailed: () async => logout(),
+///     ),
+///     responseConfig: HttpResponseConfig(
+///       defaultSuccessCode: 0,
+///     ),
 ///   ),
 /// );
 ///

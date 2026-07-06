@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:path_provider/path_provider.dart';
+
 import 'http_cache_entry.dart';
 
 /// HTTP 缓存存储抽象。
@@ -65,34 +67,62 @@ class MemoryHttpCacheStore implements HttpCacheStore {
 // =======================================================================
 
 /// 基于文件的缓存存储，适合持久化 / 冷数据。
-class FileHttpCacheStore implements HttpCacheStore {
-  FileHttpCacheStore({Directory? directory})
-    : _directory =
-          directory ?? Directory('${Directory.systemTemp.path}/http3_cache');
+typedef HttpCacheDirectoryProvider = Future<Directory> Function();
 
-  final Directory _directory;
+class FileHttpCacheStore implements HttpCacheStore {
+  FileHttpCacheStore({
+    Directory? directory,
+    HttpCacheDirectoryProvider? directoryProvider,
+  }) {
+    if (directory != null && directoryProvider != null) {
+      throw ArgumentError(
+        'Provide either directory or directoryProvider, not both.',
+      );
+    }
+    _directoryProvider =
+        directoryProvider ??
+        (directory == null ? _defaultDirectoryProvider : () async => directory);
+  }
+
+  late final HttpCacheDirectoryProvider _directoryProvider;
+  Future<Directory>? _directoryFuture;
+
+  static Future<Directory> _defaultDirectoryProvider() async {
+    final cacheRoot = await getApplicationCacheDirectory();
+    return Directory('${cacheRoot.path}/http_cache');
+  }
+
+  Future<Directory> _directory() {
+    return _directoryFuture ??= _directoryProvider();
+  }
 
   Future<void> _ensureDir() async {
-    if (!await _directory.exists()) {
-      await _directory.create(recursive: true);
+    final directory = await _directory();
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
     }
   }
 
   String _safeName(String key) => base64Url.encode(utf8.encode(key));
 
-  File _file(String key) => File('${_directory.path}/${_safeName(key)}.json');
+  Future<File> _file(String key) async {
+    final directory = await _directory();
+    return File('${directory.path}/${_safeName(key)}.json');
+  }
 
   @override
   Future<void> clear() async {
-    if (await _directory.exists()) {
-      await _directory.delete(recursive: true);
+    final directory = await _directory();
+    if (await directory.exists()) {
+      await directory.delete(recursive: true);
     }
   }
 
   @override
   Future<int> count() async {
-    if (!await _directory.exists()) return 0;
-    return _directory
+    final directory = await _directory();
+    if (!await directory.exists()) return 0;
+    return directory
         .list(recursive: false, followLinks: false)
         .where((e) => e is File)
         .length;
@@ -100,9 +130,10 @@ class FileHttpCacheStore implements HttpCacheStore {
 
   @override
   Future<int> clearExpired() async {
-    if (!await _directory.exists()) return 0;
+    final directory = await _directory();
+    if (!await directory.exists()) return 0;
     var removed = 0;
-    await for (final entity in _directory.list(
+    await for (final entity in directory.list(
       recursive: false,
       followLinks: false,
     )) {
@@ -127,7 +158,7 @@ class FileHttpCacheStore implements HttpCacheStore {
 
   @override
   Future<HttpCacheEntry?> read(String key) async {
-    final file = _file(key);
+    final file = await _file(key);
     if (!await file.exists()) return null;
     final raw = await file.readAsString();
     if (raw.isEmpty) return null;
@@ -136,13 +167,14 @@ class FileHttpCacheStore implements HttpCacheStore {
 
   @override
   Future<void> remove(String key) async {
-    final file = _file(key);
+    final file = await _file(key);
     if (await file.exists()) await file.delete();
   }
 
   @override
   Future<void> write(HttpCacheEntry entry) async {
     await _ensureDir();
-    await _file(entry.key).writeAsString(jsonEncode(entry.toJson()));
+    final file = await _file(entry.key);
+    await file.writeAsString(jsonEncode(entry.toJson()));
   }
 }
