@@ -105,11 +105,7 @@ final class _FakeAuthRepository implements AuthRepository {
   final Ref _ref;
 
   @override
-  Future<void> login(
-    String username,
-    String password, {
-    required String fallbackErrorMessage,
-  }) async {
+  Future<void> login(String username, String password) async {
     await _ref
         .read(authSessionProvider.notifier)
         .setSession(

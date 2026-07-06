@@ -170,6 +170,7 @@ lib/features/<feature>/
 │   └── repositories/              # Repository 实现
 ├── domain/
 │   ├── entities/                  # 业务实体
+│   ├── exceptions/                # 领域异常
 │   └── repositories/              # Repository 抽象
 └── presentation/
     ├── pages/                     # 页面
@@ -551,6 +552,7 @@ lib/features/order/
 │   └── repositories/order_repository_impl.dart
 ├── domain/
 │   ├── entities/order.dart
+│   ├── exceptions/order_exception.dart
 │   └── repositories/order_repository.dart
 └── presentation/
     ├── order_routes.dart

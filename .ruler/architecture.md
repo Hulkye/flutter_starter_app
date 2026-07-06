@@ -14,6 +14,7 @@
 - `data/datasources/`：远程或本地数据源。
 - `data/repositories/`：Repository 实现，负责数据转换、异常处理、数据源组合。
 - `domain/entities/`：业务实体和值对象。
+- `domain/exceptions/`：领域异常，表达业务失败语义，不携带 UI 文案兜底逻辑。
 - `domain/repositories/`：Repository 抽象。
 - `presentation/pages/`：页面与 UI 组合。
 - `presentation/viewmodels/`：页面状态与业务动作。

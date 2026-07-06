@@ -435,6 +435,10 @@ AuthRepositoryImpl
   ↓
 AuthRemoteDataSource
   ↓
+AuthException（失败时）
+  ↓
+AuthViewModel 映射国际化文案
+  ↓
 authSessionProvider.notifier.setSession()
   ↓
 AuthStore 持久化
@@ -450,7 +454,7 @@ RouterGuard / AuthInterceptor 生效
 
 ### 2. 修改响应解析
 
-将后端返回的 token、refreshToken、用户信息转换成 `AuthSession`。
+将后端返回的 token、refreshToken、用户信息转换成 `AuthSession`。认证失败或响应结构异常时，Repository 抛 `AuthException` 的具体子类，不向 domain 接口传入 UI 兜底文案；页面文案由 `AuthViewModel` 基于异常类型映射国际化资源。
 
 ### 3. 确认退出登录逻辑
 

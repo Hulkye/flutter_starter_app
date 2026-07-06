@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/l10n.dart';
 import '../../../../shared/presentation/presentation.dart';
 import '../../data/repositories/auth_repository_impl.dart';
+import '../../domain/exceptions/auth_exception.dart';
 
 /// Auth 页面状态。
 class AuthState extends BaseState {
@@ -49,19 +50,23 @@ final class AuthViewModel extends BaseVM<AuthState> {
   Future<void> login(String username, String password) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      await ref
-          .read(authRepositoryProvider)
-          .login(
-            username,
-            password,
-            fallbackErrorMessage: ref
-                .read(appLocalizationsProvider)
-                .loginFailed,
-          );
+      await ref.read(authRepositoryProvider).login(username, password);
       state = state.copyWith(isLoading: false);
-    } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    } catch (error) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _resolveLoginErrorMessage(error),
+      );
     }
+  }
+
+  String _resolveLoginErrorMessage(Object error) {
+    final i18n = ref.read(appLocalizationsProvider);
+    return switch (error) {
+      AuthLoginRejectedException() => i18n.loginFailed,
+      AuthInvalidResponseException() => i18n.loginFailed,
+      _ => i18n.loginFailed,
+    };
   }
 
   Future<void> logout() async {

@@ -17,6 +17,7 @@ lib/features/<feature>/
 │   └── repositories/
 ├── domain/
 │   ├── entities/
+│   ├── exceptions/
 │   └── repositories/
 └── presentation/
     ├── pages/

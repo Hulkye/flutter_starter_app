@@ -3,15 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/http/response/api_response.dart';
 
 /// Auth 远程数据源 —— 定义认证相关的 API 端点。
+abstract interface class AuthDataSource {
+  /// 登录。
+  Future<ApiResponse<Map<String, dynamic>>> login(
+    String username,
+    String password,
+  );
+}
+
+/// Auth 远程数据源实现。
 ///
 /// 职责：
 /// - 调用 [HttpClient] 发送请求
 /// - 将原始响应映射为 [ApiResponse]
 /// - 不包含业务逻辑（业务逻辑在 [AuthRepositoryImpl] 中）
-final class AuthRemoteDataSource {
+final class AuthRemoteDataSource implements AuthDataSource {
   const AuthRemoteDataSource();
 
   /// 登录。
+  @override
   Future<ApiResponse<Map<String, dynamic>>> login(
     String username,
     String password,
@@ -31,6 +41,6 @@ final class AuthRemoteDataSource {
 }
 
 /// Auth DataSource Provider。
-final authDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
+final authDataSourceProvider = Provider<AuthDataSource>((ref) {
   return const AuthRemoteDataSource();
 });

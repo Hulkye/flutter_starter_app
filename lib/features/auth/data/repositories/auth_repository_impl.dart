@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/network/http/response/api_response.dart';
 import '../../../../shared/services/auth/auth_provider.dart';
 import '../../../../shared/services/auth/auth_session.dart';
+import '../../domain/exceptions/auth_exception.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_datasource.dart';
 
@@ -11,25 +11,24 @@ final class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._ref, this._dataSource);
 
   final Ref _ref;
-  final AuthRemoteDataSource _dataSource;
+  final AuthDataSource _dataSource;
 
   @override
-  Future<void> login(
-    String username,
-    String password, {
-    required String fallbackErrorMessage,
-  }) async {
+  Future<void> login(String username, String password) async {
     final response = await _dataSource.login(username, password);
     if (!response.isSuccess) {
-      throw ApiException(
+      throw AuthLoginRejectedException(
         code: response.code,
-        message: response.message ?? fallbackErrorMessage,
+        message: response.message,
       );
     }
     final data = response.data;
     final token = data?['token']?.toString().trim() ?? '';
     if (token.isEmpty) {
-      throw ApiException(code: response.code, message: fallbackErrorMessage);
+      throw AuthInvalidResponseException(
+        code: response.code,
+        message: response.message,
+      );
     }
     await _ref
         .read(authSessionProvider.notifier)
