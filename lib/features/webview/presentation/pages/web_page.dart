@@ -199,6 +199,10 @@ final class _WebPageLogic extends PageLogic {
   }
 
   Future<void> goBackOrClose() async {
+    if (!canLoad) {
+      closePage();
+      return;
+    }
     if (config.enableWebHistoryBack && await controller.canGoBack()) {
       await controller.goBack();
       await _syncNavigationState();

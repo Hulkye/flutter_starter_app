@@ -63,6 +63,34 @@ void main() {
     },
   );
 
+  testWidgets(
+    'invalid public web route back closes without controller access',
+    (tester) async {
+      await _pumpApp(tester);
+      await _pumpMs(tester, 3000);
+
+      final context = tester.element(find.byType(MaterialApp));
+      final router = ProviderScope.containerOf(
+        context,
+        listen: false,
+      ).read(appRouterProvider);
+
+      final routeResult = router.push<Object?>(
+        const WebPageRoute(url: 'ftp://example.com').location,
+      );
+      await _pumpMs(tester, 1000);
+
+      expect(find.text('网页地址无效'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.arrow_back_ios));
+      await _pumpMs(tester, 1000);
+
+      expect(tester.takeException(), isNull);
+      await expectLater(routeResult, completes);
+      expect(find.text('网页地址无效'), findsNothing);
+    },
+  );
+
   testWidgets('auth web route redirects unauthenticated users to login', (
     tester,
   ) async {
