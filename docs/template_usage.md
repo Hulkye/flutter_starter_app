@@ -483,7 +483,7 @@ AuthException（失败时）
   ↓
 AuthViewModel 映射国际化文案
   ↓
-authSessionProvider.notifier.setSession()
+AuthViewModel 通过 AuthSessionController 写入 authSessionProvider
   ↓
 AuthStore 持久化
   ↓
@@ -498,17 +498,17 @@ RouterGuard / AuthInterceptor 生效
 
 ### 2. 修改响应解析
 
-将后端返回的 token、refreshToken、用户信息转换成 `AuthSession`。认证失败或响应结构异常时，Repository 抛 `AuthException` 的具体子类，不向 domain 接口传入 UI 兜底文案；页面文案由 `AuthViewModel` 基于异常类型映射国际化资源。
+将后端返回的 token、refreshToken、用户信息转换成 `AuthSession`。认证失败或响应结构异常时，Repository 抛 `AuthException` 的具体子类，不向 domain 接口传入 UI 兜底文案；页面文案由 `AuthViewModel` 基于异常类型映射国际化资源。`AuthRepositoryImpl` 只负责返回 `AuthSession`，不要直接写 `authSessionProvider`。
 
 ### 3. 确认退出登录逻辑
 
 退出登录时清空本地会话：
 
 ```dart
-await ref.read(authRepositoryProvider).logout();
+await ref.read(authSessionControllerProvider).clearSession();
 ```
 
-`authRepositoryProvider` 位于 Auth domain 层，默认由 App 组合层注入 `AuthRepositoryImpl`。页面或 ViewModel 使用该 Provider 时不需要 import data 层实现。
+`authRepositoryProvider` 位于 Auth domain 层，默认由 App 组合层注入 `AuthRepositoryImpl`。`authSessionControllerProvider` 位于 `shared/services/auth`，负责把 Repository 返回的 `AuthSession` 写入唯一登录态状态源；页面或 ViewModel 不需要 import data 层实现。
 
 登录成功后，模板会自动完成：
 
@@ -647,7 +647,7 @@ ref.read(appRouterProvider).push(
 - 不要用 `PageLogic` 替代 ViewModel 承载可观察业务状态、接口编排、跨页面状态或领域逻辑。
 - 不要为了保持目录形式统一而创建空 ViewModel、空 State、空 Repository 或空 DataSource。
 - 不要把具体业务逻辑放进 `core`。
-- 不要绕过 `authSessionProvider` 手动管理 token。
+- 不要绕过 `authSessionControllerProvider` 手动管理 token。
 - 不要在多个状态管理方案之间混用。
 
 ---

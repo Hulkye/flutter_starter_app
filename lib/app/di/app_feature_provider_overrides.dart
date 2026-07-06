@@ -21,7 +21,7 @@ List<Override> createAppFeatureProviderOverrides() {
 List<Override> createAuthFeatureProviderOverrides() {
   return <Override>[
     authRepositoryBindingProvider.overrideWith(
-      (ref) => AuthRepositoryImpl(ref, ref.watch(authDataSourceProvider)),
+      (ref) => AuthRepositoryImpl(ref.watch(authDataSourceProvider)),
     ),
   ];
 }

@@ -31,7 +31,7 @@ class ProfilePage extends BasePage {
       title: scope.context.i18n.logout,
       content: scope.context.i18n.logout,
       onConfirm: () {
-        scope.ref.read(authSessionProvider.notifier).clear();
+        scope.ref.read(authSessionControllerProvider).clearSession();
       },
     );
   }

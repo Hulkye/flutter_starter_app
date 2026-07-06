@@ -20,7 +20,7 @@ import 'package:flutter_starter_app/core/network/http/http_provider.dart';
 final client = ref.read(httpClientProvider);
 ```
 
-`httpClientProvider` 会读取 `appConfig`、国际化错误文案和 `authSessionProvider`，生成当前环境的 `HttpConfig`。认证 Header 在每次请求前懒读取会话状态，401 或业务 token 过期会清理 `authSessionProvider`。
+`httpClientProvider` 会读取 `appConfig`、国际化错误文案和 `authSessionProvider`，生成当前环境的 `HttpConfig`。认证 Header 在每次请求前懒读取会话状态，401 或业务 token 过期会通过 `authSessionControllerProvider` 清理会话。
 
 ## 目录职责
 
@@ -197,7 +197,7 @@ HttpAuthConfig(
 - `X-App-Channel: flutter_starter_app`
 - `X-App-Env: appConfig.envTag.name`
 - 有 token 时注入 `Authorization: Bearer ...`
-- 认证失败时清空 `authSessionProvider`
+- 认证失败时通过 `authSessionControllerProvider` 清空会话
 
 ## 缓存
 

@@ -11,7 +11,7 @@ import '../../../helpers/provider_container.dart';
 
 void main() {
   group('AuthRepositoryImpl', () {
-    test('sets auth session after successful login', () async {
+    test('returns auth session without writing global session', () async {
       final container = createTestContainer(
         overrides: [
           ...createAuthFeatureProviderOverrides(),
@@ -28,11 +28,11 @@ void main() {
       );
       final repository = container.read(authRepositoryProvider);
 
-      await repository.login(' demo ', 'password');
+      final session = await repository.login(' demo ', 'password');
 
-      final session = container.read(authSessionProvider);
-      expect(session?.token, 'token-from-api');
-      expect(session?.payload['username'], ' demo ');
+      expect(session.token, 'token-from-api');
+      expect(session.payload['username'], ' demo ');
+      expect(container.read(authSessionProvider), isNull);
     });
 
     test(

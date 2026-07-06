@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/env.dart';
 import '../../../shared/services/auth/auth_provider.dart';
+import '../../../shared/services/auth/auth_session_controller.dart';
 import '../../constant/duration_const.dart';
 import '../../l10n/l10n.dart';
 import 'config/http_auth_config.dart';
@@ -76,7 +77,7 @@ final httpConfigProvider = Provider<HttpConfig>((ref) {
         return headers;
       },
       onAuthFailed: () async {
-        await ref.read(authSessionProvider.notifier).clear();
+        await ref.read(authSessionControllerProvider).clearSession();
       },
     ),
   );

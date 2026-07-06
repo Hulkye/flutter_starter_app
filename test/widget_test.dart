@@ -40,7 +40,9 @@ void main() {
         ...createEnvOverrides(appConfig),
         ...createAppRouterOverrides(),
         authSessionProvider.overrideWith(_TestAuthSessionNotifier.new),
-        authRepositoryProvider.overrideWith(_FakeAuthRepository.new),
+        authRepositoryProvider.overrideWith(
+          (ref) => const _FakeAuthRepository(),
+        ),
       ];
 
       await tester.pumpWidget(
@@ -101,21 +103,13 @@ final class _TestAuthSessionNotifier extends AuthSessionNotifier {
 }
 
 final class _FakeAuthRepository implements AuthRepository {
-  const _FakeAuthRepository(this._ref);
-
-  final Ref _ref;
+  const _FakeAuthRepository();
 
   @override
-  Future<void> login(String username, String password) async {
-    await _ref
-        .read(authSessionProvider.notifier)
-        .setSession(
-          AuthSession(token: 'test-token', payload: {'username': username}),
-        );
-  }
-
-  @override
-  Future<void> logout() async {
-    await _ref.read(authSessionProvider.notifier).clear();
+  Future<AuthSession> login(String username, String password) async {
+    return AuthSession(
+      token: 'test-token',
+      payload: <String, dynamic>{'username': username},
+    );
   }
 }

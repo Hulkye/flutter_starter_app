@@ -37,7 +37,9 @@ Future<void> _pumpLoginPage(
       overrides: [
         appRouterProvider.overrideWith((ref) => navigator),
         authSessionProvider.overrideWith(() => _TestAuthSessionNotifier(null)),
-        authRepositoryProvider.overrideWith(_SuccessfulAuthRepository.new),
+        authRepositoryProvider.overrideWith(
+          (ref) => const _SuccessfulAuthRepository(),
+        ),
       ],
       child: ScreenUtil.screenInit(
         MaterialApp(
@@ -57,22 +59,14 @@ Future<void> _pumpLoginPage(
 }
 
 final class _SuccessfulAuthRepository implements AuthRepository {
-  const _SuccessfulAuthRepository(this._ref);
-
-  final Ref _ref;
+  const _SuccessfulAuthRepository();
 
   @override
-  Future<void> login(String username, String password) async {
-    await _ref
-        .read(authSessionProvider.notifier)
-        .setSession(
-          AuthSession(token: 'test-token', payload: {'username': username}),
-        );
-  }
-
-  @override
-  Future<void> logout() async {
-    await _ref.read(authSessionProvider.notifier).clear();
+  Future<AuthSession> login(String username, String password) async {
+    return AuthSession(
+      token: 'test-token',
+      payload: <String, dynamic>{'username': username},
+    );
   }
 }
 

@@ -31,7 +31,7 @@
   - `core` 中的全局服务或协议；
   - `shared` 中的跨业务服务；
   - domain repository 抽象；
-  - application/service 层能力；
+  - Controller 或 Service 层能力；
   - 语义明确的 Riverpod Provider；
   - Feature 暴露的稳定 route class。
 
@@ -39,7 +39,9 @@
 
 - 登录页可以使用 `AuthViewModel` 管理登录表单状态。
 - Profile 页退出登录不应直接调用 `AuthViewModel`。
-- 退出登录这类 App 级会话能力应通过 `authSessionProvider`、`AuthService`、`SessionController` 或共享服务暴露。
+- `AuthRepositoryImpl` 只负责调用数据源、校验响应并返回 `AuthSession`，不直接写 `authSessionProvider`。
+- 登录成功后的会话写入由 `AuthSessionController` 或共享会话服务负责，保持登录态单一状态源。
+- 退出登录这类 App 级会话能力应通过 `AuthSessionController` 或共享服务暴露。
 - 路由守卫应监听稳定的会话状态，而不是页面 ViewModel。
 
 ## MVVM 边界

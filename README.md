@@ -178,7 +178,7 @@ lib/features/<feature>/
     └── <feature>_routes.dart      # Feature 路由定义
 ```
 
-该结构适用于 Todo、订单、登录等有业务状态、Repository 或接口编排的复杂 Feature。纯展示页、设置页、Profile 这类只读取少量全局 Provider 或只有简单点击回调的页面，可以只保留 `presentation/pages` 与路由文件，不需要为了形式统一创建空 `ViewModel`、空 `State`、空 `data` 或空 `domain` 目录。
+该结构适用于 Todo、订单、登录等有业务状态、Repository 或接口编排的复杂 Feature。需要把 Repository 返回结果写入 App 级状态源时，优先通过 `shared/services` 中的稳定 Controller 或 Service 编排。纯展示页、设置页、Profile 这类只读取少量全局 Provider 或只有简单点击回调的页面，可以只保留 `presentation/pages` 与路由文件，不需要为了形式统一创建空 `ViewModel`、空 `State`、空 `data` 或空 `domain` 目录。
 
 ---
 
@@ -424,12 +424,14 @@ Page Navigation    → BaseNavigator                → RouterNavigator
 ```text
 AuthSession
   ↓
+AuthSessionController
+  ↓
 authSessionProvider
   ↓
 Router Guard / AuthInterceptor / UI
 ```
 
-`AuthSession` 以 `token`、`refreshToken` 与可扩展 payload 为核心，适配不同后端登录协议。`authSessionProvider` 是 App 内登录态读取、更新、守卫判断和 HTTP token 注入的唯一入口；`AuthStore` 只作为其安全存储后端。登录 Feature 中提供了完整示例：页面表单、ViewModel、Repository、DataSource、会话落盘与退出登录。
+`AuthSession` 以 `token`、`refreshToken` 与可扩展 payload 为核心，适配不同后端登录协议。`authSessionProvider` 是 App 内唯一响应式登录态状态源，负责守卫判断、HTTP token 注入与 UI 订阅；`AuthSessionController` 是语义化写入口，统一保存、清空和更新会话；`AuthStore` 只作为其安全存储后端。登录 Feature 中提供了完整示例：页面表单、ViewModel、Repository、DataSource、会话落盘与退出登录，其中 `AuthRepositoryImpl` 只返回 `AuthSession`，不直接写全局会话。
 
 ### 🌐 通用 WebView 页面
 

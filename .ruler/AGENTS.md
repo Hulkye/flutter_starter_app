@@ -7,7 +7,7 @@
 - 遵循 Feature-First + Clean Architecture + MVVM。
 - 新增或修改业务模块时，优先保持 `data / domain / presentation` 分层。
 - 不要让一个 Feature 的 `presentation` 直接依赖另一个 Feature 的 `presentation` 或 ViewModel。
-- 跨 Feature 复用能力时，优先通过 `core`、`shared`、domain 抽象、application/service、Repository 抽象或稳定 Provider 暴露。
+- 跨 Feature 复用能力时，优先通过 `core`、`shared`、domain 抽象、Repository 抽象、Controller 或稳定 Provider 暴露。
 - 业务页面路由通过 `AppPageRoute` 定义，底部 Tab 入口通过 `AppTabEntry` 声明，并由 `XxxFeature extends AppFeature` 暴露到 `features/features.dart` 汇聚。
 - App 级路由图由 `lib/app/router/app_router_config.dart` 组合并以 `AppRouterConfig` 注入 `core/router`；不要在 `core/router` 中 import `app/` 或 `features/` 装配具体路由。
 - ViewModel 只依赖 domain repository 抽象 Provider，不直接 import data 层 Provider；data 实现由 App 组合层装配。

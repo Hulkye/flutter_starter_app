@@ -25,6 +25,7 @@
 ## 跨模块状态
 
 - 认证会话、主题、语言、网络状态等 App 级状态应放在 `core` 或 `shared` 的稳定 Provider/Service 中。
+- Data Repository 不直接写 App 级状态源；需要把领域结果写入会话、主题等全局状态时，通过 Controller 或共享服务编排。
 - 业务模块之间需要共享状态时，优先抽象为 Service、Repository、Controller 或明确的 Provider。
 - 避免 `profile` 直接依赖 `auth` 的 `AuthViewModel` 这类 presentation 对象。
 

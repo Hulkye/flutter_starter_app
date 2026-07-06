@@ -16,7 +16,7 @@ abstract interface class AuthDataSource {
 /// 职责：
 /// - 调用 [HttpClient] 发送请求
 /// - 将原始响应映射为 [ApiResponse]
-/// - 不包含业务逻辑（业务逻辑在 [AuthRepositoryImpl] 中）
+/// - 不包含业务逻辑（响应校验与会话转换在 [AuthRepositoryImpl] 中）
 final class AuthRemoteDataSource implements AuthDataSource {
   const AuthRemoteDataSource();
 

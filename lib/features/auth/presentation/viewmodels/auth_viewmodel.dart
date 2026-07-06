@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/l10n.dart';
 import '../../../../shared/presentation/presentation.dart';
+import '../../../../shared/services/auth/auth_session_controller.dart';
 import '../../domain/exceptions/auth_exception.dart';
 import '../../domain/repositories/auth_repository.dart';
 
@@ -50,7 +51,10 @@ final class AuthViewModel extends BaseVM<AuthState> {
   Future<void> login(String username, String password) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      await ref.read(authRepositoryProvider).login(username, password);
+      final session = await ref
+          .read(authRepositoryProvider)
+          .login(username, password);
+      await ref.read(authSessionControllerProvider).saveSession(session);
       state = state.copyWith(isLoading: false);
     } catch (error) {
       state = state.copyWith(
@@ -70,7 +74,7 @@ final class AuthViewModel extends BaseVM<AuthState> {
   }
 
   Future<void> logout() async {
-    await ref.read(authRepositoryProvider).logout();
+    await ref.read(authSessionControllerProvider).clearSession();
     state = const AuthState();
   }
 }

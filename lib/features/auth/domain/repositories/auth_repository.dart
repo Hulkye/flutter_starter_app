@@ -1,12 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../shared/services/auth/auth_session.dart';
+
 /// 认证数据仓库接口（领域层）。
 abstract class AuthRepository {
-  /// 登录。
-  Future<void> login(String username, String password);
-
-  /// 登出。
-  Future<void> logout();
+  /// 登录并返回可写入 App 会话源的认证会话。
+  Future<AuthSession> login(String username, String password);
 }
 
 /// AuthRepository 抽象 Provider。

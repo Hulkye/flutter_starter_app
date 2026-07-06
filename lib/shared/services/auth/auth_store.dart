@@ -9,8 +9,8 @@ import 'auth_session.dart';
 /// - 作为 authSessionProvider 的存储后端
 /// - 与 SecureStorage 交互实现持久化
 ///
-/// App 内判断登录态、注入 token、处理登出时，应统一通过
-/// `authSessionProvider`，不要把本类作为业务侧登录态入口。
+/// App 内判断登录态、注入 token、处理登出时，应统一通过响应式
+/// `authSessionProvider` 或 `AuthSessionController`，不要把本类作为业务侧登录态入口。
 ///
 /// ## 使用
 ///
@@ -19,7 +19,7 @@ import 'auth_session.dart';
 /// await authStore.init();
 ///
 /// // 业务读写
-/// ref.read(authSessionProvider.notifier).setSession(session);
+/// ref.read(authSessionControllerProvider).saveSession(session);
 /// ```
 class AuthStore {
   AuthStore({String storageKey = 'auth_session'}) : _storageKey = storageKey;

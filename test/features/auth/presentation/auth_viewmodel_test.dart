@@ -6,7 +6,6 @@ import 'package:flutter_starter_app/features/auth/domain/repositories/auth_repos
 import 'package:flutter_starter_app/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -72,7 +71,9 @@ void main() {
     test('clears loading and error after successful login', () async {
       final container = createTestContainer(
         overrides: [
-          authRepositoryProvider.overrideWith(_SuccessfulAuthRepository.new),
+          authRepositoryProvider.overrideWith(
+            (ref) => const _SuccessfulAuthRepository(),
+          ),
           authSessionProvider.overrideWith(_TestAuthSessionNotifier.new),
         ],
       );
@@ -94,29 +95,17 @@ final class _ThrowingAuthRepository implements AuthRepository {
   final Object error;
 
   @override
-  Future<void> login(String username, String password) {
+  Future<AuthSession> login(String username, String password) {
     throw error;
   }
-
-  @override
-  Future<void> logout() async {}
 }
 
 final class _SuccessfulAuthRepository implements AuthRepository {
-  const _SuccessfulAuthRepository(this._ref);
-
-  final Ref _ref;
+  const _SuccessfulAuthRepository();
 
   @override
-  Future<void> login(String username, String password) async {
-    await _ref
-        .read(authSessionProvider.notifier)
-        .setSession(const AuthSession(token: 'test-token'));
-  }
-
-  @override
-  Future<void> logout() async {
-    await _ref.read(authSessionProvider.notifier).clear();
+  Future<AuthSession> login(String username, String password) async {
+    return const AuthSession(token: 'test-token');
   }
 }
 
