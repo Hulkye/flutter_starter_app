@@ -156,7 +156,7 @@ await Application.run(
 
 模板采用 Feature-First + Clean Architecture。新增业务模块时，推荐在 `lib/features/` 下创建独立目录。
 
-模板已内置 `todo` 示例 Feature，可作为新增业务模块的参考：
+模板已内置 `todo` 示例 Feature，可作为复杂业务模块的完整分层参考：
 
 ```text
 lib/features/todo/
@@ -173,7 +173,7 @@ lib/features/todo/
     └── viewmodels/todo_viewmodel.dart
 ```
 
-该示例演示了本地内存数据源、Repository 抽象、ViewModel 状态管理、页面交互、路由注册和默认根 Tab 入口。
+该示例演示了本地内存数据源、Repository 抽象、ViewModel 状态管理、页面交互、路由注册和默认根 Tab 入口。纯展示页、设置页、Profile 这类只读取少量全局 Provider 或只有简单点击回调的页面，可以使用更薄的结构，不要机械创建空 `ViewModel`、空 `State`、空 `data` 或空 `domain` 目录。
 
 以 `order` 模块为例：
 
@@ -199,6 +199,16 @@ lib/features/order/
 | `presentation` | 页面、ViewModel、路由定义、UI 状态 |
 | `domain` | 业务实体、Repository 抽象 |
 | `data` | DataSource、Repository 实现、接口数据转换 |
+
+简单页面可以只保留页面与路由：
+
+```text
+lib/features/profile/
+├── profile_feature.dart
+└── presentation/
+    ├── pages/profile_page.dart
+    └── profile_routes.dart
+```
 
 推荐调用链：
 
@@ -584,6 +594,7 @@ ref.read(appRouterProvider).push(
 - 纯展示页面、简单 Provider 渲染页面或只有少量点击回调的页面，可以不创建 `PageLogic`。
 - ViewModel / Notifier 负责页面可观察状态、业务动作编排，以及把领域/服务状态转换成 UI 状态。
 - ViewModel 只依赖 Repository 抽象，不直接依赖 HTTP 客户端，也不管理页面生命周期。
+- 简单页面不要机械创建空 ViewModel、空 State 或空分层目录。
 - RepositoryImpl 负责把接口数据转换成业务实体。
 - 公共 UI 放到 `shared/widgets`。
 - 公共业务服务放到 `shared/services`。
@@ -598,6 +609,7 @@ ref.read(appRouterProvider).push(
 - 不要让一个 Feature 直接依赖另一个 Feature 的内部实现。
 - 不要把页面级 `PageLogic` 当作跨模块公共 API。
 - 不要用 `PageLogic` 替代 ViewModel 承载可观察业务状态、接口编排、跨页面状态或领域逻辑。
+- 不要为了保持目录形式统一而创建空 ViewModel、空 State、空 Repository 或空 DataSource。
 - 不要把具体业务逻辑放进 `core`。
 - 不要绕过 `authSessionProvider` 手动管理 token。
 - 不要在多个状态管理方案之间混用。

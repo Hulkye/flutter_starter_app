@@ -178,6 +178,8 @@ lib/features/<feature>/
     └── <feature>_routes.dart      # Feature 路由定义
 ```
 
+该结构适用于 Todo、订单、登录等有业务状态、Repository 或接口编排的复杂 Feature。纯展示页、设置页、Profile 这类只读取少量全局 Provider 或只有简单点击回调的页面，可以只保留 `presentation/pages` 与路由文件，不需要为了形式统一创建空 `ViewModel`、空 `State`、空 `data` 或空 `domain` 目录。
+
 ---
 
 ## 🏗 架构设计
@@ -536,8 +538,8 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 2. 按 `data / domain / presentation` 创建分层文件。
 3. 在 `domain/repositories` 中定义 Repository 抽象。
 4. 在 `data/repositories` 中实现 Repository。
-5. 在 `presentation/viewmodels` 中继承 `BaseVM` 管理 UI 状态与业务动作。
-6. 在 `presentation/pages` 中继承 `BasePage` 编写 UI，并在 `page(scope)` 中读取状态、调用 ViewModel。
+5. 如页面存在可观察业务状态或动作编排，在 `presentation/viewmodels` 中继承 `BaseVM` 管理 UI 状态与业务动作。
+6. 在 `presentation/pages` 中继承 `BasePage` 编写 UI，并在 `page(scope)` 中读取状态、调用 ViewModel 或稳定 Provider。
 7. 在 `<feature>_routes.dart` 中声明路由。
 8. 在 `<feature>_feature.dart` 中继承 `AppFeature` 并暴露路由。
 9. 在 `features/features.dart` 中注册 `XxxFeature()`，并导出该 Feature；App 路由配置会自动消费 `appFeatures`。
@@ -560,10 +562,21 @@ lib/features/order/
     └── viewmodels/order_viewmodel.dart
 ```
 
+如果只是简单页面，可以使用更薄的结构：
+
+```text
+lib/features/profile/
+├── profile_feature.dart
+└── presentation/
+    ├── pages/profile_page.dart
+    └── profile_routes.dart
+```
+
 ### 📝 页面开发建议
 
 - UI 逻辑放在 Page，业务动作放在 ViewModel。
 - ViewModel 通过 Repository 抽象获取数据。
+- 简单页面不要机械创建空 ViewModel、空 State 或空分层目录。
 - 不在 Page 中直接调用 Dio、SharedPreferences、SecureStorage。
 - 不让 Feature 直接依赖其他 Feature 的内部实现。
 - 可复用 UI 放到 `shared/widgets`，可复用业务服务放到 `shared/services`。

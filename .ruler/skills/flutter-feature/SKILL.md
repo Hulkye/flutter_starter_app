@@ -9,6 +9,8 @@ description: "Use when: creating or refactoring a Flutter business Feature in th
 
 ## 目标结构
 
+复杂业务 Feature 使用完整分层；简单展示页或设置页只保留实际需要的页面、路由与 Feature 声明，不创建空目录或空 ViewModel。
+
 ```text
 lib/features/<feature>/
 ├── <feature>_feature.dart
@@ -45,6 +47,7 @@ lib/features/<feature>/
 - Page 负责 UI 结构、Widget 组合、布局、样式。
 - PageLogic 是按需页面逻辑层，负责页面私有 controller、FocusNode、临时交互状态、生命周期、首帧副作用和页面级 UI 副作用。
 - 纯展示页面、简单 Provider 渲染页面或只有少量点击回调的页面，不要机械创建空 PageLogic。
+- 没有可观察业务状态或动作编排的简单页面，不要机械创建空 ViewModel / State。
 - PageLogic 可以调用 VM/Provider，但不承载可观察业务状态、接口编排、跨页面状态或领域逻辑。
 - ViewModel / Notifier 负责页面可观察状态、业务动作编排、把领域/服务状态转换成 UI 状态。
 - ViewModel 不持有 `BuildContext`，不直接依赖 GoRouter。

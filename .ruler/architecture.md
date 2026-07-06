@@ -3,7 +3,7 @@
 ## 总体原则
 
 - 使用 Feature-First 组织业务代码。
-- 每个 Feature 内部优先保持 `data / domain / presentation` 三层结构。
+- 复杂 Feature 内部优先保持 `data / domain / presentation` 三层结构；简单展示页或设置页可以只保留实际需要的 `presentation`、路由与 Feature 声明，不创建空分层。
 - Clean Architecture 依赖方向为：`presentation -> domain <- data`。
 - `core` 提供全局基础设施，不依赖具体 Feature。
 - `core/router` 不装配具体 App/Feature 路由；App 层通过 `AppRouterConfig` 注入路由图。
@@ -20,6 +20,7 @@
 - `presentation/viewmodels/`：页面状态与业务动作。
 - `presentation/<feature>_routes.dart`：当前 Feature 的路由定义。
 - `<feature>_feature.dart`：当前 Feature 对 App 暴露的模块声明与路由导出。
+- 简单页面不要为了保持目录形式统一而创建空 ViewModel、空 State、空 Repository、空 DataSource 或空目录。
 
 ## 跨 Feature 依赖边界
 
@@ -47,6 +48,7 @@
 - 纯展示页面、简单 Provider 渲染页面或只有少量点击回调的页面，不需要为了保持形式统一而创建空 PageLogic。
 - PageLogic 可以调用 VM/Provider，但不承载可观察业务状态、接口编排、跨页面状态或领域逻辑；这些职责应放入 ViewModel、Service、Repository 或稳定 Provider。
 - ViewModel / Notifier 负责页面可观察状态、业务动作编排、把领域/服务状态转换成 UI 状态，不持有 `BuildContext`，不直接调用一次性 UI 反馈服务。
+- 没有可观察业务状态或动作编排的简单页面，不需要创建空 ViewModel / State。
 - Repository 负责业务数据获取与持久化抽象。
 - DataSource 负责具体 API、本地缓存或 Mock 数据来源。
 - 一次性 UI 反馈使用注入式 `PresentationFeedbackService`（`presentationFeedbackProvider`、`PageScope.presentation`、`PageLogic.presentation`）或专门事件机制，不污染长期可渲染状态。
