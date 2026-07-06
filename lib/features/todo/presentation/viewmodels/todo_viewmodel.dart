@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/l10n/l10n.dart';
 import '../../../../shared/presentation/presentation.dart';
 import '../../data/repositories/todo_repository_impl.dart';
 import '../../domain/entities/todo_item.dart';
@@ -48,17 +47,9 @@ final class TodoViewModel extends BaseVM<TodoState> {
 
   Future<void> addTodo() async {
     final title = state.draftTitle.trim();
-    if (title.isEmpty) {
-      PresentationHelper.emitHint(
-        ref.read(appLocalizationsProvider).todoEmptyTitleHint,
-      );
-      return;
-    }
-
-    await PresentationHelper.runWithLoading(() async {
-      final todos = await ref.read(todoRepositoryProvider).addTodo(title);
-      state = state.copyWith(todos: todos, draftTitle: '');
-    });
+    if (title.isEmpty) return;
+    final todos = await ref.read(todoRepositoryProvider).addTodo(title);
+    state = state.copyWith(todos: todos, draftTitle: '');
   }
 
   Future<void> toggleTodo(String id) async {
@@ -67,10 +58,8 @@ final class TodoViewModel extends BaseVM<TodoState> {
   }
 
   Future<void> deleteTodo(String id) async {
-    await PresentationHelper.runWithLoading(() async {
-      final todos = await ref.read(todoRepositoryProvider).deleteTodo(id);
-      state = state.copyWith(todos: todos);
-    });
+    final todos = await ref.read(todoRepositoryProvider).deleteTodo(id);
+    state = state.copyWith(todos: todos);
   }
 }
 

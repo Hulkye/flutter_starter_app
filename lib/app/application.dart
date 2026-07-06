@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_starter_app/core/di/di.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
-import 'package:flutter_starter_app/shared/presentation/presentation_helper.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_store.dart';
 
 import '../core/exception/app_exception_catcher.dart';
@@ -12,7 +11,6 @@ import 'router/app_router_config.dart';
 
 class Application {
   static Future<void> bootstrap() async {
-    bindPresentationHelper();
     // Pre-ProviderScope 初始化
     await prefsStorage.init();
     await secureStorage.init();

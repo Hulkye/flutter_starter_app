@@ -376,10 +376,8 @@ final class OrderViewModel extends BaseVM<OrderState> {
   OrderState initialState() => const OrderState();
 
   Future<void> loadOrders() async {
-    await PresentationHelper.runWithLoading(() async {
-      final orders = await ref.read(orderRepositoryProvider).fetchOrders();
-      state = state.copyWith(initialized: true, orders: orders);
-    });
+    final orders = await ref.read(orderRepositoryProvider).fetchOrders();
+    state = state.copyWith(initialized: true, orders: orders);
   }
 }
 ```
@@ -390,7 +388,14 @@ final class OrderViewModel extends BaseVM<OrderState> {
 final class OrderPageLogic extends PageLogic {
   @override
   void onReady() {
-    ref.read(orderViewModelProvider.notifier).loadOrders();
+    unawaited(loadOrders());
+  }
+
+  Future<void> loadOrders() {
+    return presentation.runWithLoading(
+      () => ref.read(orderViewModelProvider.notifier).loadOrders(),
+      rethrowError: false,
+    );
   }
 }
 

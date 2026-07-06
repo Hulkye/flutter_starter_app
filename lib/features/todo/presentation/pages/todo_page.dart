@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_starter_app/shared/widgets/input/base_text_field.dart';
 
@@ -23,8 +25,8 @@ final class TodoPage extends BasePage {
 
   @override
   Widget page(PageScope scope) {
+    final logic = scope.logic<_TodoPageLogic>();
     final state = scope.ref.watch(todoViewModelProvider);
-    final vm = scope.ref.read(todoViewModelProvider.notifier);
 
     if (!state.initialized) {
       return ColoredBox(color: scope.context.appColor.backgroundPrimary);
@@ -35,7 +37,11 @@ final class TodoPage extends BasePage {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _TodoInputCard(state: state, vm: vm),
+          _TodoInputCard(
+            state: state,
+            onDraftChanged: logic.updateDraft,
+            onAdd: () => unawaited(logic.addTodo()),
+          ),
           SizedBox(height: 18.w),
           _TodoStats(state: state),
           SizedBox(height: 18.w),
@@ -45,7 +51,11 @@ final class TodoPage extends BasePage {
             ...state.todos.map(
               (todo) => Padding(
                 padding: EdgeInsets.only(bottom: 12.w),
-                child: _TodoListItem(todo: todo, vm: vm),
+                child: _TodoListItem(
+                  todo: todo,
+                  onToggle: () => unawaited(logic.toggleTodo(todo.id)),
+                  onDelete: () => unawaited(logic.deleteTodo(todo.id)),
+                ),
               ),
             ),
         ],
@@ -55,17 +65,50 @@ final class TodoPage extends BasePage {
 }
 
 final class _TodoPageLogic extends PageLogic {
+  TodoViewModel get _vm => ref.read(todoViewModelProvider.notifier);
+
   @override
   void onReady() {
-    ref.read(todoViewModelProvider.notifier).loadTodos();
+    unawaited(_vm.loadTodos());
+  }
+
+  void updateDraft(String value) {
+    _vm.updateDraft(value);
+  }
+
+  Future<void> addTodo() async {
+    final title = ref.read(todoViewModelProvider).draftTitle.trim();
+    if (title.isEmpty) {
+      presentation.emitHint(
+        ref.read(appLocalizationsProvider).todoEmptyTitleHint,
+      );
+      return;
+    }
+    await presentation.runWithLoading(_vm.addTodo, rethrowError: false);
+  }
+
+  Future<void> toggleTodo(String id) {
+    return _vm.toggleTodo(id);
+  }
+
+  Future<void> deleteTodo(String id) {
+    return presentation.runWithLoading(
+      () => _vm.deleteTodo(id),
+      rethrowError: false,
+    );
   }
 }
 
 final class _TodoInputCard extends StatefulWidget {
-  const _TodoInputCard({required this.state, required this.vm});
+  const _TodoInputCard({
+    required this.state,
+    required this.onDraftChanged,
+    required this.onAdd,
+  });
 
   final TodoState state;
-  final TodoViewModel vm;
+  final ValueChanged<String> onDraftChanged;
+  final VoidCallback onAdd;
 
   @override
   State<_TodoInputCard> createState() => _TodoInputCardState();
@@ -97,8 +140,6 @@ final class _TodoInputCardState extends State<_TodoInputCard> {
 
   @override
   Widget build(BuildContext context) {
-    final vm = widget.vm;
-
     return DecoratedBox(
       decoration: BoxDecoration(
         color: context.appColor.compBackgroundPrimary,
@@ -122,13 +163,13 @@ final class _TodoInputCardState extends State<_TodoInputCard> {
             BaseTextField(
               controller: _controller,
               hintText: context.i18n.todoInputHint,
-              onChanged: vm.updateDraft,
+              onChanged: widget.onDraftChanged,
             ),
             SizedBox(height: 16.w),
             PrimaryRoundButton(
               context: context,
               label: context.i18n.add,
-              onPressed: vm.addTodo,
+              onPressed: widget.onAdd,
               height: 44.w,
             ),
           ],
@@ -221,10 +262,15 @@ final class _TodoStatItem extends StatelessWidget {
 }
 
 final class _TodoListItem extends StatelessWidget {
-  const _TodoListItem({required this.todo, required this.vm});
+  const _TodoListItem({
+    required this.todo,
+    required this.onToggle,
+    required this.onDelete,
+  });
 
   final TodoItem todo;
-  final TodoViewModel vm;
+  final VoidCallback onToggle;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +291,7 @@ final class _TodoListItem extends StatelessWidget {
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 4.w),
           leading: IconButton(
-            onPressed: () => vm.toggleTodo(todo.id),
+            onPressed: onToggle,
             icon: Icon(
               todo.isCompleted
                   ? Icons.check_circle
@@ -267,7 +313,7 @@ final class _TodoListItem extends StatelessWidget {
             onPressed: () => _confirmDelete(context),
             icon: Icon(Icons.delete_outline, color: appColor.alert),
           ),
-          onTap: () => vm.toggleTodo(todo.id),
+          onTap: onToggle,
         ),
       ),
     );
@@ -279,7 +325,7 @@ final class _TodoListItem extends StatelessWidget {
       title: context.i18n.todoDeleteConfirmTitle,
       content: context.i18n.todoDeleteConfirmContent,
       confirmLabel: context.i18n.delete,
-      onConfirm: () => vm.deleteTodo(todo.id),
+      onConfirm: onDelete,
     );
   }
 }

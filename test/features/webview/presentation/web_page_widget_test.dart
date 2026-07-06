@@ -7,7 +7,6 @@ import 'package:flutter_starter_app/core/di/di_overrides.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_starter_app/features/webview/webview_feature.dart';
-import 'package:flutter_starter_app/shared/presentation/presentation_helper.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,7 +25,6 @@ Future<void> _pumpApp(WidgetTester tester, {AuthSession? session}) async {
     'app_locale_code': 'zh',
     'app_theme_mode': 0,
   });
-  bindPresentationHelper();
   await prefsStorage.init();
   appConfig = const EnvConfig();
 

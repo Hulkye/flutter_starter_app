@@ -1,6 +1,5 @@
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_starter_app/features/todo/presentation/viewmodels/todo_viewmodel.dart';
-import 'package:flutter_starter_app/shared/presentation/presentation_helper.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,11 +10,6 @@ void main() {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       await prefsStorage.init();
-      PresentationHelper.resetHandlers();
-    });
-
-    tearDown(() {
-      PresentationHelper.resetHandlers();
     });
 
     test('loads seeded todos and marks state initialized', () async {
@@ -57,16 +51,13 @@ void main() {
       );
     });
 
-    test('emits hint when adding empty todo', () async {
-      final hints = <String>[];
-      PresentationHelper.showHintHandler = hints.add;
+    test('ignores empty todo title', () async {
       final container = createTestContainer();
       final vm = container.read(todoViewModelProvider.notifier);
 
       vm.updateDraft('   ');
       await vm.addTodo();
 
-      expect(hints, contains('Please enter a todo item'));
       expect(container.read(todoViewModelProvider).todos, isEmpty);
     });
   });

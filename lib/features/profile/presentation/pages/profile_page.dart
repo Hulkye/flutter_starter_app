@@ -42,7 +42,7 @@ class ProfilePage extends BasePage {
     required String title,
   }) {
     if (WebPageConfig.normalizeWebUri(url) == null) {
-      PresentationHelper.emitHint(scope.context.i18n.webInvalidUrl);
+      scope.presentation.emitHint(scope.context.i18n.webInvalidUrl);
       return;
     }
     scope.ref

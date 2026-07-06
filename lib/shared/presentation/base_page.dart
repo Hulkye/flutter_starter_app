@@ -9,6 +9,9 @@ final class PageScope {
   final WidgetRef ref;
   final PageLogic? pageLogic;
 
+  PresentationFeedbackService get presentation =>
+      ref.read(presentationFeedbackProvider);
+
   T logic<T extends PageLogic>() {
     final logic = pageLogic;
     if (logic is T) return logic;
@@ -28,6 +31,7 @@ abstract class PageLogic {
   PageScope get scope => _scope;
   BuildContext get context => _scope.context;
   WidgetRef get ref => _scope.ref;
+  PresentationFeedbackService get presentation => _scope.presentation;
   bool get mounted => _mounted;
 
   void onInit() {}

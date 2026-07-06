@@ -226,11 +226,11 @@ final class _WebPageLogic extends PageLogic {
       case _WebPageMenuAction.copyLink:
         final url = await controller.currentUrl() ?? currentUrl ?? config.url;
         await Clipboard.setData(ClipboardData(text: url));
-        PresentationHelper.emitHint(ref.read(appLocalizationsProvider).copied);
+        presentation.emitHint(ref.read(appLocalizationsProvider).copied);
       case _WebPageMenuAction.clearCache:
         await controller.clearCache();
         await controller.clearLocalStorage();
-        PresentationHelper.emitHint(
+        presentation.emitHint(
           ref.read(appLocalizationsProvider).webCacheCleared,
         );
     }
@@ -256,9 +256,7 @@ final class _WebPageLogic extends PageLogic {
     } catch (e) {
       hasError = true;
       errorMessage = e.toString();
-      PresentationHelper.emitHint(
-        ref.read(appLocalizationsProvider).webLoadFailed,
-      );
+      presentation.emitHint(ref.read(appLocalizationsProvider).webLoadFailed);
       markNeedsBuild();
     }
   }
@@ -293,13 +291,13 @@ final class _WebPageLogic extends PageLogic {
       onNavigationRequest: (request) {
         final uri = WebPageConfig.normalizeWebUri(request.url);
         if (uri == null) {
-          PresentationHelper.emitHint(
+          presentation.emitHint(
             ref.read(appLocalizationsProvider).webBlockedUrl,
           );
           return NavigationDecision.prevent;
         }
         if (!WebPageConfig.isAllowedHost(uri, config.allowedHosts)) {
-          PresentationHelper.emitHint(
+          presentation.emitHint(
             ref.read(appLocalizationsProvider).webBlockedUrl,
           );
           return NavigationDecision.prevent;
@@ -311,31 +309,23 @@ final class _WebPageLogic extends PageLogic {
         hasError = true;
         isLoading = false;
         errorMessage = error.description;
-        PresentationHelper.emitHint(
-          ref.read(appLocalizationsProvider).webLoadFailed,
-        );
+        presentation.emitHint(ref.read(appLocalizationsProvider).webLoadFailed);
         markNeedsBuild();
       },
       onHttpError: (error) {
         hasError = true;
         isLoading = false;
         errorMessage = ref.read(appLocalizationsProvider).webLoadFailed;
-        PresentationHelper.emitHint(
-          ref.read(appLocalizationsProvider).webLoadFailed,
-        );
+        presentation.emitHint(ref.read(appLocalizationsProvider).webLoadFailed);
         markNeedsBuild();
       },
       onSslAuthError: (error) {
         error.cancel();
-        PresentationHelper.emitHint(
-          ref.read(appLocalizationsProvider).webBlockedUrl,
-        );
+        presentation.emitHint(ref.read(appLocalizationsProvider).webBlockedUrl);
       },
       onHttpAuthRequest: (request) {
         request.onCancel();
-        PresentationHelper.emitHint(
-          ref.read(appLocalizationsProvider).webBlockedUrl,
-        );
+        presentation.emitHint(ref.read(appLocalizationsProvider).webBlockedUrl);
       },
     );
   }
@@ -348,9 +338,7 @@ final class _WebPageLogic extends PageLogic {
 
   void _denyPermissionRequest(WebViewPermissionRequest request) {
     request.deny();
-    PresentationHelper.emitHint(
-      ref.read(appLocalizationsProvider).webBlockedUrl,
-    );
+    presentation.emitHint(ref.read(appLocalizationsProvider).webBlockedUrl);
   }
 }
 

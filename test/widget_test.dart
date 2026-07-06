@@ -7,7 +7,6 @@ import 'package:flutter_starter_app/features/auth/data/repositories/auth_reposit
 import 'package:flutter_starter_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
-import 'package:flutter_starter_app/shared/presentation/presentation_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,7 +32,6 @@ void main() {
         'app_locale_code': 'zh',
         'app_theme_mode': 0,
       });
-      bindPresentationHelper();
       await prefsStorage.init();
 
       appConfig = const EnvConfig();

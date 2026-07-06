@@ -133,7 +133,7 @@ lib/
 │   ├── todo/                      # 默认根 Tab 与完整分层示例
 │   └── webview/                   # 通用 WebView 页面与路由
 ├── shared/                        # 跨 Feature 共享能力
-│   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseState / PresentationHelper
+│   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseState / PresentationFeedbackService
 │   ├── services/                  # AuthSession / AuthStore
 │   └── widgets/                   # Toast、Loading、Button、Dialog 等组件
 ├── header.dart                    # 常用导出
@@ -215,13 +215,13 @@ Presentation  ──────▶  Domain  ◀──────  Data
 | `app/` | 应用启动、环境注入、根组件挂载 | 可组合全局能力 |
 | `core/` | 网络、路由、存储、主题、DI、异常、工具 | 不依赖具体 Feature |
 | `features/` | 业务模块 | 可依赖 `core` 与 `shared` |
-| `shared/` | BasePage、PageLogic、BaseVM、PresentationHelper、认证服务、通用组件 | 提供跨业务复用能力 |
+| `shared/` | BasePage、PageLogic、BaseVM、PresentationFeedbackService、认证服务、通用组件 | 提供跨业务复用能力 |
 
 ---
 
 ## 🧭 MVVM 基础能力
 
-模板通过 `BasePage`、`PageLogic`、`BaseVM`、`BaseState`、`PresentationHelper` 固化页面开发方式，同时保持 Page、PageLogic 与 ViewModel 的职责边界：Page 负责 UI 结构、Widget 组合、布局、样式；PageLogic 负责页面本地 controller、临时交互状态、生命周期、调用 VM/Provider；ViewModel / Notifier 负责页面可观察状态、业务动作编排，并把领域/服务状态转换成 UI 状态。
+模板通过 `BasePage`、`PageLogic`、`BaseVM`、`BaseState`、`PresentationFeedbackService` 固化页面开发方式，同时保持 Page、PageLogic 与 ViewModel 的职责边界：Page 负责 UI 结构、Widget 组合、布局、样式；PageLogic 负责页面本地 controller、临时交互状态、生命周期、调用 VM/Provider；ViewModel / Notifier 负责页面可观察状态、业务动作编排，并把领域/服务状态转换成 UI 状态。
 
 ### BasePage
 
@@ -240,7 +240,14 @@ Presentation  ──────▶  Domain  ◀──────  Data
 final class OrderPageLogic extends PageLogic {
   @override
   void onReady() {
-    ref.read(orderViewModelProvider.notifier).loadOrders();
+    unawaited(loadOrders());
+  }
+
+  Future<void> loadOrders() {
+    return presentation.runWithLoading(
+      () => ref.read(orderViewModelProvider.notifier).loadOrders(),
+      rethrowError: false,
+    );
   }
 }
 ```
@@ -260,16 +267,15 @@ final class OrderPageLogic extends PageLogic {
 
 `PageLogic` 可以调用 VM/Provider，但不要承载可观察业务状态、接口编排、跨页面状态或领域逻辑；这些职责应放入 ViewModel、Service、Repository 或稳定 Provider。
 
-页面在 `page(scope)` 中按需桥接状态与 ViewModel：
+页面在 `page(scope)` 中按需桥接状态与 PageLogic：
 
 ```dart
 @override
 Widget page(PageScope scope) {
   final logic = scope.logic<OrderPageLogic>();
   final state = scope.ref.watch(todoViewModelProvider);
-  final vm = scope.ref.read(todoViewModelProvider.notifier);
 
-  return TodoContent(state: state, vm: vm, logic: logic);
+  return TodoContent(state: state, onRefresh: logic.loadOrders);
 }
 ```
 
@@ -280,21 +286,21 @@ Widget page(PageScope scope) {
 - `initialState()` 提供初始状态
 - 通过 `state = state.copyWith(...)` 更新 UI 状态
 - 调用 Repository 抽象完成业务数据读写
-- 不感知 `BuildContext`、Widget 生命周期、页面返回或页面 ready 策略
+- 不感知 `BuildContext`、Widget 生命周期、页面返回、页面 ready 策略或一次性 UI 反馈服务
 
 ### BaseState
 
 `BaseState` 是纯状态基类，不内置页面级字段。业务页面如需首屏加载、空态、错误态，应在各自 Feature 的 State 中显式建模，例如 `initialized`、`loading`、`errorMessage`。
 
-### PresentationHelper
+### PresentationFeedbackService
 
-`PresentationHelper` 承接 Presentation 层的一次性 UI 反馈：
+`PresentationFeedbackService` 承接 Presentation 层的一次性 UI 反馈，并通过 `presentationFeedbackProvider` 注入：
 
 - `runWithLoading` 包装异步任务
 - `emitHint` 展示提示
 - `showLoading` / `hideLoading` 控制全局 Loading
 
-这些反馈不进入 `BaseState`，避免临时事件污染可渲染状态。
+这些反馈不进入 `BaseState`，避免临时事件污染可渲染状态。`BasePage` / `PageLogic` 可通过 `scope.presentation` 或 `presentation` 访问；`BaseVM` 不直接持有 Presentation 反馈服务。Loading 使用 token/counter 管理，并发 action 不会被静默跳过；`runWithLoading` 默认展示错误提示后继续抛出异常，需要吞掉异常时必须显式传入 `rethrowError: false`。
 
 推荐页面开发流程：
 
@@ -322,7 +328,6 @@ DataSource / HttpClient 负责具体数据来源
 main()
   → Application.run(envConfig)
       → WidgetsFlutterBinding.ensureInitialized()
-      → 绑定 PresentationHelper 全局反馈处理
       → 初始化普通存储与安全存储
       → 恢复 AuthSession 到 authSessionProvider
       → createEnvOverrides(envConfig)

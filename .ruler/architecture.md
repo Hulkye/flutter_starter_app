@@ -45,7 +45,7 @@
 - PageLogic 是按需使用的页面本地逻辑层，负责当前页面私有的 controller、FocusNode、临时交互状态、生命周期和 UI 副作用，不作为跨页面公共 API。
 - 纯展示页面、简单 Provider 渲染页面或只有少量点击回调的页面，不需要为了保持形式统一而创建空 PageLogic。
 - PageLogic 可以调用 VM/Provider，但不承载可观察业务状态、接口编排、跨页面状态或领域逻辑；这些职责应放入 ViewModel、Service、Repository 或稳定 Provider。
-- ViewModel / Notifier 负责页面可观察状态、业务动作编排、把领域/服务状态转换成 UI 状态，不持有 `BuildContext`。
+- ViewModel / Notifier 负责页面可观察状态、业务动作编排、把领域/服务状态转换成 UI 状态，不持有 `BuildContext`，不直接调用一次性 UI 反馈服务。
 - Repository 负责业务数据获取与持久化抽象。
 - DataSource 负责具体 API、本地缓存或 Mock 数据来源。
-- 一次性 UI 反馈使用 `PresentationHelper` 或专门事件机制，不污染长期可渲染状态。
+- 一次性 UI 反馈使用注入式 `PresentationFeedbackService`（`presentationFeedbackProvider`、`PageScope.presentation`、`PageLogic.presentation`）或专门事件机制，不污染长期可渲染状态。
