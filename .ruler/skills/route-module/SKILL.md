@@ -17,7 +17,7 @@ description: "Use when: adding, changing, reviewing, or documenting app routes, 
 6. 在 `<feature>_feature.dart` 的 `routes` 中暴露该路由。
 7. 如果该路由是底部 Tab 根路由，在 `<feature>_feature.dart` 的 `tabs` 中暴露 `AppTabEntry`。
 8. 在 `features/features.dart` 注册 Feature；如 route class 需要给业务页面使用，在 `features/exports.dart` 导出。
-9. App 层 `lib/app/router/app_router_config.dart` 会从 `appFeatures` 组合路由图并注入 `core/router`；不要为新增 Feature 修改 `core/router/router_provider.dart`。
+9. App 层 `lib/app/navigation/app_router_config.dart` 会从 `appFeatures` 组合路由图并注入 `core/router`；不要为新增 Feature 修改 `core/router/router_provider.dart`。
 10. 如果项目没有任何底部 Tab，不创建 `/` 的 Root redirect 或 Root Shell；应提供明确首页路由或自定义登录后的目标页。
 
 ## 导航使用

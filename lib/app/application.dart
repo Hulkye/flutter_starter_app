@@ -7,7 +7,7 @@ import 'package:flutter_starter_app/shared/services/auth/auth_store.dart';
 
 import '../core/exception/app_exception_catcher.dart';
 import 'app.dart';
-import 'router/app_router_config.dart';
+import 'navigation/app_router_config.dart';
 
 class Application {
   static Future<void> bootstrap() async {

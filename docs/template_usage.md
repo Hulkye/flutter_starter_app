@@ -314,7 +314,7 @@ const List<AppFeature> appFeatures = [
 ];
 ```
 
-`lib/app/router/app_router_config.dart` 会从 `appFeatures` 读取 `appFeatureRoutes` 与 `appFeatureTabs`，并通过 `AppRouterConfig` 注入 `core/router`。`Application.run()` 会把 `appFeatureProviderOverrides` 加入根 `ProviderScope`。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart` 或 App 启动入口。
+`lib/app/navigation/app_router_config.dart` 会从 `appFeatures` 读取 `appFeatureRoutes` 与 `appFeatureTabs`，并通过 `AppRouterConfig` 注入 `core/router`。`Application.run()` 会把 `appFeatureProviderOverrides` 加入根 `ProviderScope`。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart` 或 App 启动入口。
 
 如果 route class 或公开类型需要给业务页面通过 `header.dart` 使用，在 `lib/features/exports.dart` 补充导出：
 
@@ -639,7 +639,7 @@ ref.read(appRouterProvider).push(
 - 全局基础设施放到 `core`。
 - 新增页面时先在 Feature 内定义 `AppPageRoute`，再通过 `XxxFeature` 注册到 `features/features.dart`。
 - 业务页面需要使用的 route class 或公开类型通过 `features/exports.dart` 导出，再由 `header.dart` 汇总。
-- App 级路由组合放在 `lib/app/router/app_router_config.dart`，不要在 `core/router` 中 import 具体 Feature。
+- App 级路由组合放在 `lib/app/navigation/app_router_config.dart`，不要在 `core/router` 中 import 具体 Feature。
 
 ### 避免做法
 

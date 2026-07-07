@@ -15,7 +15,7 @@
 ## 重要目录
 
 - `lib/app/`：应用启动、根组件与 App 路由装配。
-- `lib/app/router/`：App 路由图组合与 `AppRouterConfig` 注入。
+- `lib/app/navigation/`：App 路由图组合、Splash、Root/Shell 导航骨架与 `AppRouterConfig` 注入。
 - `lib/core/`：全局基础设施，不承载具体业务。
 - `lib/core/config/`：环境配置 `EnvConfig` / `EnvTag` / `appConfig`。
 - `lib/core/feature/`：`AppFeature` 模块协议。

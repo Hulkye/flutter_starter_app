@@ -8,8 +8,8 @@ export 'package:flutter/material.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 
 export 'core/config/env_config.dart';
-export 'app/splash/splash_route.dart';
-export 'app/shell/root_shell_route.dart';
+export 'app/navigation/splash/splash_route.dart';
+export 'app/navigation/shell/root_shell_route.dart';
 export 'core/feature/app_tab_entry.dart';
 export 'core/constant/constant.dart';
 export 'core/l10n/l10n.dart';

@@ -132,7 +132,7 @@ class RootShellPage extends BasePage {
 
 ## 路由注册流程
 
-`core/router` 不维护具体应用路由表；应用总路由图由 `lib/app/router/app_router_config.dart` 在 App 组合层创建，并通过 `appRouterConfigProvider` 注入：
+`core/router` 不维护具体应用路由表；应用总路由图由 `lib/app/navigation/app_router_config.dart` 在 App 组合层创建，并通过 `appRouterConfigProvider` 注入：
 
 ```dart
 AppRouterConfig createAppRouterConfig() {
@@ -152,9 +152,9 @@ AppRouterConfig createAppRouterConfig() {
 
 注册顺序含义：
 
-- `SplashRoute`：启动展示页，属于 `lib/app/splash/`。
+- `SplashRoute`：启动展示页，属于 `lib/app/navigation/splash/`。
 - `RootRoute`：有 Tab 时才注册，`/` 重定向到默认 Tab。
-- `RootShellRoute`：有 Tab 时才注册的底部 Tab Shell，属于 `lib/app/shell/`。
+- `RootShellRoute`：有 Tab 时才注册的底部 Tab Shell，属于 `lib/app/navigation/shell/`。
 - `appFeatureRoutes`：从 `features/features.dart` 汇聚的普通业务页面路由；已挂到 Shell Tab 的根路由不会重复注册到顶层。
 - `WebPageRoute` / `AuthWebPageRoute`：来自 `shared/webview` 的通用 WebView 公共路由，由 App 组合层注册，不作为业务 Feature。
 
@@ -324,16 +324,14 @@ lib/app/host/
   app_bootstrap_coordinator.dart
   app_session_coordinator.dart
 
-lib/app/router/
+lib/app/navigation/
   app_router_config.dart
-
-lib/app/splash/
-  splash_page.dart
-  splash_route.dart
-
-lib/app/shell/
-  root_shell_page.dart
-  root_shell_route.dart
+  splash/
+    splash_page.dart
+    splash_route.dart
+  shell/
+    root_shell_page.dart
+    root_shell_route.dart
 ```
 
 当前 Shell 结构：
@@ -341,7 +339,7 @@ lib/app/shell/
 - 有 Tab 时，`/` 由 `RootRoute` 重定向到默认 Feature Tab。
 - `RootShellRoute` 从 `appFeatureTabs` 自动装配底部 Tab 分支。
 - 没有 Tab 时，不注册 `RootRoute` 和 `RootShellRoute`，避免 `/` 自重定向；模板使用者应提供明确的首页路由或自定义启动后的目标页。
-- `app_router_config.dart` 负责把 Splash、Root/Shell 与 Feature 路由组合成 `AppRouterConfig` 并注入 core/router。
+- `app_router_config.dart` 负责把 Splash、Root/Shell、Feature 路由与 App 公共路由组合成 `AppRouterConfig` 并注入 core/router。
 - GoRouter 的 `StatefulShellRoute` 只存在于 `app_router_transfor.dart`，不会暴露给业务 Feature。
 
 ## 认证守卫
@@ -372,7 +370,7 @@ bool get public => true;
 
 - 业务层不直接 import `go_router`，统一通过 `AppPageRoute`、`AppRouteState`、`BaseNavigator` 解耦。
 - Feature 只暴露稳定 route class，不让一个 Feature 的 presentation 直接依赖另一个 Feature 的 presentation。
-- App Shell、Splash、Root redirect 放在 `lib/app/`，由 App 层组合 Feature 入口；无 Tab 时不注册 Root redirect。
+- App Shell、Splash、Root redirect 放在 `lib/app/navigation/`，由 App 层组合 Feature 入口；无 Tab 时不注册 Root redirect。
 - `core/router` 不 import `app/` 或 `features/`；应用路由图只能通过 `AppRouterConfig` 注入。
 - `features/features.dart` 是 App 注册表，`features/exports.dart` 是业务公共导出入口；不要让 `header.dart` 间接导出 Feature 默认 data 装配。
 - `header.dart` 只服务业务页面便捷导入，App/Core/Shared 内部使用精确 import，避免形成 `shared -> header -> features`。

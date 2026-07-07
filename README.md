@@ -110,9 +110,10 @@ lib/
 │   ├── app.dart                   # MaterialApp.router 根组件
 │   ├── application.dart           # Application.run 启动入口
 │   ├── host/                      # 启动协调、会话协调、AppHost
-│   ├── router/                    # App 路由图组合与 core/router 配置注入
-│   ├── shell/                     # RootRoute / RootShellRoute / 底部 Tab 容器
-│   └── splash/                    # 启动展示页
+│   ├── navigation/                # App 路由图组合、Splash、Root/Shell 导航骨架
+│   │   ├── app_router_config.dart # AppRouterConfig 注入
+│   │   ├── shell/                 # RootRoute / RootShellRoute / 底部 Tab 容器
+│   │   └── splash/                # 启动展示页
 ├── core/                          # 全局基础设施，不承载具体业务
 │   ├── config/                    # EnvConfig / EnvTag / appConfig
 │   ├── constant/                  # 常量
@@ -410,7 +411,7 @@ Page Navigation    → BaseNavigator                 → RouterNavigator
 - 每个 Feature 通过 `XxxFeature` 暴露模块路由、可选底部 Tab 入口与默认 Provider 装配
 - `features/features.dart` 汇聚所有 Feature 的路由、Tab 与 Provider overrides
 - `features/exports.dart` 只导出业务页面需要的 route class 与公开类型，并由 `header.dart` 汇总
-- `lib/app/router/app_router_config.dart` 组合 Splash、Root/Shell 与 Feature 路由，并注入 `core/router`
+- `lib/app/navigation/app_router_config.dart` 组合 Splash、Root/Shell、Feature 路由与 App 公共路由，并注入 `core/router`
 - `header.dart` 只作为业务页面便捷入口，App/Core/Shared 内部使用精确 import，避免隐式依赖 Feature
 - App Shell 从 `appFeatureTabs` 自动装配底部 Tab 分支；无 Tab 时不创建 Root redirect / Shell
 - 支持公开路由与登录态路由

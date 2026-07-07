@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_starter_app/app/shell/root_shell_route.dart';
+import 'package:flutter_starter_app/app/navigation/shell/root_shell_route.dart';
 import 'package:flutter_starter_app/core/feature/app_tab_entry.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_test/flutter_test.dart';

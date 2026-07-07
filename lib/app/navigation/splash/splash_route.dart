@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../core/router/definitions/router_definitions.dart';
+import '../../../core/router/definitions/router_definitions.dart';
 import 'splash_page.dart';
 
 final class SplashRoute extends AppPageRoute {

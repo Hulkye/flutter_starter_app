@@ -4,8 +4,8 @@ import '../../core/router/router.dart';
 import '../../features/auth/presentation/auth_routes.dart';
 import '../../features/features.dart';
 import '../../shared/webview/webview.dart';
-import '../shell/root_shell_route.dart';
-import '../splash/splash_route.dart';
+import 'shell/root_shell_route.dart';
+import 'splash/splash_route.dart';
 
 /// 构建 App 的完整路由配置。
 ///

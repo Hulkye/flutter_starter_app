@@ -1,6 +1,6 @@
-import '../../core/feature/app_tab_entry.dart';
-import '../../core/router/router.dart';
-import '../../features/features.dart';
+import '../../../core/feature/app_tab_entry.dart';
+import '../../../core/router/router.dart';
+import '../../../features/features.dart';
 import 'root_shell_page.dart';
 
 List<AppRouteNode> buildRootRouteNodes({List<AppTabEntry>? tabs}) {
