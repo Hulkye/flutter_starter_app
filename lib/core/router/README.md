@@ -141,6 +141,8 @@ AppRouterConfig createAppRouterConfig() {
       const SplashRoute(),
       ...buildRootRouteNodes(),
       ...appFeatureRoutes,
+      const WebPageRoute(),
+      const AuthWebPageRoute(),
     ],
     initialLocation: const SplashRoute().location,
     loginLocation: const LoginRoute().location,
@@ -154,6 +156,7 @@ AppRouterConfig createAppRouterConfig() {
 - `RootRoute`：有 Tab 时才注册，`/` 重定向到默认 Tab。
 - `RootShellRoute`：有 Tab 时才注册的底部 Tab Shell，属于 `lib/app/shell/`。
 - `appFeatureRoutes`：从 `features/features.dart` 汇聚的普通业务页面路由；已挂到 Shell Tab 的根路由不会重复注册到顶层。
+- `WebPageRoute` / `AuthWebPageRoute`：来自 `shared/webview` 的通用 WebView 公共路由，由 App 组合层注册，不作为业务 Feature。
 
 同时，`RootShellRoute` 不再手写 tab 分支，而是从 `features/features.dart` 汇聚的 `appFeatureTabs` 自动装配：
 

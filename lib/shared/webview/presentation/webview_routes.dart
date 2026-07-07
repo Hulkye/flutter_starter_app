@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 import 'package:flutter_starter_app/core/router/router.dart';
-import '../domain/entities/web_page_config.dart';
-import 'pages/web_page.dart';
+import '../domain/web_page_config.dart';
+import 'web_page.dart';
 
 final class WebPageRoute extends AppPageRoute {
   const WebPageRoute({this.url, this.title});

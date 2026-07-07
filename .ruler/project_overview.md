@@ -23,7 +23,8 @@
 - `lib/features/`：业务功能模块，按 Feature 聚合。
 - `lib/features/features.dart`：App Feature 注册表，汇聚业务路由、Tab 入口与默认 Provider 覆盖项。
 - `lib/features/exports.dart`：业务页面可用的 Route class 与公开类型统一导出入口。
-- `lib/shared/`：跨 Feature 共享的基础表现层、服务、Controller 与组件。
+- `lib/shared/`：跨 Feature 共享的基础表现层、服务、Controller、组件与通用能力。
+- `lib/shared/webview/`：通用 WebView 页面、配置与公共路由。
 - `lib/header.dart`：业务页面常用统一导出，App/Core/Shared 内部不通过它导入依赖。
 - `docs/`：模板使用、测试与质量保障文档。
 

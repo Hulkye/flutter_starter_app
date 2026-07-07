@@ -5,9 +5,9 @@ import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/app/router/app_router_config.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
-import 'package:flutter_starter_app/features/exports.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
+import 'package:flutter_starter_app/shared/webview/webview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

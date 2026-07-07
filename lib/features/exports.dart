@@ -7,5 +7,3 @@ library;
 export 'auth/presentation/auth_routes.dart';
 export 'profile/presentation/profile_routes.dart';
 export 'todo/presentation/todo_routes.dart';
-export 'webview/domain/entities/web_page_config.dart';
-export 'webview/presentation/webview_routes.dart';

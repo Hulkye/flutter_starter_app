@@ -17,7 +17,7 @@
 
 ---
 
-这是一个面向中大型 Flutter 项目的快速启动模板。项目以 **Feature-First** 组织业务模块，在每个 Feature 内落地 **Data / Domain / Presentation** 分层，并通过 **BasePage + PageLogic + BaseVM + Riverpod** 建立职责清晰的 MVVM 开发范式。
+这是一个面向中大型 Flutter 项目的快速启动模板。项目以 **Feature-First** 组织业务模块，在每个业务 Feature 内落地 **Data / Domain / Presentation** 分层，并通过 **BasePage + PageLogic + BaseVM + Riverpod** 建立职责清晰的 MVVM 开发范式。
 
 模板已内置多环境、网络请求、路由守卫、主题、国际化、本地存储、登录会话、通用 WebView 页面、Toast/Loading、刷新、按钮、弹窗等常用基础设施。Clone 后只需要替换业务接口与页面，即可进入功能开发。
 
@@ -130,12 +130,12 @@ lib/
 │   ├── features.dart              # App Feature 注册与路由/Tab/Provider 汇聚
 │   ├── auth/                      # 登录示例
 │   ├── profile/                   # 个人中心与主题/退出登录示例
-│   ├── todo/                      # 默认根 Tab 与完整分层示例
-│   └── webview/                   # 通用 WebView 页面与路由
+│   └── todo/                      # 默认根 Tab 与完整分层示例
 ├── shared/                        # 跨 Feature 共享能力
 │   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseState / PresentationFeedbackService
 │   ├── services/                  # AuthSession / AuthStore
-│   └── widgets/                   # Toast、Loading、Button、Dialog 等组件
+│   ├── widgets/                   # Toast、Loading、Button、Dialog 等组件
+│   └── webview/                   # 通用 WebView 页面、配置与公共路由
 ├── header.dart                    # 业务页面常用导出，app/core/shared 内部不使用
 ├── main_dev.dart                  # 开发环境入口
 ├── main_sit.dart                  # SIT 环境入口
@@ -218,7 +218,7 @@ Presentation  ──────▶  Domain  ◀──────  Data
 | `app/` | 应用启动、环境注入、根组件挂载 | 可组合全局能力 |
 | `core/` | 网络、路由、存储、主题、DI、异常、工具 | 不依赖具体 Feature |
 | `features/` | 业务模块 | 可依赖 `core` 与 `shared` |
-| `shared/` | BasePage、PageLogic、BaseVM、PresentationFeedbackService、认证服务、通用组件 | 提供跨业务复用能力 |
+| `shared/` | BasePage、PageLogic、BaseVM、PresentationFeedbackService、认证服务、通用组件、通用 WebView 等跨 Feature 能力 | 提供跨业务复用能力，不承载具体业务流程 |
 
 ---
 
@@ -435,7 +435,7 @@ Router Guard / AuthInterceptor / UI
 
 ### 🌐 通用 WebView 页面
 
-模板内置 `webview_flutter` 驱动的通用网页容器，适合隐私政策、用户协议、帮助中心和业务 H5。
+模板内置 `webview_flutter` 驱动的通用网页容器，位于 `lib/shared/webview/`，适合隐私政策、用户协议、帮助中心和业务 H5。它不作为业务 Feature 注册，公共路由由 App 路由组合层统一加入路由图。
 
 快速打开公开网页：
 

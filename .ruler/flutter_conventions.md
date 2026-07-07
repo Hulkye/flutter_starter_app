@@ -39,5 +39,6 @@
 - 业务通用/常用能力优先通过 `lib/header.dart` 暴露。
 - `lib/header.dart` 只作为业务页面便捷导入入口；`lib/app/`、`lib/core/`、`lib/shared/` 内部不要 import `header.dart`。
 - Feature route class 和公开类型由 `features/exports.dart` 汇总，最后由 `header.dart` 暴露。
+- 通用 shared 能力通过自身 barrel export 暴露，例如 `shared/webview/webview.dart`，再由 `header.dart` 汇总。
 - `features/features.dart` 是 App 注册表，不作为业务页面公共导出入口；不要通过它向 `header.dart` 暴露 Feature 默认 data 装配。
 - 不要为了使用某个业务路由在多个页面重复 import 深层 route 文件。

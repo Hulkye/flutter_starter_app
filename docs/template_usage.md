@@ -580,7 +580,7 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 
 ## 🌐 打开通用网页
 
-模板内置通用 WebView 页面，已注册为普通业务路由：
+模板内置通用 WebView 页面，位于 `lib/shared/webview/`，并由 App 路由组合层注册为公共路由。它属于跨业务复用能力，不作为独立业务 Feature：
 
 | 路由 | 登录要求 | 适用场景 |
 | --- | --- | --- |

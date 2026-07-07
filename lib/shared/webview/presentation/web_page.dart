@@ -1,6 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_starter_app/header.dart';
+import 'package:flutter_starter_app/core/l10n/l10n.dart';
+import 'package:flutter_starter_app/core/router/router.dart';
+import 'package:flutter_starter_app/core/theme/theme.dart';
+import 'package:flutter_starter_app/core/util/screen_util.dart';
+import 'package:flutter_starter_app/shared/presentation/presentation.dart';
+import 'package:flutter_starter_app/shared/widgets/button/primary_round_button.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+import '../domain/web_page_config.dart';
 
 final class WebPage extends BasePage {
   const WebPage({required this.config, super.key});

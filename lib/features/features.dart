@@ -6,14 +6,12 @@ import '../core/feature/app_feature.dart';
 import 'auth/auth_feature.dart';
 import 'profile/profile_feature.dart';
 import 'todo/todo_feature.dart';
-import 'webview/webview_feature.dart';
 
 /// App 中启用的所有业务 Feature。
 const List<AppFeature> appFeatures = [
   AuthFeature(),
   TodoFeature(),
   ProfileFeature(),
-  WebViewFeature(),
 ];
 
 final List<AppTabEntry> appFeatureTabs = [

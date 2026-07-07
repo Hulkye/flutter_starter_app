@@ -79,6 +79,7 @@ app.*.symbols
 app.*.map.json
 symbols/
 app_release_packages/
+.codegraph/
 
 # Local tool state
 .cursor/

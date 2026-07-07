@@ -9,7 +9,8 @@
 - Feature 通过 `XxxFeature extends AppFeature` 暴露路由。
 - `features/features.dart` 汇聚普通业务路由、可选底部 Tab 入口与 Feature Provider 覆盖项。
 - `features/exports.dart` 汇聚业务页面需要通过 `header.dart` 使用的 route class 和公开类型。
-- App 组合层通过 `lib/app/router/app_router_config.dart` 组装 Splash、Root/Shell 与 Feature 路由，并以 `AppRouterConfig` 注入 `core/router`。
+- App 组合层通过 `lib/app/router/app_router_config.dart` 组装 Splash、Root/Shell、Feature 路由与 App 公共路由，并以 `AppRouterConfig` 注入 `core/router`。
+- 通用页面能力的公共路由可由 App 组合层直接注册，例如 `shared/webview` 的 `WebPageRoute` / `AuthWebPageRoute`；不要为这类非业务能力创建 `AppFeature`。
 - `core/router` 只提供路由定义、GoRouter 适配、守卫和导航 Provider，不 import `app/` 或 `features/`。
 - 无底部 Tab 时不要创建 `/` 的 Root redirect 或 Root Shell；应提供明确首页路由或自定义登录后的目标页。
 
