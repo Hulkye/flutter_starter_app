@@ -84,6 +84,10 @@ void main(List<String> args) {
     _updatePackageImports(root, oldName, newName, options, report);
     _updateAndroid(root, packageId, appName, options, report);
     _updateIos(root, packageId, appName, newName, options, report);
+    _updateMacos(root, packageId, appName, newName, options, report);
+    _updateLinux(root, packageId, appName, newName, options, report);
+    _updateWeb(root, appName, options, report);
+    _updateWindows(root, appName, newName, options, report);
     _updateArbAppTitle(
       root,
       'lib/core/l10n/arb/app_zh.arb',
@@ -367,6 +371,235 @@ void _updateIos(
   });
 }
 
+void _updateMacos(
+  Directory root,
+  String packageId,
+  String appName,
+  String newName,
+  _Options options,
+  _RenameReport report,
+) {
+  _updateFile(root, 'macos/Runner/Configs/AppInfo.xcconfig', options, report, (
+    content,
+  ) {
+    var updated = _replaceXcconfigAssignment(
+      content,
+      'PRODUCT_NAME',
+      appName,
+      'macos/Runner/Configs/AppInfo.xcconfig',
+    );
+    updated = _replaceXcconfigAssignment(
+      updated,
+      'PRODUCT_BUNDLE_IDENTIFIER',
+      packageId,
+      'macos/Runner/Configs/AppInfo.xcconfig',
+    );
+    return updated;
+  });
+
+  _updateFile(root, 'macos/Runner.xcodeproj/project.pbxproj', options, report, (
+    content,
+  ) {
+    var updated = content.replaceAllMapped(
+      RegExp(r'PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);'),
+      (match) {
+        final current = match.group(1)!.trim();
+        final bundleId = current.endsWith('.RunnerTests')
+            ? '$packageId.RunnerTests'
+            : packageId;
+        return 'PRODUCT_BUNDLE_IDENTIFIER = $bundleId;';
+      },
+    );
+    updated = updated.replaceAllMapped(
+      RegExp(r'BuildableName = "[^"]+\.app"'),
+      (_) => 'BuildableName = "${_escapeQuotedString(appName)}.app"',
+    );
+    updated = updated.replaceAllMapped(
+      RegExp(r'path = "[^"]+\.app";'),
+      (_) => 'path = "${_escapeQuotedString(appName)}.app";',
+    );
+    updated = updated.replaceAllMapped(
+      RegExp(r'/\* [^*]+\.app \*/'),
+      (_) => '/* $appName.app */',
+    );
+    updated = updated.replaceAllMapped(
+      RegExp(
+        r'TEST_HOST = "\$\(BUILT_PRODUCTS_DIR\)/[^"]+\.app/\$\(BUNDLE_EXECUTABLE_FOLDER_PATH\)/[^"]+";',
+      ),
+      (_) =>
+          'TEST_HOST = "\$(BUILT_PRODUCTS_DIR)/${_escapeQuotedString(appName)}.app/\$(BUNDLE_EXECUTABLE_FOLDER_PATH)/${_escapeQuotedString(appName)}";',
+    );
+    return updated;
+  });
+
+  _updateFile(
+    root,
+    'macos/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme',
+    options,
+    report,
+    (content) => content.replaceAllMapped(
+      RegExp(r'BuildableName = "[^"]+\.app"'),
+      (_) => 'BuildableName = "${_escapeXmlAttribute(appName)}.app"',
+    ),
+  );
+}
+
+void _updateLinux(
+  Directory root,
+  String packageId,
+  String appName,
+  String newName,
+  _Options options,
+  _RenameReport report,
+) {
+  _updateFile(root, 'linux/CMakeLists.txt', options, report, (content) {
+    var updated = _replaceFirstMatch(
+      content,
+      RegExp(r'set\(BINARY_NAME "[^"]+"\)'),
+      (_) => 'set(BINARY_NAME "$newName")',
+      path: 'linux/CMakeLists.txt',
+      description: 'Linux binary name',
+    );
+    updated = _replaceFirstMatch(
+      updated,
+      RegExp(r'set\(APPLICATION_ID "[^"]+"\)'),
+      (_) => 'set(APPLICATION_ID "$packageId")',
+      path: 'linux/CMakeLists.txt',
+      description: 'Linux application id',
+    );
+    return updated;
+  });
+
+  _updateFile(root, 'linux/runner/my_application.cc', options, report, (
+    content,
+  ) {
+    var updated = _replaceFirstMatch(
+      content,
+      RegExp(r'gtk_header_bar_set_title\(header_bar, "[^"]+"\)'),
+      (_) =>
+          'gtk_header_bar_set_title(header_bar, "${_escapeQuotedString(appName)}")',
+      path: 'linux/runner/my_application.cc',
+      description: 'Linux header bar title',
+    );
+    updated = _replaceFirstMatch(
+      updated,
+      RegExp(r'gtk_window_set_title\(window, "[^"]+"\)'),
+      (_) => 'gtk_window_set_title(window, "${_escapeQuotedString(appName)}")',
+      path: 'linux/runner/my_application.cc',
+      description: 'Linux window title',
+    );
+    return updated;
+  });
+}
+
+void _updateWeb(
+  Directory root,
+  String appName,
+  _Options options,
+  _RenameReport report,
+) {
+  _updateFile(root, 'web/index.html', options, report, (content) {
+    var updated = _replaceHtmlMetaContent(
+      content,
+      'apple-mobile-web-app-title',
+      appName,
+      'web/index.html',
+    );
+    updated = _replaceFirstMatch(
+      updated,
+      RegExp(r'(<title>)(.*?)(</title>)', dotAll: true),
+      (match) => '${match.group(1)}${_escapeXmlText(appName)}${match.group(3)}',
+      path: 'web/index.html',
+      description: 'Web document title',
+    );
+    return updated;
+  });
+
+  _updateFile(root, 'web/manifest.json', options, report, (content) {
+    final decoded = jsonDecode(content);
+    if (decoded is! Map) {
+      throw const _RenameException(
+        'web/manifest.json is not a JSON object.',
+        65,
+      );
+    }
+    final data = Map<String, dynamic>.from(decoded);
+    if (!data.containsKey('name') || !data.containsKey('short_name')) {
+      throw const _RenameException(
+        'Missing name or short_name in web/manifest.json.',
+        65,
+      );
+    }
+    data['name'] = appName;
+    data['short_name'] = appName;
+    return '${const JsonEncoder.withIndent('    ').convert(data)}\n';
+  });
+}
+
+void _updateWindows(
+  Directory root,
+  String appName,
+  String newName,
+  _Options options,
+  _RenameReport report,
+) {
+  _updateFile(root, 'windows/CMakeLists.txt', options, report, (content) {
+    var updated = _replaceFirstMatch(
+      content,
+      RegExp(r'project\([A-Za-z0-9_]+ LANGUAGES CXX\)'),
+      (_) => 'project($newName LANGUAGES CXX)',
+      path: 'windows/CMakeLists.txt',
+      description: 'Windows CMake project name',
+    );
+    updated = _replaceFirstMatch(
+      updated,
+      RegExp(r'set\(BINARY_NAME "[^"]+"\)'),
+      (_) => 'set(BINARY_NAME "$newName")',
+      path: 'windows/CMakeLists.txt',
+      description: 'Windows binary name',
+    );
+    return updated;
+  });
+
+  _updateFile(root, 'windows/runner/main.cpp', options, report, (content) {
+    return _replaceFirstMatch(
+      content,
+      RegExp(r'window\.Create\(L"[^"]+"'),
+      (_) => 'window.Create(L"${_escapeQuotedString(appName)}"',
+      path: 'windows/runner/main.cpp',
+      description: 'Windows window title',
+    );
+  });
+
+  _updateFile(root, 'windows/runner/Runner.rc', options, report, (content) {
+    var updated = _replaceRcValue(
+      content,
+      'FileDescription',
+      appName,
+      'windows/runner/Runner.rc',
+    );
+    updated = _replaceRcValue(
+      updated,
+      'InternalName',
+      newName,
+      'windows/runner/Runner.rc',
+    );
+    updated = _replaceRcValue(
+      updated,
+      'OriginalFilename',
+      '$newName.exe',
+      'windows/runner/Runner.rc',
+    );
+    updated = _replaceRcValue(
+      updated,
+      'ProductName',
+      appName,
+      'windows/runner/Runner.rc',
+    );
+    return updated;
+  });
+}
+
 void _updateArbAppTitle(
   Directory root,
   String relativePath,
@@ -497,6 +730,50 @@ String _replacePlistStringValue(
   );
 }
 
+String _replaceXcconfigAssignment(
+  String content,
+  String key,
+  String value,
+  String path,
+) {
+  return _replaceFirstMatch(
+    content,
+    RegExp('^${RegExp.escape(key)}\\s*=.*\$', multiLine: true),
+    (_) => '$key = $value',
+    path: path,
+    description: key,
+  );
+}
+
+String _replaceHtmlMetaContent(
+  String content,
+  String name,
+  String value,
+  String path,
+) {
+  return _replaceFirstMatch(
+    content,
+    RegExp(
+      '(<meta\\s+name="${RegExp.escape(name)}"\\s+content=")(.*?)(">)',
+      dotAll: true,
+    ),
+    (match) =>
+        '${match.group(1)}${_escapeXmlAttribute(value)}${match.group(3)}',
+    path: path,
+    description: '$name meta content',
+  );
+}
+
+String _replaceRcValue(String content, String key, String value, String path) {
+  return _replaceFirstMatch(
+    content,
+    RegExp('VALUE "${RegExp.escape(key)}", "[^"]*" "\\\\0"'),
+    (_) => 'VALUE "$key", "${_escapeQuotedString(value)}" "\\0"',
+    path: path,
+    description: 'Windows $key resource value',
+  );
+}
+
 Iterable<File> _walkTextFiles(Directory root) sync* {
   for (final entity in root.listSync(recursive: true, followLinks: false)) {
     if (entity is Directory) continue;
@@ -587,6 +864,10 @@ String _escapeXmlText(String value) {
       .replaceAll('&', '&amp;')
       .replaceAll('<', '&lt;')
       .replaceAll('>', '&gt;');
+}
+
+String _escapeQuotedString(String value) {
+  return value.replaceAll(r'\', r'\\').replaceAll('"', r'\"');
 }
 
 void _deleteEmptyParentDirectories(Directory directory, Directory stopAt) {

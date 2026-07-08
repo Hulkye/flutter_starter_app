@@ -632,6 +632,9 @@ dart run script/rename_project.dart my_app \
   --app-name "我的APP" \
   --en-app-name "My App"
 
+# 脚本会同步更新 Android、iOS、macOS、Linux、Web、Windows 的应用名、包名/Bundle ID 与启动配置
+# 不会直接修改国际化生成物，也不会猜测公司名、版权、签名等发布主体信息
+
 # 重命名后重新生成国际化代码
 ./script/gen_l10n.sh
 ```

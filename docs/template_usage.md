@@ -92,14 +92,18 @@ dart run script/rename_project.dart my_app \
 参数说明：
 
 - `<new_project_name>`：Dart 包名，用于 `pubspec.yaml` 与 `package:` imports，例如 `my_app`。
-- `--package-id`：Android `namespace` / `applicationId` 与 iOS `PRODUCT_BUNDLE_IDENTIFIER`，例如 `com.example.myapp`。
-- `--app-name`：默认显示名，用于 Android、iOS 与中文 ARB 的 `appTitle`。
+- `--package-id`：Android `namespace` / `applicationId`、Apple 平台 `PRODUCT_BUNDLE_IDENTIFIER` 与 Linux `APPLICATION_ID`，例如 `com.example.myapp`。
+- `--app-name`：默认显示名，用于 Android、Apple 平台、Linux、Web、Windows 与中文 ARB 的 `appTitle`。
 - `--en-app-name`：英文显示名，用于英文 ARB 的 `appTitle`，并在 `.vscode/launch.json` 存在时更新启动配置名。
 
 脚本会自动处理：
 
 - Android：`namespace`、`applicationId`、`AndroidManifest.xml` 显示名、`MainActivity` package 声明与 Kotlin/Java 目录迁移。
 - iOS：Runner target bundle id、RunnerTests target bundle id、`Info.plist` 显示名与 `CFBundleName`。
+- macOS：`AppInfo.xcconfig` 的应用名与 bundle id、RunnerTests bundle id、Scheme / Test Host 中的 `.app` 名称。
+- Linux：`BINARY_NAME`、`APPLICATION_ID`、窗口标题。
+- Web：`index.html` 标题、PWA manifest 的 `name` 与 `short_name`。
+- Windows：CMake project / binary name、窗口标题、版本资源中的产品名与文件名。
 - Flutter：`pubspec.yaml` 包名、`package:` imports、ARB 的 `appTitle`。
 - VS Code：如果 `.vscode/launch.json` 已存在，自动更新启动配置名；脚本不会主动创建本地 IDE 配置。
 
@@ -120,8 +124,8 @@ flutter test
 
 以下平台或发布配置仍建议人工复核：
 
-- macOS / Windows / Linux 应用名
-- Web 应用名与 PWA manifest
+- macOS / Windows 的公司名、版权等发布主体元数据
+- App 图标、启动图、商店展示名称等品牌资源
 - 发布签名配置
 
 ---
@@ -351,7 +355,7 @@ export 'order/presentation/order_routes.dart';
 Presentation/Page 层建议依赖 `BaseNavigator` 抽象，并传入 route 的 `location`，而不是直接依赖 GoRouter：
 
 ```dart
-import 'package:flutter_starter_app/header.dart';
+import 'package:my_app/header.dart';
 
 ref.read(appRouterProvider).push(const OrderRoute().location);
 ```
