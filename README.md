@@ -617,7 +617,7 @@ lib/features/profile/
 | --- | --- |
 | `./script/gen_l10n.sh` | 生成国际化代码 |
 | `./script/gen_app_icon.sh` | 根据 `assets/app_icon.png` 生成 App 图标 |
-| `dart run script/rename_project.dart <name>` | 重命名项目 |
+| `dart run script/rename_project.dart <name> --package-id <id> --app-name <name> --en-app-name <name>` | 重命名项目 |
 
 ```bash
 # 生成国际化代码
@@ -627,7 +627,13 @@ lib/features/profile/
 ./script/gen_app_icon.sh
 
 # 重命名项目
-dart run script/rename_project.dart my_app
+dart run script/rename_project.dart my_app \
+  --package-id com.example.myapp \
+  --app-name "我的APP" \
+  --en-app-name "My App"
+
+# 重命名后重新生成国际化代码
+./script/gen_l10n.sh
 ```
 
 ---

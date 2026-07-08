@@ -84,6 +84,7 @@ app_release_packages/
 # Local tool state
 .cursor/
 .claude/
+.codex/
 example_app/
 .ruler/local_profile.md
 

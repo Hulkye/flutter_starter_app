@@ -83,23 +83,45 @@ flutter run -t lib/main.dart
 模板提供了项目重命名脚本：
 
 ```bash
-dart run script/rename_project.dart my_app
+dart run script/rename_project.dart my_app \
+  --package-id com.example.myapp \
+  --app-name "我的APP" \
+  --en-app-name "My App"
+```
+
+参数说明：
+
+- `<new_project_name>`：Dart 包名，用于 `pubspec.yaml` 与 `package:` imports，例如 `my_app`。
+- `--package-id`：Android `namespace` / `applicationId` 与 iOS `PRODUCT_BUNDLE_IDENTIFIER`，例如 `com.example.myapp`。
+- `--app-name`：默认显示名，用于 Android、iOS 与中文 ARB 的 `appTitle`。
+- `--en-app-name`：英文显示名，用于英文 ARB 的 `appTitle`，并在 `.vscode/launch.json` 存在时更新启动配置名。
+
+脚本会自动处理：
+
+- Android：`namespace`、`applicationId`、`AndroidManifest.xml` 显示名、`MainActivity` package 声明与 Kotlin/Java 目录迁移。
+- iOS：Runner target bundle id、RunnerTests target bundle id、`Info.plist` 显示名与 `CFBundleName`。
+- Flutter：`pubspec.yaml` 包名、`package:` imports、ARB 的 `appTitle`。
+- VS Code：如果 `.vscode/launch.json` 已存在，自动更新启动配置名；脚本不会主动创建本地 IDE 配置。
+
+脚本默认不直接修改 `lib/core/l10n/gen/` 下的国际化生成物。修改 ARB 后需要重新生成：
+
+```bash
+./script/gen_l10n.sh
 ```
 
 执行后建议检查：
 
 ```bash
 flutter pub get
+./script/gen_l10n.sh
 flutter analyze
 flutter test
 ```
 
-脚本主要用于替换 Flutter/Dart 项目内的名称引用。平台侧配置仍建议人工复核：
+以下平台或发布配置仍建议人工复核：
 
-- Android package name
-- iOS bundle identifier
 - macOS / Windows / Linux 应用名
-- App 显示名称
+- Web 应用名与 PWA manifest
 - 发布签名配置
 
 ---
