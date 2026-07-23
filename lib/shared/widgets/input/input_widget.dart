@@ -54,10 +54,10 @@ class InputWidget extends StatefulWidget {
 }
 
 class InputWidgetState<T extends InputWidget> extends State<T> {
-  late final TextEditingController controller;
-  late final FocusNode focusNode;
-  late final bool ownsController;
-  late final bool ownsFocusNode;
+  late TextEditingController controller;
+  late FocusNode focusNode;
+  late bool ownsController;
+  late bool ownsFocusNode;
   final ValueNotifier<bool> suffixVisible = ValueNotifier(false);
   final ValueNotifier<String?> warnText = ValueNotifier(null);
 
@@ -79,6 +79,24 @@ class InputWidgetState<T extends InputWidget> extends State<T> {
   void didUpdateWidget(covariant T oldWidget) {
     super.didUpdateWidget(oldWidget);
     warnText.value = widget.warnText;
+    if (oldWidget.controller != widget.controller) {
+      if (ownsController) {
+        controller.dispose();
+      }
+      ownsController = widget.controller == null;
+      controller =
+          widget.controller ?? TextEditingController(text: widget.defaultText);
+      syncSuffixVisible(controller.text);
+    }
+    if (oldWidget.focusNode != widget.focusNode) {
+      focusNode.removeListener(onFocusChanged);
+      if (ownsFocusNode) {
+        focusNode.dispose();
+      }
+      ownsFocusNode = widget.focusNode == null;
+      focusNode = widget.focusNode ?? FocusNode();
+      focusNode.addListener(onFocusChanged);
+    }
     if (oldWidget.textChange != widget.textChange) {
       oldWidget.textChange?.removeListener(listenTextChange);
       widget.textChange?.addListener(listenTextChange);
