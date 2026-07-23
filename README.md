@@ -619,6 +619,8 @@ lib/features/profile/
 | --- | --- |
 | `./script/gen_l10n.sh` | 生成国际化代码 |
 | `./script/gen_app_icon.sh` | 根据 `assets/app_icon.png` 生成 App 图标 |
+| `./script/build_android.sh [apk\|aab]` | 构建 Android release 包，并收集混淆符号与 R8 mapping |
+| `./script/build_ios.sh` | 构建 iOS release IPA，并收集混淆符号与 dSYM |
 | `dart run script/rename_project.dart <name> --package-id <id> --app-name <name> --en-app-name <name>` | 重命名项目 |
 
 ```bash
@@ -627,6 +629,20 @@ lib/features/profile/
 
 # 生成 App 图标
 ./script/gen_app_icon.sh
+
+# 构建 Android APK，默认输出 apk
+./script/build_android.sh
+
+# 构建 Android AAB
+./script/build_android.sh aab
+
+# 构建 iOS IPA
+./script/build_ios.sh
+
+# 构建脚本会执行 flutter pub get，并使用 release + obfuscate + split-debug-info
+# Android 产物归档到 app_release_packages/android/<version>/
+# iOS 产物归档到 app_release_packages/ios/<version>/
+# 混淆符号表输出到 symbols/<platform>/<version>/，归档目录内也会保留一份 symbols
 
 # 重命名项目
 dart run script/rename_project.dart my_app \

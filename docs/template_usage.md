@@ -14,6 +14,7 @@
 - [接入真实登录](#-接入真实登录)
 - [修改主题与资源](#-修改主题与资源)
 - [修改国际化文案](#-修改国际化文案)
+- [构建发布包](#-构建发布包)
 - [常见开发约定](#-常见开发约定)
 
 ---
@@ -607,6 +608,41 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 ```
 
 页面中读取文案时，优先使用项目内已经封装好的 l10n Provider 或 BuildContext 扩展，保持调用方式统一。
+
+---
+
+## 📦 构建发布包
+
+模板提供 Android 与 iOS 发布构建脚本。脚本会优先使用本机 `fvm flutter`，未安装 FVM 时使用全局 `flutter`。
+
+```bash
+# 构建 Android APK，默认输出 apk
+./script/build_android.sh
+
+# 构建 Android AAB
+./script/build_android.sh aab
+
+# 构建 iOS IPA
+./script/build_ios.sh
+```
+
+构建脚本会执行：
+
+- `flutter pub get`
+- release 构建
+- `--obfuscate`
+- `--split-debug-info=symbols/<platform>/<version>`
+
+产物与符号文件默认归档到：
+
+| 平台 | 发布产物 | 符号文件 |
+| --- | --- | --- |
+| Android | `app_release_packages/android/<version>/` | `symbols/android/<version>/`，并复制到归档目录的 `symbols/` |
+| iOS | `app_release_packages/ios/<version>/` | `symbols/ios/<version>/`，并复制到归档目录的 `symbols/` |
+
+Android 构建会额外收集 R8 `mapping.txt`。iOS 构建会在存在归档 dSYM 时复制 `dSYMs`，并在缺少 `objective_c.framework.dSYM` 且 framework binary 存在时用 `dsymutil` 补齐。
+
+脚本不负责配置 Android keystore、Apple 证书、Provisioning Profile 或商店发布参数。接入真实项目后，应先完成对应平台签名配置，再运行发布构建脚本。
 
 ---
 
