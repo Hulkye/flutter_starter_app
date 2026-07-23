@@ -122,7 +122,7 @@ lib/
 │   ├── l10n/                      # 国际化
 │   ├── network/                   # 网络、连接状态、HTTP 客户端
 │   ├── router/                    # GoRouter 封装、守卫、导航抽象
-│   ├── service/                   # 日志、事件总线等公共服务
+│   ├── service/                   # 日志等全局基础服务
 │   ├── storage/                   # SharedPreferences / SecureStorage 封装
 │   ├── theme/                     # 主题、色值、主题资源
 │   └── util/                      # 工具类
@@ -134,7 +134,7 @@ lib/
 │   └── todo/                      # 默认根 Tab 与完整分层示例
 ├── shared/                        # 跨 Feature 共享能力
 │   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseAutoDisposeVM / BaseState / PresentationFeedbackService
-│   ├── services/                  # AuthSession / AuthStore
+│   ├── services/                  # AuthSession / AuthStore / AppEventBus
 │   ├── widgets/                   # Toast、Loading、Button、Dialog 等组件
 │   └── webview/                   # 通用 WebView 页面、配置与公共路由
 ├── header.dart                    # 业务页面常用导出，app/core/shared 内部不使用
@@ -219,7 +219,7 @@ Presentation  ──────▶  Domain  ◀──────  Data
 | `app/` | 应用启动、环境注入、根组件挂载 | 可组合全局能力 |
 | `core/` | 网络、路由、存储、主题、DI、异常、工具 | 不依赖具体 Feature |
 | `features/` | 业务模块 | 可依赖 `core` 与 `shared` |
-| `shared/` | BasePage、PageLogic、BaseVM、BaseAutoDisposeVM、PresentationFeedbackService、认证服务、通用组件、通用 WebView 等跨 Feature 能力 | 提供跨业务复用能力，不承载具体业务流程 |
+| `shared/` | BasePage、PageLogic、BaseVM、BaseAutoDisposeVM、PresentationFeedbackService、认证服务、事件总线、通用组件、通用 WebView 等跨 Feature 能力 | 提供跨业务复用能力，不承载具体业务流程 |
 
 ---
 

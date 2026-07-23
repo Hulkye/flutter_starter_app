@@ -8,7 +8,7 @@
 - `core` 提供全局基础设施，不依赖具体 Feature。
 - `core/config` 承载 App 环境配置，供 `main_*`、`app`、`core/network` 与业务页面读取；避免 `core` 反向依赖 `app`。
 - `core/router` 不装配具体 App/Feature 路由；App 层通过 `AppRouterConfig` 注入路由图。
-- `shared` 提供跨 Feature 可复用能力，不承载具体业务流程；较完整的通用能力可按能力名建目录，例如 `shared/webview/`。
+- `shared` 提供跨 Feature 可复用能力，不承载具体业务流程；较完整的通用能力可按能力名建目录，例如 `shared/webview/`；跨页面、跨模块的低频业务通知使用 `shared/services/event_bus`。
 
 ## Feature 内部分层
 
