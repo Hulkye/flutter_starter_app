@@ -17,7 +17,7 @@
 
 ---
 
-这是一个面向中大型 Flutter 项目的快速启动模板。项目以 **Feature-First** 组织业务模块，在每个业务 Feature 内落地 **Data / Domain / Presentation** 分层，并通过 **BasePage + PageLogic + BaseVM + Riverpod** 建立职责清晰的 MVVM 开发范式。
+这是一个面向中大型 Flutter 项目的快速启动模板。项目以 **Feature-First** 组织业务模块，在每个业务 Feature 内落地 **Data / Domain / Presentation** 分层，并通过 **BasePage + PageLogic + BaseVM / BaseAutoDisposeVM + Riverpod** 建立职责清晰的 MVVM 开发范式。
 
 模板已内置多环境、网络请求、路由守卫、主题、国际化、本地存储、登录会话、通用 WebView 页面、Toast/Loading、刷新、按钮、弹窗等常用基础设施。Clone 后只需要替换业务接口与页面，即可进入功能开发。
 
@@ -59,7 +59,7 @@
 | 能力 | 说明 |
 | --- | --- |
 | 清晰分层 | 每个业务模块按 `data / domain / presentation` 拆分，职责边界明确 |
-| MVVM 开发范式 | `BasePage` 承载页面骨架，`PageLogic` 承载页面私有生命周期与局部交互，`BaseVM` 只承载状态与业务动作 |
+| MVVM 开发范式 | `BasePage` 承载页面骨架，`PageLogic` 承载页面私有生命周期与局部交互，`BaseVM` / `BaseAutoDisposeVM` 只承载状态与业务动作 |
 | Clean Architecture | 业务依赖抽象而非实现，Repository 接口与实现分离，便于替换数据源 |
 | Feature-First | 业务代码按功能聚合，模块可独立演进，避免按技术层级散落全局 |
 | Riverpod 驱动 | 状态管理、依赖注入、服务组合统一使用 Riverpod，减少框架混用成本 |
@@ -133,7 +133,7 @@ lib/
 │   ├── profile/                   # 个人中心与主题/退出登录示例
 │   └── todo/                      # 默认根 Tab 与完整分层示例
 ├── shared/                        # 跨 Feature 共享能力
-│   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseState / PresentationFeedbackService
+│   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseAutoDisposeVM / BaseState / PresentationFeedbackService
 │   ├── services/                  # AuthSession / AuthStore
 │   ├── widgets/                   # Toast、Loading、Button、Dialog 等组件
 │   └── webview/                   # 通用 WebView 页面、配置与公共路由
@@ -219,13 +219,13 @@ Presentation  ──────▶  Domain  ◀──────  Data
 | `app/` | 应用启动、环境注入、根组件挂载 | 可组合全局能力 |
 | `core/` | 网络、路由、存储、主题、DI、异常、工具 | 不依赖具体 Feature |
 | `features/` | 业务模块 | 可依赖 `core` 与 `shared` |
-| `shared/` | BasePage、PageLogic、BaseVM、PresentationFeedbackService、认证服务、通用组件、通用 WebView 等跨 Feature 能力 | 提供跨业务复用能力，不承载具体业务流程 |
+| `shared/` | BasePage、PageLogic、BaseVM、BaseAutoDisposeVM、PresentationFeedbackService、认证服务、通用组件、通用 WebView 等跨 Feature 能力 | 提供跨业务复用能力，不承载具体业务流程 |
 
 ---
 
 ## 🧭 MVVM 基础能力
 
-模板通过 `BasePage`、`PageLogic`、`BaseVM`、`BaseState`、`PresentationFeedbackService` 固化页面开发方式，同时保持 Page、PageLogic 与 ViewModel 的职责边界：Page 负责 UI 结构、Widget 组合、布局、样式；PageLogic 负责页面本地 controller、临时交互状态、生命周期、调用 VM/Provider；ViewModel / Notifier 负责页面可观察状态、业务动作编排，并把领域/服务状态转换成 UI 状态。
+模板通过 `BasePage`、`PageLogic`、`BaseVM`、`BaseAutoDisposeVM`、`BaseState`、`PresentationFeedbackService` 固化页面开发方式，同时保持 Page、PageLogic 与 ViewModel 的职责边界：Page 负责 UI 结构、Widget 组合、布局、样式；PageLogic 负责页面本地 controller、临时交互状态、生命周期、调用 VM/Provider；ViewModel / Notifier 负责页面可观察状态、业务动作编排，并把领域/服务状态转换成 UI 状态。
 
 ### BasePage
 
@@ -283,14 +283,16 @@ Widget page(PageScope scope) {
 }
 ```
 
-### BaseVM
+### BaseVM / BaseAutoDisposeVM
 
-`BaseVM` 基于 Riverpod `Notifier`，只用于承载页面可观察状态、业务动作编排，并把领域/服务状态转换成 UI 状态：
+`BaseVM` 与 `BaseAutoDisposeVM` 分别基于 Riverpod `Notifier` 与 `AutoDisposeNotifier`，只用于承载页面可观察状态、业务动作编排，并把领域/服务状态转换成 UI 状态：
 
 - `initialState()` 提供初始状态
 - 通过 `state = state.copyWith(...)` 更新 UI 状态
 - 调用 Repository 抽象完成业务数据读写
 - 不感知 `BuildContext`、Widget 生命周期、页面返回、页面 ready 策略或一次性 UI 反馈服务
+
+选择基类时按状态保留需求区分：需要跨页面或离开页面后继续保留状态时使用 `BaseVM` 并配套 `NotifierProvider`；只服务当前页面、最后一个监听者移除后即可释放状态时使用 `BaseAutoDisposeVM` 并配套 `AutoDisposeNotifierProvider`。
 
 ### BaseState
 
@@ -304,7 +306,7 @@ Widget page(PageScope scope) {
 - `emitHint` 展示提示
 - `showLoading` / `hideLoading` 控制全局 Loading
 
-这些反馈不进入 `BaseState`，避免临时事件污染可渲染状态。`BasePage` / `PageLogic` 可通过 `scope.presentation` 或 `presentation` 访问；`BaseVM` 不直接持有 Presentation 反馈服务。Loading 使用 token/counter 管理，并发 action 不会被静默跳过；`runWithLoading` 默认展示错误提示后继续抛出异常，需要吞掉异常时必须显式传入 `rethrowError: false`。
+这些反馈不进入 `BaseState`，避免临时事件污染可渲染状态。`BasePage` / `PageLogic` 可通过 `scope.presentation` 或 `presentation` 访问；`BaseVM` / `BaseAutoDisposeVM` 不直接持有 Presentation 反馈服务。Loading 使用 token/counter 管理，并发 action 不会被静默跳过；`runWithLoading` 默认展示错误提示后继续抛出异常，需要吞掉异常时必须显式传入 `rethrowError: false`。
 
 推荐页面开发流程：
 
@@ -545,7 +547,7 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 2. 按 `data / domain / presentation` 创建分层文件。
 3. 在 `domain/repositories` 中定义 Repository 抽象。
 4. 在 `domain/repositories` 中定义 Repository 抽象 Provider，在 `data/repositories` 中实现 Repository。
-5. 如页面存在可观察业务状态或动作编排，在 `presentation/viewmodels` 中继承 `BaseVM` 管理 UI 状态与业务动作。
+5. 如页面存在可观察业务状态或动作编排，在 `presentation/viewmodels` 中按状态保留需求继承 `BaseVM` 或 `BaseAutoDisposeVM` 管理 UI 状态与业务动作。
 6. 在 `presentation/pages` 中继承 `BasePage` 编写 UI，并在 `page(scope)` 中读取状态、调用 ViewModel 或稳定 Provider。
 7. 在 `<feature>_routes.dart` 中声明路由。
 8. 在 `<feature>_feature.dart` 中继承 `AppFeature` 并暴露路由；如有默认 data 实现，在 `providerOverrides` 中装配 domain binding Provider。

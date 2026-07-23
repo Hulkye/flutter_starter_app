@@ -14,3 +14,15 @@ abstract class BaseVM<S extends BaseState> extends Notifier<S> {
   /// 子类返回初始状态。
   S initialState();
 }
+
+/// 页面级 ViewModel 基类。
+///
+/// 用于不需要跨页面保留状态的页面，最后一个监听者移除后由 Riverpod 自动销毁。
+abstract class BaseAutoDisposeVM<S extends BaseState>
+    extends AutoDisposeNotifier<S> {
+  @override
+  S build() => initialState();
+
+  /// 子类返回初始状态。
+  S initialState();
+}

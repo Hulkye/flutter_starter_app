@@ -32,7 +32,7 @@ lib/features/<feature>/
 1. 明确 Feature 的业务边界，避免把多个无关业务塞进同一模块。
 2. 先设计 domain 抽象，再实现 data 层。
 3. 在 domain 层暴露 Repository 抽象 Provider 与 binding Provider，在 `XxxFeature.providerOverrides` 中声明默认 data 实现，由 App 组合层汇聚注入，再暴露 ViewModel；跨模块或 App 级状态写入优先使用 shared/core 的 Controller 或 Service。
-4. 页面使用 `BasePage` / `BaseVM` 项目范式，并按需使用 `PageLogic`。
+4. 页面使用 `BasePage` / `BaseVM` / `BaseAutoDisposeVM` 项目范式，并按需使用 `PageLogic`；只服务当前页面且无需跨页面保留状态的 ViewModel 优先使用 `BaseAutoDisposeVM`。
 5. 在 `<feature>_routes.dart` 定义 `XxxRoute extends AppPageRoute`。
 6. 在 `<feature>_feature.dart` 定义 `XxxFeature extends AppFeature`，暴露 routes、tabs 与 providerOverrides。
 7. 如该 Feature 需要底部 Tab，在 `XxxFeature.tabs` 中返回 `AppTabEntry`。

@@ -443,7 +443,7 @@ final class OrderState extends BaseState {
   }
 }
 
-final class OrderViewModel extends BaseVM<OrderState> {
+final class OrderViewModel extends BaseAutoDisposeVM<OrderState> {
   @override
   OrderState initialState() => const OrderState();
 
@@ -452,7 +452,13 @@ final class OrderViewModel extends BaseVM<OrderState> {
     state = state.copyWith(initialized: true, orders: orders);
   }
 }
+
+final orderViewModelProvider = AutoDisposeNotifierProvider<OrderViewModel, OrderState>(
+  OrderViewModel.new,
+);
 ```
+
+`BaseAutoDisposeVM` 适合只服务当前页面的状态，最后一个监听者移除后会由 Riverpod 自动销毁；如果状态需要跨页面保留，改用 `BaseVM` 并配套 `NotifierProvider`。
 
 由页面逻辑决定何时触发首屏加载：
 
