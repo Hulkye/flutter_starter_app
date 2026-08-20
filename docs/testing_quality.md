@@ -56,6 +56,8 @@ CI 会在 `push` 和 `pull_request` 时执行：
 
 其中 `./script/gen_l10n.sh + git diff --exit-code` 用于保证 ARB 文案和生成文件保持同步。
 
+CI 的 Flutter 版本在 `.github/workflows/quality.yml` 中固定为 `3.41.8`，用于避免 `stable` 频道漂移导致依赖解析结果变化。升级 Flutter 时请同步更新该配置。
+
 ## ➕ 新增 Feature 后建议补充的测试
 
 新增业务模块时，建议至少补充：
