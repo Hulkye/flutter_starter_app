@@ -21,12 +21,14 @@ APP_NAME="$(awk -F': ' '/^name:/{print $2; exit}' "$PUBSPEC_FILE")"
 VERSION_RAW="$(awk -F': ' '/^version:/{print $2; exit}' "$PUBSPEC_FILE")"
 VERSION_NAME="${VERSION_RAW%%+*}"
 
-SYMBOLS_BASE_DIR="$ROOT_DIR/symbols/android"
-SYMBOLS_DIR="$SYMBOLS_BASE_DIR/${VERSION_NAME}"
 PACKAGES_DIR="$ROOT_DIR/app_release_packages/android/${VERSION_NAME}"
+SYMBOLS_DIR="$PACKAGES_DIR/symbols"
 
 rm -rf "$SYMBOLS_DIR"
 mkdir -p "$SYMBOLS_DIR" "$PACKAGES_DIR"
+
+echo "==> 清理 Flutter 构建缓存"
+"${FLUTTER_CMD[@]}" clean
 
 echo "==> Flutter 依赖拉取"
 "${FLUTTER_CMD[@]}" pub get
@@ -47,6 +49,12 @@ if [[ ! -f "$SOURCE_FILE" ]]; then
   exit 2
 fi
 
+SYMBOLS_FILE="$(find "$SYMBOLS_DIR" -maxdepth 1 -type f -name '*.symbols' -print -quit)"
+if [[ -z "$SYMBOLS_FILE" ]]; then
+  echo "未找到 Flutter/Dart 符号表: $SYMBOLS_DIR"
+  exit 3
+fi
+
 cp -f "$SOURCE_FILE" "$TARGET_FILE"
 
 # 额外收集 R8 混淆映射
@@ -55,11 +63,15 @@ if [[ -f "$MAPPING_FILE" ]]; then
   cp -f "$MAPPING_FILE" "$PACKAGES_DIR/mapping.txt"
 fi
 
-# 在打包目录内保留一份符号表
-cp -R "$SYMBOLS_DIR" "$PACKAGES_DIR/symbols"
+# 额外收集 Android 原生/NDK 符号
+NATIVE_SYMBOLS_FILE="$ROOT_DIR/build/app/outputs/native-debug-symbols/release/native-debug-symbols.zip"
+if [[ -f "$NATIVE_SYMBOLS_FILE" ]]; then
+  cp -f "$NATIVE_SYMBOLS_FILE" "$PACKAGES_DIR/native-debug-symbols.zip"
+fi
 
 echo ""
 echo "Android 构建完成:"
 echo "  产物: $TARGET_FILE"
 echo "  符号: $SYMBOLS_DIR"
+echo "  原生符号: $PACKAGES_DIR/native-debug-symbols.zip"
 echo "  归档: $PACKAGES_DIR"

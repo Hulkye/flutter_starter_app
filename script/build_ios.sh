@@ -15,10 +15,9 @@ APP_NAME="$(awk -F': ' '/^name:/{print $2; exit}' "$PUBSPEC_FILE")"
 VERSION_RAW="$(awk -F': ' '/^version:/{print $2; exit}' "$PUBSPEC_FILE")"
 VERSION_NAME="${VERSION_RAW%%+*}"
 
-SYMBOLS_BASE_DIR="$ROOT_DIR/symbols/ios"
-SYMBOLS_DIR="$SYMBOLS_BASE_DIR/${VERSION_NAME}"
 PACKAGES_DIR="$ROOT_DIR/app_release_packages/ios/${VERSION_NAME}"
-EXPORT_DIR="$ROOT_DIR/build/ios_ipa"
+SYMBOLS_DIR="$PACKAGES_DIR/symbols"
+EXPORT_DIR="$ROOT_DIR/build/ios/ipa"
 ARCHIVE_DIR="$ROOT_DIR/build/ios/archive/Runner.xcarchive"
 
 generate_missing_objective_c_dsym() {
@@ -62,9 +61,6 @@ DSYM_DIR="$ARCHIVE_DIR/dSYMs"
 if [[ -d "$DSYM_DIR" ]]; then
   cp -R "$DSYM_DIR" "$PACKAGES_DIR/dSYMs"
 fi
-
-# 在打包目录内保留一份符号表
-cp -R "$SYMBOLS_DIR" "$PACKAGES_DIR/symbols"
 
 echo ""
 echo "iOS 构建完成:"

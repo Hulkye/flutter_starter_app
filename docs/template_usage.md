@@ -631,16 +631,16 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 - `flutter pub get`
 - release 构建
 - `--obfuscate`
-- `--split-debug-info=symbols/<platform>/<version>`
+- `--split-debug-info=app_release_packages/<platform>/<version>/symbols`
 
 产物与符号文件默认归档到：
 
-| 平台 | 发布产物 | 符号文件 |
-| --- | --- | --- |
-| Android | `app_release_packages/android/<version>/` | `symbols/android/<version>/`，并复制到归档目录的 `symbols/` |
-| iOS | `app_release_packages/ios/<version>/` | `symbols/ios/<version>/`，并复制到归档目录的 `symbols/` |
+| 平台 | 发布产物 | Dart 混淆符号 | 附加符号文件 |
+| --- | --- | --- | --- |
+| Android | `app_release_packages/android/<version>/<app_name>_v<version>_release.apk` 或 `.aab` | `app_release_packages/android/<version>/symbols/` | `mapping.txt`、`native-debug-symbols.zip`（如存在） |
+| iOS | `app_release_packages/ios/<version>/<app_name>_v<version>_release.ipa` | `app_release_packages/ios/<version>/symbols/` | `dSYMs/`（如存在） |
 
-Android 构建会额外收集 R8 `mapping.txt`。iOS 构建会在存在归档 dSYM 时复制 `dSYMs`，并在缺少 `objective_c.framework.dSYM` 且 framework binary 存在时用 `dsymutil` 补齐。
+Android 构建前会执行 `flutter clean`，并在构建完成后校验发布产物和 Dart `.symbols` 文件是否存在。iOS 构建会在存在归档 dSYM 时复制 `dSYMs`，并在缺少 `objective_c.framework.dSYM` 且 framework binary 存在时用 `dsymutil` 补齐。
 
 脚本不负责配置 Android keystore、Apple 证书、Provisioning Profile 或商店发布参数。接入真实项目后，应先完成对应平台签名配置，再运行发布构建脚本。
 

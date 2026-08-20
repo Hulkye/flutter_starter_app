@@ -642,7 +642,9 @@ lib/features/profile/
 # 构建脚本会执行 flutter pub get，并使用 release + obfuscate + split-debug-info
 # Android 产物归档到 app_release_packages/android/<version>/
 # iOS 产物归档到 app_release_packages/ios/<version>/
-# 混淆符号表输出到 symbols/<platform>/<version>/，归档目录内也会保留一份 symbols
+# Dart 混淆符号表保存在对应归档目录的 symbols/ 子目录
+# Android 会额外收集 mapping.txt 与 native-debug-symbols.zip（如存在）
+# iOS 会额外收集 dSYMs，并在缺少 objective_c.framework.dSYM 时尝试用 dsymutil 补齐
 
 # 重命名项目
 dart run script/rename_project.dart my_app \
