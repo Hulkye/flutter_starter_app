@@ -7,8 +7,8 @@
 - 对业务层暴露框架无关的路由定义：`AppPageRoute`、`AppRedirectRoute`、`AppShellRoute`。
 - 对业务层暴露导航接口：`BaseNavigator` 与 `appRouterProvider`。
 - 在基础设施层把 `AppRouteNode` 转换为 GoRouter 的 `RouteBase`。
-- 通过 `AppRouterConfig` 接收 App 组合层注入的路由图、初始页和登录页 location。
-- 在 `router_provider.dart` 创建 GoRouter、认证守卫和导航 Provider。
+- 通过 `AppRouterConfig` 接收 App 组合层注入的路由图和初始页。
+- 在 `router_provider.dart` 创建 GoRouter、状态机守卫和导航 Provider。
 - App Shell 的 Tab 入口由 Feature 显式声明，Shell 只做装配。
 
 ## 文件清单
@@ -28,7 +28,8 @@
 | `router_navigator.dart` | `RouterNavigator` 的 GoRouter 导航实现 | ✅ |
 | `app_router_transfor.dart` | `AppRouteNode` 到 `RouteBase` 的适配器 | ✅ |
 | `router_provider.dart` | `AppRouterConfig`、GoRouter、导航接口、守卫 Provider | ✅ |
-| `router_guard.dart` | `createAuthGuard()` 认证守卫工具 | ✅ |
+| `route_access_decision.dart` | `AllowRoute` / `RedirectRoute` 最终访问决策 | ❌ |
+| `router_guard.dart` | 访问决策执行、认证守卫和目标页安全校验 | ✅ |
 
 ## 分层关系
 
@@ -145,11 +146,8 @@ AppRouterConfig createAppRouterConfig() {
       const AuthWebPageRoute(),
     ],
     initialLocation: const SplashRoute().location,
-    loginLocation: const LoginRoute().location,
   );
 }
-```
-
 注册顺序含义：
 
 - `SplashRoute`：启动展示页，属于 `lib/app/navigation/splash/`。
@@ -342,18 +340,38 @@ lib/app/navigation/
 - `app_router_config.dart` 负责把 Splash、Root/Shell、Feature 路由与 App 公共路由组合成 `AppRouterConfig` 并注入 core/router。
 - GoRouter 的 `StatefulShellRoute` 只存在于 `app_router_transfor.dart`，不会暴露给业务 Feature。
 
-## 认证守卫
+## 访问决策守卫
 
-`createAuthGuard()` 接收登录页路径、登录态读取函数和 public route pattern 列表。`router_provider.dart` 会递归扫描 `AppRouterConfig.routeNodes`，收集 `public == true` 的页面或重定向路径。
+`RouteAccessDecision` 是路由守卫消费的稳定契约，仅包含两种结果：
+
+- `AllowRoute`：允许当前访问，也可声明已登录访问登录页等少量入口替代规则。
+- `RedirectRoute`：重定向到明确 location，可选择保留原始目标，或覆盖公开路由。
+
+core/router 不枚举启动、Token、资料、升级、权限或租户等业务状态，也不维护状态到
+location 的映射。App 组合层监听各业务 Provider，按产品优先级生成一个最终决策，
+并通过 `routeAccessDecisionProvider` override 注入。
+
+模板默认的 App 组合只处理登录态：未登录时跳登录页并保留原目标；已登录时允许访问，
+但访问登录页会返回首页。
 
 ```dart
-redirect: createAuthGuard(
-  loginPath: routerConfig.loginLocation,
-  isAuthenticated: () =>
-      ref.read(authSessionProvider)?.isValid == true,
+redirect: createAccessGuard(
+  accessDecision: () => ref.read(routeAccessDecisionProvider),
   publicPaths: collectPublicRoutePatterns(routerConfig.routeNodes),
 ),
 ```
+
+需要增加强制升级时，应在 App 决策 Provider 中优先返回：
+
+```dart
+const RedirectRoute(
+  location: '/upgrade',
+  appliesToPublicRoutes: true,
+)
+```
+
+目标页已是 `/upgrade` 时守卫会放行，避免重定向循环。资料补充、重新认证、权限不足
+和租户选择采用同一决策类型，不需要修改 core/router。
 
 需要免登录访问的页面在 Route 中覆盖 `public`：
 
@@ -365,6 +383,18 @@ bool get public => true;
 公开路由支持动态路径片段匹配。例如 `path = '/article/:id'` 时，实际访问 `/article/42` 也会被识别为公开路由。
 
 模板在存在底部 Tab 时保留根路径 `/` 作为重定向入口，但未登录访问 `/` 时会先进入登录页。无 Tab 时不会创建 Root redirect，需要由业务显式提供首页路由或自定义启动后的目标页。
+
+### 登录后的目标页
+
+未登录访问受保护路由时，守卫将完整内部 location 放入登录页的 `redirect` query 参数，例如：
+
+```text
+/login?redirect=%2Ftodo%3Ffilter%3Dopen
+```
+
+登录成功后，登录页只接受根路径形式的内部 location，并使用 `replaceAll()` 返回目标页。
+带 scheme 或 authority 的外部 URL 会被拒绝；没有目标参数时由 App 组合层的
+`AllowRoute.redirects` 决定默认首页。
 
 ## 设计约束
 

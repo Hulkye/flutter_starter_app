@@ -25,11 +25,32 @@ void main() {
     expect(navigator.replaceAllCount, 1);
     expect(navigator.lastReplaceAllLocation, '/');
   });
+
+  testWidgets('login success returns to the original protected location', (
+    tester,
+  ) async {
+    final navigator = _RecordingNavigator();
+    await _pumpLoginPage(
+      tester,
+      navigator: navigator,
+      redirectLocation: '/todo?filter=open',
+    );
+
+    await tester.enterText(find.byType(EditableText).first, 'demo');
+    await tester.enterText(find.byType(EditableText).last, 'password');
+    await tester.tap(find.widgetWithText(ElevatedButton, '登录'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(navigator.replaceAllCount, 1);
+    expect(navigator.lastReplaceAllLocation, '/todo?filter=open');
+  });
 }
 
 Future<void> _pumpLoginPage(
   WidgetTester tester, {
   required _RecordingNavigator navigator,
+  String? redirectLocation,
 }) async {
   await tester.binding.setSurfaceSize(const Size(414, 896));
   await tester.pumpWidget(
@@ -48,7 +69,7 @@ Future<void> _pumpLoginPage(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           theme: AppThemeData.light,
           darkTheme: AppThemeData.dark,
-          home: const LoginPage(),
+          home: LoginPage(redirectLocation: redirectLocation),
         ),
         const Size(375, 812),
       ),

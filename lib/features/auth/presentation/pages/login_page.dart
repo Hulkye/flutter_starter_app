@@ -1,9 +1,12 @@
 import 'package:flutter_starter_app/header.dart';
+
 import '../viewmodels/auth_viewmodel.dart';
 
 /// 登录页（模板演示）。
 class LoginPage extends BasePage {
-  const LoginPage({super.key});
+  const LoginPage({this.redirectLocation, super.key});
+
+  final String? redirectLocation;
 
   // ── UI ──
 
@@ -13,7 +16,7 @@ class LoginPage extends BasePage {
   bool? get resizeToAvoidBottomInset => true;
 
   @override
-  PageLogic createPageLogic() => _LoginPageLogic();
+  PageLogic createPageLogic() => _LoginPageLogic(redirectLocation);
 
   Widget _createInputWidget(
     PageScope scope, {
@@ -135,6 +138,9 @@ class LoginPage extends BasePage {
 }
 
 final class _LoginPageLogic extends PageLogic {
+  _LoginPageLogic(this.redirectLocation);
+
+  final String? redirectLocation;
   final accountCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
   bool _redirecting = false;
@@ -155,7 +161,9 @@ final class _LoginPageLogic extends PageLogic {
     if (_redirecting) return;
     if (ref.read(authSessionProvider)?.isValid != true) return;
     _redirecting = true;
-    ref.read(appRouterProvider).replaceAll(RootRoute.location);
+    ref
+        .read(appRouterProvider)
+        .replaceAll(redirectLocation ?? RootRoute.location);
   }
 
   @override

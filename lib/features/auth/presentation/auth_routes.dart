@@ -15,6 +15,8 @@ final class LoginRoute extends AppPageRoute {
 
   @override
   Widget buildPage(BuildContext context, AppRouteState state) {
-    return LoginPage();
+    return LoginPage(
+      redirectLocation: readInternalRedirect(state.queryParameters['redirect']),
+    );
   }
 }

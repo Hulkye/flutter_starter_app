@@ -4,6 +4,9 @@ import '../../shared/services/auth/auth.dart';
 
 enum AppBootstrapTarget { root, login }
 
+/// App bootstrap 是否已完成。
+final appBootstrapCompletedProvider = StateProvider<bool>((ref) => false);
+
 typedef AppReader = T Function<T>(ProviderListenable<T> provider);
 
 final appBootstrapCoordinatorProvider = Provider<AppBootstrapCoordinator>(

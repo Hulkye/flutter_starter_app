@@ -40,7 +40,10 @@ ref.read(appRouterProvider).push(const LoginRoute().location);
 
 ## 守卫规则
 
-- 登录守卫依赖稳定的会话 Provider/Service。
+- `core/router` 守卫只消费 `RouteAccessDecision`，不直接读取具体业务状态。
+- App 组合层监听会话、启动、升级、资料、权限或租户 Provider，并按业务优先级生成最终决策。
+- 使用 `RedirectRoute.appliesToPublicRoutes` 显式声明强制升级等全局门禁是否覆盖公开路由。
+- 使用 `RedirectRoute.preserveTarget` 显式声明登录后是否返回原始目标页。
 - 公开路由通过 `AppPageRoute.public` 标记。
 - 登录路径应使用 `const LoginRoute().location`，避免硬编码分散。
 

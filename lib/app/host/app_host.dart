@@ -52,7 +52,9 @@ class _AppHostState extends ConsumerState<AppHost> {
       AppBootstrapTarget.root => RootRoute.location,
       AppBootstrapTarget.login => const LoginRoute().location,
     };
-    if (appRouter.location == targetLocation) return;
-    appRouter.replaceAll(targetLocation);
+    ref.read(appBootstrapCompletedProvider.notifier).state = true;
+    if (appRouter.location != targetLocation) {
+      appRouter.replaceAll(targetLocation);
+    }
   }
 }

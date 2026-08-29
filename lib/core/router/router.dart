@@ -39,3 +39,4 @@ export 'definitions/router_definitions.dart';
 export 'router_provider.dart';
 export 'router_navigator.dart';
 export 'router_guard.dart';
+export 'route_access_decision.dart';

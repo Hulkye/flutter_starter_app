@@ -44,7 +44,8 @@
 - `AuthRepositoryImpl` 只负责调用数据源、校验响应并返回 `AuthSession`，不直接写 `authSessionProvider`。
 - 登录成功后的会话写入由 `AuthSessionController` 或共享会话服务负责，保持登录态单一状态源。
 - 退出登录这类 App 级会话能力应通过 `AuthSessionController` 或共享服务暴露。
-- 路由守卫应监听稳定的会话状态，而不是页面 ViewModel。
+- 路由守卫只消费 App 组合层注入的 `RouteAccessDecision`，不直接枚举具体业务状态；
+  登录、启动、升级、资料、权限和租户等状态由组合层按业务优先级解析为最终决策。
 
 ## MVVM 边界
 

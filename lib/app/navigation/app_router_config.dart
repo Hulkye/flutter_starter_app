@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/router/router.dart';
 import '../../features/auth/presentation/auth_routes.dart';
 import '../../features/features.dart';
+import '../../shared/services/auth/auth.dart';
 import '../../shared/webview/webview.dart';
+import '../host/app_bootstrap_coordinator.dart';
 import 'shell/root_shell_route.dart';
 import 'splash/splash_route.dart';
 
@@ -21,7 +23,6 @@ AppRouterConfig createAppRouterConfig() {
       const AuthWebPageRoute(),
     ],
     initialLocation: const SplashRoute().location,
-    loginLocation: const LoginRoute().location,
   );
 }
 
@@ -29,5 +30,26 @@ AppRouterConfig createAppRouterConfig() {
 List<Override> createAppRouterOverrides() {
   return <Override>[
     appRouterConfigProvider.overrideWith((ref) => createAppRouterConfig()),
+    routeAccessDecisionProvider.overrideWith((ref) {
+      if (!ref.watch(appBootstrapCompletedProvider)) {
+        return RedirectRoute(
+          location: SplashRoute().location,
+          appliesToPublicRoutes: true,
+        );
+      }
+
+      final authenticated = ref.watch(authSessionProvider)?.isValid == true;
+      if (authenticated) {
+        return AllowRoute(
+          redirects: <String, String>{
+            const LoginRoute().location: RootRoute.location,
+          },
+        );
+      }
+      return RedirectRoute(
+        location: const LoginRoute().location,
+        preserveTarget: true,
+      );
+    }),
   ];
 }

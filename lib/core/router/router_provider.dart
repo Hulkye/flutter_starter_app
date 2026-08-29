@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../shared/services/auth/auth.dart';
 import '../../shared/widgets/toast/toast_util.dart';
 import 'app_router_transfor.dart';
 import 'base_navigator.dart';
 import 'definitions/router_definitions.dart';
+import 'route_access_decision.dart';
 import 'router_guard.dart';
 import 'router_navigator.dart';
 
@@ -21,7 +21,6 @@ final class AppRouterConfig {
   const AppRouterConfig({
     required this.routeNodes,
     required this.initialLocation,
-    required this.loginLocation,
   });
 
   /// 完整应用路由节点。
@@ -30,8 +29,6 @@ final class AppRouterConfig {
   /// GoRouter 初始 location。
   final String initialLocation;
 
-  /// 未登录访问受保护页面时跳转的登录页 location。
-  final String loginLocation;
 }
 
 /// 应用路由配置 Provider。
@@ -41,6 +38,13 @@ final class AppRouterConfig {
 final appRouterConfigProvider = Provider<AppRouterConfig>((ref) {
   throw StateError(
     'appRouterConfigProvider must be overridden by the app composition layer.',
+  );
+});
+
+/// App 组合层可覆盖的最终路由访问决策。
+final routeAccessDecisionProvider = Provider<RouteAccessDecision>((ref) {
+  throw StateError(
+    'routeAccessDecisionProvider must be overridden by the app composition layer.',
   );
 });
 
@@ -59,7 +63,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   final routerConfig = ref.watch(appRouterConfigProvider);
   final refreshNotifier = _RouterRefreshNotifier();
   ref.onDispose(refreshNotifier.dispose);
-  ref.listen<AuthSession?>(authSessionProvider, (_, _) {
+  ref.listen<RouteAccessDecision>(routeAccessDecisionProvider, (_, _) {
     refreshNotifier.refresh();
   });
 
@@ -68,9 +72,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: routerConfig.initialLocation,
     observers: [ToastUtil.navigatorObserver],
     refreshListenable: refreshNotifier,
-    redirect: createAuthGuard(
-      loginPath: routerConfig.loginLocation,
-      isAuthenticated: () => ref.read(authSessionProvider)?.isValid == true,
+    redirect: createAccessGuard(
+      accessDecision: () => ref.read(routeAccessDecisionProvider),
       publicPaths: collectPublicRoutePatterns(routerConfig.routeNodes),
     ),
     routes: routerConfig.routeNodes.map(toRouteBase).toList(),
