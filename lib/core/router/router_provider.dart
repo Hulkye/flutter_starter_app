@@ -28,7 +28,6 @@ final class AppRouterConfig {
 
   /// GoRouter 初始 location。
   final String initialLocation;
-
 }
 
 /// 应用路由配置 Provider。
