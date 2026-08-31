@@ -136,12 +136,12 @@ class RootShellPage extends BasePage {
 `core/router` 不维护具体应用路由表；应用总路由图由 `lib/app/navigation/app_router_config.dart` 在 App 组合层创建，并通过 `appRouterConfigProvider` 注入：
 
 ```dart
-AppRouterConfig createAppRouterConfig() {
+AppRouterConfig createAppRouterConfig(AppFeatureRegistry featureRegistry) {
   return AppRouterConfig(
     routeNodes: <AppRouteNode>[
       const SplashRoute(),
-      ...buildRootRouteNodes(),
-      ...appFeatureRoutes,
+      ...buildRootRouteNodes(tabs: featureRegistry.tabs),
+      ...featureRegistry.routes,
       const WebPageRoute(),
       const AuthWebPageRoute(),
     ],
@@ -153,15 +153,13 @@ AppRouterConfig createAppRouterConfig() {
 - `SplashRoute`：启动展示页，属于 `lib/app/navigation/splash/`。
 - `RootRoute`：有 Tab 时才注册，`/` 重定向到默认 Tab。
 - `RootShellRoute`：有 Tab 时才注册的底部 Tab Shell，属于 `lib/app/navigation/shell/`。
-- `appFeatureRoutes`：从 `features/features.dart` 汇聚的普通业务页面路由；已挂到 Shell Tab 的根路由不会重复注册到顶层。
+- `featureRegistry.routes`：当前环境启用的普通业务页面路由；已挂到 Shell Tab 的根路由不会重复注册到顶层。
 - `WebPageRoute` / `AuthWebPageRoute`：来自 `shared/webview` 的通用 WebView 公共路由，由 App 组合层注册，不作为业务 Feature。
 
-同时，`RootShellRoute` 不再手写 tab 分支，而是从 `features/features.dart` 汇聚的 `appFeatureTabs` 自动装配：
+同时，`RootShellRoute` 不再手写 tab 分支，而是从当前环境的 Feature 注册表自动装配：
 
 ```dart
-final List<AppTabEntry> appFeatureTabs = [
-  for (final feature in appFeatures) ...feature.tabs,
-];
+buildRootRouteNodes(tabs: featureRegistry.tabs);
 ```
 
 这样一个 Feature 可以：
@@ -171,7 +169,7 @@ final List<AppTabEntry> appFeatureTabs = [
 - 通过 `providerOverrides` 提供默认 data 实现装配，例如 Repository binding。
 - 由 App Shell 统一决定展示顺序，而不是把业务页面写死在 Shell 内部。
 
-`Application.run()` 会把 `appFeatureProviderOverrides` 与 `createAppRouterOverrides()` 加入 `ProviderScope.overrides`。`goRouterProvider` 只消费注入后的 `AppRouterConfig` 创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。登录态统一来自 `authSessionProvider`；登录态变化只刷新 redirect，不重建 Router，避免重复应用 `initialLocation`。
+`Application.run()` 会按当前环境构建一次 `AppFeatureRegistry`，把其中的 `providerOverrides` 与 `createAppRouterOverrides(featureRegistry)` 加入 `ProviderScope.overrides`。路由、Tab 和依赖注入因此始终来自同一批启用 Feature。`goRouterProvider` 只消费注入后的 `AppRouterConfig` 创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。
 
 ## 导航用法
 
@@ -242,7 +240,8 @@ final class DemoFeature extends AppFeature {
   const DemoFeature();
 
   @override
-  String get name => 'demo';
+  AppFeatureMetadata get metadata =>
+      const AppFeatureMetadata(key: 'demo', priority: 400);
 
   @override
   List<AppPageRoute> get routes => const [DemoRoute()];
@@ -256,7 +255,8 @@ final class DemoFeature extends AppFeature {
   const DemoFeature();
 
   @override
-  String get name => 'demo';
+  AppFeatureMetadata get metadata =>
+      const AppFeatureMetadata(key: 'demo', priority: 400);
 
   @override
   List<AppPageRoute> get routes => const [DemoRoute()];
@@ -303,7 +303,7 @@ const List<AppFeature> appFeatures = [
 ];
 ```
 
-完成后，`appFeatureRoutes` 会自动展开所有 Feature 的普通页面路由，`appFeatureTabs` 会自动汇聚底部 Tab 入口。已作为 Tab 根路由挂到 `RootShellRoute` 的页面不会再重复加入顶层路由表。
+完成后，`AppFeatureRegistry` 会按环境筛选、按 priority 和 key 排序，并展开普通页面路由、Tab 与 Provider overrides。已作为 Tab 根路由挂到 `RootShellRoute` 的页面不会再重复加入顶层路由表。Feature key、route path、Tab key 冲突以及 Tab route 来源不匹配会在注册表构建时立即失败。
 
 如果业务页面需要通过 `header.dart` 使用新 route class，再把它加入公共导出文件：
 
@@ -335,7 +335,7 @@ lib/app/navigation/
 当前 Shell 结构：
 
 - 有 Tab 时，`/` 由 `RootRoute` 重定向到默认 Feature Tab。
-- `RootShellRoute` 从 `appFeatureTabs` 自动装配底部 Tab 分支。
+- `RootShellRoute` 从当前环境 `AppFeatureRegistry.tabs` 自动装配底部 Tab 分支。
 - 没有 Tab 时，不注册 `RootRoute` 和 `RootShellRoute`，避免 `/` 自重定向；模板使用者应提供明确的首页路由或自定义启动后的目标页。
 - `app_router_config.dart` 负责把 Splash、Root/Shell、Feature 路由与 App 公共路由组合成 `AppRouterConfig` 并注入 core/router。
 - GoRouter 的 `StatefulShellRoute` 只存在于 `app_router_transfor.dart`，不会暴露给业务 Feature。

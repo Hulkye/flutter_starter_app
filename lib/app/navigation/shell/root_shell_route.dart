@@ -1,15 +1,13 @@
 import '../../../core/feature/app_tab_entry.dart';
 import '../../../core/router/router.dart';
-import '../../../features/features.dart';
 import 'root_shell_page.dart';
 
-List<AppRouteNode> buildRootRouteNodes({List<AppTabEntry>? tabs}) {
-  final entries = tabs ?? appFeatureTabs;
-  if (entries.isEmpty) return const <AppRouteNode>[];
+List<AppRouteNode> buildRootRouteNodes({required List<AppTabEntry> tabs}) {
+  if (tabs.isEmpty) return const <AppRouteNode>[];
 
   return <AppRouteNode>[
-    RootRoute(redirectTo: entries.first.initialLocation),
-    RootShellRoute(tabs: entries),
+    RootRoute(redirectTo: tabs.first.initialLocation),
+    RootShellRoute(tabs: tabs),
   ];
 }
 

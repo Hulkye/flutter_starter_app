@@ -34,9 +34,10 @@ void main() {
       await prefsStorage.init();
 
       appConfig = const EnvConfig();
+      final featureRegistry = createAppFeatureRegistry(appConfig.envTag);
       final overrides = [
-        ...appFeatureProviderOverrides,
-        ...createAppRouterOverrides(),
+        ...featureRegistry.providerOverrides,
+        ...createAppRouterOverrides(featureRegistry),
         authSessionProvider.overrideWith(_TestAuthSessionNotifier.new),
         authRepositoryProvider.overrideWith(
           (ref) => const _FakeAuthRepository(),

@@ -401,7 +401,7 @@ noCache · cacheFirst · networkFirst · cacheOnly · networkOnly · staleWhileR
 
 ```text
 Feature Route Node → AppPageRoute / AppShellRoute  → GoRoute / StatefulShellRoute
-Feature Module     → AppFeature / AppTabEntry      → appFeatureRoutes / appFeatureTabs
+Feature Module     → AppFeature / AppTabEntry      → AppFeatureRegistry
 Feature DI         → providerOverrides             → domain binding Provider
 App Composition    → AppRouterConfig               → goRouterProvider
 Page Navigation    → BaseNavigator                 → RouterNavigator
@@ -410,12 +410,13 @@ Page Navigation    → BaseNavigator                 → RouterNavigator
 特点：
 
 - 每个 Feature 自己维护路由定义
-- 每个 Feature 通过 `XxxFeature` 暴露模块路由、可选底部 Tab 入口与默认 Provider 装配
-- `features/features.dart` 汇聚所有 Feature 的路由、Tab 与 Provider overrides
+- 每个 Feature 通过 `XxxFeature` 暴露元数据、模块路由、可选底部 Tab 入口与默认 Provider 装配
+- `features/features.dart` 保留候选列表，并按当前环境创建唯一的 `AppFeatureRegistry`
+- 注册表按 `priority` 升序、Feature key 升序稳定排序，并校验 Feature key、route path 与 Tab key 唯一
 - `features/exports.dart` 只导出业务页面需要的 route class 与公开类型，并由 `header.dart` 汇总
 - `lib/app/navigation/app_router_config.dart` 组合 Splash、Root/Shell、Feature 路由与 App 公共路由，并注入 `core/router`
 - `header.dart` 只作为业务页面便捷入口，App/Core/Shared 内部使用精确 import，避免隐式依赖 Feature
-- App Shell 从 `appFeatureTabs` 自动装配底部 Tab 分支；无 Tab 时不创建 Root redirect / Shell
+- App Shell 从当前环境注册表的 tabs 自动装配底部 Tab 分支；无 Tab 时不创建 Root redirect / Shell
 - 支持公开路由与登录态路由
 - 未登录访问受保护页面时自动跳转登录页
 - 提供 root navigator key，支持非 UI 场景导航
@@ -550,11 +551,13 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 5. 如页面存在可观察业务状态或动作编排，在 `presentation/viewmodels` 中按状态保留需求继承 `BaseVM` 或 `BaseAutoDisposeVM` 管理 UI 状态与业务动作。
 6. 在 `presentation/pages` 中继承 `BasePage` 编写 UI，并在 `page(scope)` 中读取状态、调用 ViewModel 或稳定 Provider。
 7. 在 `<feature>_routes.dart` 中声明路由。
-8. 在 `<feature>_feature.dart` 中继承 `AppFeature` 并暴露路由；如有默认 data 实现，在 `providerOverrides` 中装配 domain binding Provider。
+8. 在 `<feature>_feature.dart` 中继承 `AppFeature`，声明唯一 key、priority、允许环境等元数据并暴露路由；如有默认 data 实现，在 `providerOverrides` 中装配 domain binding Provider。
 9. 在 `features/features.dart` 中注册 `XxxFeature()`；App 路由配置与根 `ProviderScope` 会自动消费 `appFeatures`。
 10. 如 route class 或公开类型需要给业务页面使用，在 `features/exports.dart` 中导出。
 
 ViewModel 只依赖 domain 抽象 Provider，不直接 import `data/repositories` 或 `data/datasources`。
+
+`AppFeatureMetadata.permissions` 只声明业务权限 key，不执行鉴权；`experimental` 只标记实验模块。默认启用全部环境、无权限且非实验功能。注册表发现 Feature key、route path、Tab key 冲突或 Tab 引用了所属 Feature 未声明的路由时会立即失败。
 
 推荐最小结构：
 

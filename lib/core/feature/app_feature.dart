@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 
 import 'app_tab_entry.dart';
+import 'app_feature_metadata.dart';
 
 /// Feature 对 App 暴露能力的统一协议。
 ///
@@ -10,8 +11,11 @@ import 'app_tab_entry.dart';
 abstract class AppFeature {
   const AppFeature();
 
-  /// Feature 标识，用于日志、调试、菜单、权限或埋点。
-  String get name;
+  /// Feature 的身份、排序和启用策略元数据。
+  AppFeatureMetadata get metadata;
+
+  /// Feature 标识的便捷访问。
+  String get key => metadata.key;
 
   /// 模块下的路由
   List<AppPageRoute> get routes;

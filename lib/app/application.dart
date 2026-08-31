@@ -27,9 +27,10 @@ class Application {
       appRunner: () async {
         WidgetsFlutterBinding.ensureInitialized();
         await bootstrap();
+        final featureRegistry = createAppFeatureRegistry(envConfig.envTag);
         final overrides = [
-          ...appFeatureProviderOverrides,
-          ...createAppRouterOverrides(),
+          ...featureRegistry.providerOverrides,
+          ...createAppRouterOverrides(featureRegistry),
         ];
         runApp(ProviderScope(overrides: overrides, child: const App()));
       },

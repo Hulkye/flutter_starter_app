@@ -1,8 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_starter_app/core/feature/app_tab_entry.dart';
-import 'package:flutter_starter_app/core/router/router.dart';
-
+import '../core/config/env_config.dart';
 import '../core/feature/app_feature.dart';
+import '../core/feature/app_feature_registry.dart';
 import 'auth/auth_feature.dart';
 import 'profile/profile_feature.dart';
 import 'todo/todo_feature.dart';
@@ -14,20 +12,7 @@ const List<AppFeature> appFeatures = [
   ProfileFeature(),
 ];
 
-final List<AppTabEntry> appFeatureTabs = [
-  for (final feature in appFeatures) ...feature.tabs,
-];
-
-final Set<String> _appFeatureTabRoutePaths = {
-  for (final tab in appFeatureTabs) tab.route.path,
-};
-
-final List<AppPageRoute> appFeatureRoutes = [
-  for (final feature in appFeatures)
-    for (final route in feature.routes)
-      if (!_appFeatureTabRoutePaths.contains(route.path)) route,
-];
-
-final List<Override> appFeatureProviderOverrides = [
-  for (final feature in appFeatures) ...feature.providerOverrides,
-];
+/// 构建指定环境下唯一的 Feature 注册结果。
+AppFeatureRegistry createAppFeatureRegistry(EnvTag environment) {
+  return AppFeatureRegistry(candidates: appFeatures, environment: environment);
+}

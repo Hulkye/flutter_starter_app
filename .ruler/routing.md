@@ -7,7 +7,9 @@
 - 一个 Route class 表达一个路由目标和页面构建方式。
 - 页面 Route class 继承 `AppPageRoute`，Shell/Redirect 使用对应的 `AppRouteNode` 子类。
 - Feature 通过 `XxxFeature extends AppFeature` 暴露路由。
-- `features/features.dart` 汇聚普通业务路由、可选底部 Tab 入口与 Feature Provider 覆盖项。
+- `features/features.dart` 保留候选 Feature，`AppFeatureRegistry` 按环境筛选并统一派生普通业务路由、可选底部 Tab 入口与 Provider 覆盖项。
+- Feature 必须声明唯一 key 和显式 priority；priority 越小越靠前，相同时按 key 稳定排序。
+- 注册表必须 fail-fast 校验 Feature key、route path、Tab key 唯一，并校验 Tab route 由所属 Feature 声明。
 - `features/exports.dart` 汇聚业务页面需要通过 `header.dart` 使用的 route class 和公开类型。
 - App 组合层通过 `lib/app/navigation/app_router_config.dart` 组装 Splash、Root/Shell、Feature 路由与 App 公共路由，并以 `AppRouterConfig` 注入 `core/router`。
 - 通用页面能力的公共路由可由 App 组合层直接注册，例如 `shared/webview` 的 `WebPageRoute` / `AuthWebPageRoute`；不要为这类非业务能力创建 `AppFeature`。
@@ -17,7 +19,7 @@
 ## 新增路由流程
 
 1. 在 `lib/features/<feature>/presentation/<feature>_routes.dart` 创建 `XxxRoute extends AppPageRoute`。
-2. 在 `lib/features/<feature>/<feature>_feature.dart` 创建 `XxxFeature extends AppFeature`。
+2. 在 `lib/features/<feature>/<feature>_feature.dart` 创建 `XxxFeature extends AppFeature`，声明 `AppFeatureMetadata` 的唯一 key、priority 与允许环境。
 3. 在 `XxxFeature.routes` 中返回当前 Feature 的路由列表。
 4. 如需底部 Tab，在 `XxxFeature.tabs` 中返回 `AppTabEntry`，由 `RootShellRoute` 自动装配。
 5. 如存在默认 data 实现，在 `XxxFeature.providerOverrides` 中装配 domain binding Provider。

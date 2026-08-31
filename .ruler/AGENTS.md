@@ -13,7 +13,8 @@
 - ViewModel 只依赖 domain repository 抽象 Provider，不直接 import data 层 Provider；默认 data 实现由 `XxxFeature.providerOverrides` 声明，并由 App 组合层汇聚装配。
 - 业务页面导航优先使用 `package:flutter_starter_app/header.dart` 中统一导出的路由与 `appRouterProvider`。
 - `header.dart` 是业务页面便捷入口；`app/`、`core/`、`shared/` 内部必须使用精确 import，避免经由 `header.dart -> features/exports.dart` 形成隐式反向依赖。
-- `features/features.dart` 是 App Feature 注册表，负责汇聚 `appFeatures`、`appFeatureRoutes`、`appFeatureTabs` 与 `appFeatureProviderOverrides`；`features/exports.dart` 只导出业务页面需要的 route class 和公开类型。
+- `features/features.dart` 保留 App Feature 候选列表，并按环境创建唯一 `AppFeatureRegistry`；路由、Tab 与 Provider overrides 必须从同一注册表实例派生。`features/exports.dart` 只导出业务页面需要的 route class 和公开类型。
+- 每个 `AppFeature` 必须声明唯一 key 与显式 priority；注册表按环境筛选，校验 Feature key、route path、Tab key 唯一，并校验 Tab route 来源，不得静默去重或覆盖。
 - 模板使用者的业务背景、业务术语和项目特殊约束优先维护在 `.ruler/project_profile.md`；不要为了补充业务介绍而改动模板通用规则。
 - 如存在本地私有补充文件 `.ruler/local_profile.md`，可结合其中信息理解当前工作区，但不要要求提交该文件，也不要在其中记录密钥、Token、账号密码等敏感信息。
 - 修改代码后优先运行 `flutter analyze`；涉及测试逻辑时补充或运行 `flutter test`。

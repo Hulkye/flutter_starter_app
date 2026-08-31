@@ -298,6 +298,7 @@ final class OrderRoute extends AppPageRoute {
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/feature/app_feature.dart';
+import '../../core/feature/app_feature_metadata.dart';
 import '../../core/router/router.dart';
 import 'data/datasources/order_datasource.dart';
 import 'data/repositories/order_repository_impl.dart';
@@ -308,7 +309,12 @@ final class OrderFeature extends AppFeature {
   const OrderFeature();
 
   @override
-  String get name => 'order';
+  AppFeatureMetadata get metadata => const AppFeatureMetadata(
+    key: 'order',
+    priority: 400,
+    enabledEnvironments: <EnvTag>{EnvTag.dev, EnvTag.sit, EnvTag.prod},
+    permissions: <String>{'order.read'},
+  );
 
   @override
   List<AppPageRoute> get routes => const [OrderRoute()];
@@ -326,6 +332,8 @@ final class OrderFeature extends AppFeature {
 
 如果该 Feature 需要作为底部 Tab 入口，再额外覆盖 `tabs` 并返回 `AppTabEntry`。默认没有 Tab 的 Feature 只需要暴露 `routes`。Repository 的默认 data 实现在 `XxxFeature.providerOverrides` 中装配，ViewModel 仍只依赖 domain 抽象 Provider，不直接 import data 层。
 
+`metadata.key` 在 App 内必须唯一；`priority` 越小越靠前，相同时按 key 排序。`enabledEnvironments` 声明允许启用的环境，默认覆盖 dev、sit、prod。`permissions` 只记录业务权限 key，不执行鉴权；`experimental` 只作为实验功能标识。
+
 ### 3. 注册到 Feature 汇聚入口
 
 打开 `lib/features/features.dart`，补充 import 与 `appFeatures` 注册项：
@@ -341,7 +349,7 @@ const List<AppFeature> appFeatures = [
 ];
 ```
 
-`lib/app/navigation/app_router_config.dart` 会从 `appFeatures` 读取 `appFeatureRoutes` 与 `appFeatureTabs`，并通过 `AppRouterConfig` 注入 `core/router`。`Application.run()` 会把 `appFeatureProviderOverrides` 加入根 `ProviderScope`。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart` 或 App 启动入口。
+`Application.run()` 会按 `EnvConfig.envTag` 从 `appFeatures` 构建一次 `AppFeatureRegistry`。`lib/app/navigation/app_router_config.dart` 和根 `ProviderScope` 共同消费该注册表的 routes、tabs 与 provider overrides。注册表会在启动时校验 Feature key、route path、Tab key 唯一，并校验 Tab route 由所属 Feature 声明。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart` 或 App 启动入口。
 
 如果 route class 或公开类型需要给业务页面通过 `header.dart` 使用，在 `lib/features/exports.dart` 补充导出：
 

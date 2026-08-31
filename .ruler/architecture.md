@@ -21,7 +21,8 @@
 - `presentation/viewmodels/`：页面状态与业务动作。
 - `presentation/<feature>_routes.dart`：当前 Feature 的路由定义。
 - `<feature>_feature.dart`：当前 Feature 对 App 暴露的模块声明，包括路由、Tab 入口和默认 Provider 覆盖项。
-- `lib/features/features.dart`：App Feature 注册表，汇聚 `appFeatures`、`appFeatureRoutes`、`appFeatureTabs` 与 `appFeatureProviderOverrides`。
+- `lib/core/feature/`：定义 `AppFeatureMetadata` 与 `AppFeatureRegistry`；注册表统一负责环境筛选、稳定排序、冲突校验和 routes/tabs/provider overrides 派生。
+- `lib/features/features.dart`：保留 App Feature 候选列表，并按 `EnvTag` 创建唯一注册表实例。
 - `lib/features/exports.dart`：业务页面公共导出入口，只导出 route class 和明确需要跨模块使用的公开类型，避免通过 `header.dart` 暴露默认 data 装配。
 - 简单页面不要为了保持目录形式统一而创建空 ViewModel、空 State、空 Repository、空 DataSource 或空目录。
 

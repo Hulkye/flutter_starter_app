@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../core/feature/app_feature.dart';
+import '../../core/feature/app_feature_metadata.dart';
 import '../../core/feature/app_tab_entry.dart';
 import '../../core/l10n/l10n.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
@@ -11,7 +12,8 @@ final class ProfileFeature extends AppFeature {
   const ProfileFeature();
 
   @override
-  String get name => 'profile';
+  AppFeatureMetadata get metadata =>
+      const AppFeatureMetadata(key: 'profile', priority: 300);
 
   @override
   List<AppPageRoute> get routes => const [ProfileRoute()];

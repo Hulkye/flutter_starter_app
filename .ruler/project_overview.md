@@ -18,10 +18,10 @@
 - `lib/app/navigation/`：App 路由图组合、Splash、Root/Shell 导航骨架与 `AppRouterConfig` 注入。
 - `lib/core/`：全局基础设施，不承载具体业务。
 - `lib/core/config/`：环境配置 `EnvConfig` / `EnvTag` / `appConfig`。
-- `lib/core/feature/`：`AppFeature` 模块协议。
+- `lib/core/feature/`：`AppFeature` 模块协议、元数据与环境注册表。
 - `lib/core/router/`：路由抽象、GoRouter 适配、Provider、守卫；不装配具体 App/Feature 路由。
 - `lib/features/`：业务功能模块，按 Feature 聚合。
-- `lib/features/features.dart`：App Feature 注册表，汇聚业务路由、Tab 入口与默认 Provider 覆盖项。
+- `lib/features/features.dart`：App Feature 候选注册入口，按环境构建 `AppFeatureRegistry`。
 - `lib/features/exports.dart`：业务页面可用的 Route class 与公开类型统一导出入口。
 - `lib/shared/`：跨 Feature 共享的基础表现层、服务、Controller、事件总线、组件与通用能力。
 - `lib/shared/webview/`：通用 WebView 页面、配置与公共路由。

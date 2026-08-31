@@ -7,6 +7,7 @@ import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_starter_app/core/theme/theme.dart';
 
 import '../../core/feature/app_feature.dart';
+import '../../core/feature/app_feature_metadata.dart';
 import 'data/datasources/todo_local_datasource.dart';
 import 'data/repositories/todo_repository_impl.dart';
 import 'domain/repositories/todo_repository.dart';
@@ -16,7 +17,8 @@ final class TodoFeature extends AppFeature {
   const TodoFeature();
 
   @override
-  String get name => 'todo';
+  AppFeatureMetadata get metadata =>
+      const AppFeatureMetadata(key: 'todo', priority: 200);
 
   @override
   List<AppPageRoute> get routes => const [TodoRoute()];

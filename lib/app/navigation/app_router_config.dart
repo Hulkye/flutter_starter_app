@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/feature/app_feature_registry.dart';
 import '../../core/router/router.dart';
 import '../../features/auth/presentation/auth_routes.dart';
-import '../../features/features.dart';
 import '../../shared/services/auth/auth.dart';
 import '../../shared/webview/webview.dart';
 import '../host/app_bootstrap_coordinator.dart';
@@ -13,12 +13,12 @@ import 'splash/splash_route.dart';
 ///
 /// 应用层负责组合 Splash、Root Shell 和业务 Feature 路由；
 /// core/router 只消费 [AppRouterConfig]，不直接依赖具体 Feature。
-AppRouterConfig createAppRouterConfig() {
+AppRouterConfig createAppRouterConfig(AppFeatureRegistry featureRegistry) {
   return AppRouterConfig(
     routeNodes: <AppRouteNode>[
       const SplashRoute(),
-      ...buildRootRouteNodes(),
-      ...appFeatureRoutes,
+      ...buildRootRouteNodes(tabs: featureRegistry.tabs),
+      ...featureRegistry.routes,
       const WebPageRoute(),
       const AuthWebPageRoute(),
     ],
@@ -27,9 +27,11 @@ AppRouterConfig createAppRouterConfig() {
 }
 
 /// App 路由配置的 Provider 覆盖项。
-List<Override> createAppRouterOverrides() {
+List<Override> createAppRouterOverrides(AppFeatureRegistry featureRegistry) {
   return <Override>[
-    appRouterConfigProvider.overrideWith((ref) => createAppRouterConfig()),
+    appRouterConfigProvider.overrideWith(
+      (ref) => createAppRouterConfig(featureRegistry),
+    ),
     routeAccessDecisionProvider.overrideWith((ref) {
       if (!ref.watch(appBootstrapCompletedProvider)) {
         return RedirectRoute(

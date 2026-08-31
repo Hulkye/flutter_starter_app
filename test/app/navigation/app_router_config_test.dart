@@ -1,16 +1,20 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_starter_app/app/navigation/app_router_config.dart';
 import 'package:flutter_starter_app/app/host/app_bootstrap_coordinator.dart';
+import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
+import 'package:flutter_starter_app/features/features.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  final featureRegistry = createAppFeatureRegistry(EnvTag.dev);
+
   test('app router overrides provide config and access decision together', () {
     final container = ProviderContainer(
       overrides: [
-        ...createAppRouterOverrides(),
+        ...createAppRouterOverrides(featureRegistry),
         appBootstrapCompletedProvider.overrideWith((ref) => true),
         authSessionProvider.overrideWith(() => _TestAuthSessionNotifier(null)),
       ],
@@ -24,7 +28,7 @@ void main() {
   test('authenticated app router decision allows login redirect to home', () {
     final container = ProviderContainer(
       overrides: [
-        ...createAppRouterOverrides(),
+        ...createAppRouterOverrides(featureRegistry),
         appBootstrapCompletedProvider.overrideWith((ref) => true),
         authSessionProvider.overrideWith(
           () => _TestAuthSessionNotifier(const AuthSession(token: 'token')),
@@ -55,7 +59,7 @@ void main() {
   test('bootstrap keeps routing at splash until completion', () {
     final container = ProviderContainer(
       overrides: [
-        ...createAppRouterOverrides(),
+        ...createAppRouterOverrides(featureRegistry),
         appBootstrapCompletedProvider.overrideWith((ref) => false),
       ],
     );
