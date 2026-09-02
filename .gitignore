@@ -27,6 +27,8 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 build/
+android/deep_links.properties
+ios/Flutter/DeepLinks.generated.xcconfig
 coverage/
 **/doc/api/
 pubspec.lock

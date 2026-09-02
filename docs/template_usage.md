@@ -177,6 +177,55 @@ await Application.run(
 | SIT | 测试环境、联调环境 |
 | Prod | 生产环境 |
 
+### 配置深链和外链
+
+模板在 App 层统一接收 App Scheme、Universal Links、Android App Links 和外部网页链接。
+页面不需要自行解析 URL。每个允许被外部打开的 `AppPageRoute` 必须显式覆盖
+`deepLinkEnabled`，默认值为 `false`。链接的 path 和 query 会统一转换为
+`AppNavigationCommand`，页面只通过 `AppRouteState` 读取自己需要的参数，未知参数忽略。
+
+Deep Link 实现位于 `lib/integrations/deep_link/`，属于可选的外部集成能力，不属于
+`lib/features/` 业务 Feature。App 组合层通过 `DeepLinkCapability` 和
+`AppCapabilityRegistry` 装配它；未装配时使用禁用能力，不启动平台链接监听，也不影响
+普通路由和登录流程。
+
+在各环境的 `EnvConfig` 中填写可选的 Deep Link 配置：
+
+```dart
+const EnvConfig(
+  deepLinkConfig: DeepLinkConfig(
+    appScheme: 'replace_me',
+    appLinkHost: 'links.example.com',
+  ),
+)
+```
+
+系统是否将 HTTPS 链接交给 App，由 Android App Links 和 iOS Universal Links 的原生关联
+配置决定。App 收到链接后按 path 分发；网页统一使用 `/web?url=...`，不会再单独配置网页
+host 白名单或认证网页入口。
+
+配置 Android App Links 前，需要在关联域名部署 `/.well-known/assetlinks.json`，内容必须匹配 application ID 和
+发布签名证书 SHA-256。iOS 需要为 Runner 配置 Associated Domains，并在关联域名部署
+`apple-app-site-association`，内容必须匹配 Team ID、Bundle ID 和允许路径。
+
+原生配置不需要手动维护。Deep Link 默认关闭，`config/deep_links.json` 是可选配置源。
+需要启用时，先复制 `config/deep_links.json.example` 为 `config/deep_links.json`，填写各环境值，
+再按环境执行：
+
+```bash
+dart run script/configure_links.dart --env dev
+flutter build apk -t lib/main_dev.dart
+```
+
+如果 `config/deep_links.json` 不存在，脚本会清理旧的原生 Deep Link 配置并正常退出。
+配置存在但格式或值非法时，脚本会报错。有效配置时，脚本会生成 `android/deep_links.properties` 和
+`ios/Flutter/DeepLinks.generated.xcconfig`，这两个文件已加入 `.gitignore`，由 Android
+Gradle 和 iOS xcconfig 自动读取。CI 应在构建前执行对应环境的生成命令，并使用
+`--check` 检查生成文件没有被手工修改或过期；不同环境必须分别执行脚本。
+
+链接解析失败只返回分类错误，不自动回首页、不自动打开任意网页；产品层可以通过
+`DeepLinkResolution` 的失效原因决定后续展示策略。
+
 ---
 
 ## ➕ 新增业务 Feature

@@ -107,6 +107,9 @@ void main(List<String> args) {
     report.addNotice(
       'Generated localization files under $_generatedL10nDirectory were not edited. Run ./script/gen_l10n.sh after renaming.',
     );
+    report.addNotice(
+      'Deep link native files are generated from config/deep_links.json. Run dart run script/configure_links.dart --env <dev|sit|prod> before building.',
+    );
     report.print(dryRun: options.dryRun);
   } on _RenameException catch (error) {
     stderr.writeln(error.message);

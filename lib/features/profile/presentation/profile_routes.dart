@@ -11,6 +11,9 @@ final class ProfileRoute extends AppPageRoute {
   String get path => '/profile';
 
   @override
+  bool get deepLinkEnabled => true;
+
+  @override
   Widget buildPage(BuildContext context, AppRouteState state) {
     return const ProfilePage();
   }

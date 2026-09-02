@@ -2,7 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/router/router.dart';
+import '../capabilities/app_capability_registry.dart';
 import '../../features/auth/presentation/auth_routes.dart';
+import 'app_lifecycle_coordinator.dart';
 import '../navigation/shell/root_shell_route.dart';
 import '../navigation/splash/splash_route.dart';
 import 'app_bootstrap_coordinator.dart';
@@ -19,6 +21,7 @@ class AppHost extends ConsumerStatefulWidget {
 
 class _AppHostState extends ConsumerState<AppHost> {
   late final AppSessionCoordinator _sessionCoordinator;
+  late final AppLifecycleCoordinator _lifecycleCoordinator;
   bool _bootstrapStarted = false;
 
   @override
@@ -28,7 +31,11 @@ class _AppHostState extends ConsumerState<AppHost> {
       read: ref.read,
       context: context,
     );
+    _lifecycleCoordinator = AppLifecycleCoordinator(
+      ref.read(appCapabilityRegistryProvider),
+    );
     _sessionCoordinator.start();
+    _lifecycleCoordinator.start();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _bootstrapStarted) return;
       _bootstrapStarted = true;
@@ -56,5 +63,6 @@ class _AppHostState extends ConsumerState<AppHost> {
     if (appRouter.location != targetLocation) {
       appRouter.replaceAll(targetLocation);
     }
+    _lifecycleCoordinator.onBootstrapCompleted();
   }
 }

@@ -161,6 +161,11 @@ final class _LoginPageLogic extends PageLogic {
     if (_redirecting) return;
     if (ref.read(authSessionProvider)?.isValid != true) return;
     _redirecting = true;
+    if (ref
+        .read(appCapabilityRegistryProvider)
+        .dispatchAuthenticatedCommand()) {
+      return;
+    }
     ref
         .read(appRouterProvider)
         .replaceAll(redirectLocation ?? RootRoute.location);

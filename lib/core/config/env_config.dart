@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'deep_link_config.dart';
+
 enum EnvTag {
   dev, // 开发环境
   sit, // 测试环境
@@ -43,6 +45,9 @@ class EnvConfig {
   /// 用户协议URL
   final String userAgreementUrl;
 
+  /// Deep Link 配置；为 null 时表示未启用 Deep Link。
+  final DeepLinkConfig? deepLinkConfig;
+
   const EnvConfig({
     this.envTag = EnvTag.dev,
     this.uiScreenSize = const Size(402, 786),
@@ -56,6 +61,7 @@ class EnvConfig {
     bool? httpAllowBadCertificate,
     this.privacyPolicyUrl = '',
     this.userAgreementUrl = '',
+    this.deepLinkConfig,
   }) : httpLogEnable = httpLogEnable ?? envTag != EnvTag.prod,
        httpRetryEnable = httpRetryEnable ?? true,
        httpBusinessStatusCheckEnable = httpBusinessStatusCheckEnable ?? false,
@@ -86,6 +92,7 @@ class EnvConfig {
     bool? httpAllowBadCertificate,
     String? privacyPolicyUrl,
     String? userAgreementUrl,
+    DeepLinkConfig? deepLinkConfig,
   }) {
     return EnvConfig(
       envTag: envTag ?? this.envTag,
@@ -102,6 +109,7 @@ class EnvConfig {
           httpAllowBadCertificate ?? this.httpAllowBadCertificate,
       privacyPolicyUrl: privacyPolicyUrl ?? this.privacyPolicyUrl,
       userAgreementUrl: userAgreementUrl ?? this.userAgreementUrl,
+      deepLinkConfig: deepLinkConfig ?? this.deepLinkConfig,
     );
   }
 }

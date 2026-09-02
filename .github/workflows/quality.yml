@@ -24,6 +24,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Generate deep link native configuration
+        run: dart run script/configure_links.dart --env dev
+
+      - name: Check deep link native configuration
+        run: dart run script/configure_links.dart --env dev --check
+
       - name: Check formatting
         run: dart format --set-exit-if-changed lib test script
 

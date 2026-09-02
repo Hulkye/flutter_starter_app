@@ -1,0 +1,14 @@
+{
+  "dev": {
+    "appScheme": "replace-me-dev",
+    "appLinkHost": "dev-links.example.com"
+  },
+  "sit": {
+    "appScheme": "replace-me-sit",
+    "appLinkHost": "sit-links.example.com"
+  },
+  "prod": {
+    "appScheme": "replace-me",
+    "appLinkHost": "links.example.com"
+  }
+}

@@ -35,6 +35,13 @@ final class AppFeatureRegistry {
         if (!_tabRoutePaths.contains(route.path)) route,
   ];
 
+  /// 当前环境所有已注册页面路由，包含底部 Tab 路由。
+  late final List<AppPageRoute> allRoutes = [
+    ...routes,
+    for (final tab in tabs)
+      if (!routes.any((route) => route.path == tab.route.path)) tab.route,
+  ];
+
   /// 当前环境启用的 Provider 覆盖项。
   late final List<Override> providerOverrides = [
     for (final feature in features) ...feature.providerOverrides,

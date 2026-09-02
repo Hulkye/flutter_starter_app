@@ -48,6 +48,9 @@ abstract class AppPageRoute extends AppRouteNode {
   /// ```
   String get location => path;
 
+  /// 是否允许通过外部链接打开该路由，默认关闭。
+  bool get deepLinkEnabled => false;
+
   /// 是否无需登录即可访问，默认 false。
   @override
   bool get public => false;

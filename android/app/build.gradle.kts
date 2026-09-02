@@ -1,8 +1,17 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+val deepLinkProperties = Properties().apply {
+    val file = rootProject.file("deep_links.properties")
+    if (file.isFile) {
+        file.inputStream().use(::load)
+    }
 }
 
 android {
@@ -28,6 +37,12 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        deepLinkProperties.getProperty("appScheme")?.let {
+            manifestPlaceholders["appScheme"] = it
+        }
+        deepLinkProperties.getProperty("appLinkHost")?.let {
+            manifestPlaceholders["appLinkHost"] = it
+        }
     }
 
     buildTypes {

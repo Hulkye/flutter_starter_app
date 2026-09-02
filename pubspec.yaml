@@ -63,6 +63,8 @@ dependencies:
   flutter_secure_storage: 9.2.4
   # 路由管理
   go_router: 16.2.4
+  # App Scheme、Universal Links 和 Android App Links
+  app_links: 6.4.1
   # 异常收集捕获
   exception_catcher: 0.1.1
   # loading动画
@@ -104,6 +106,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - config/
     - assets/images/
     - assets/images/dark/
 
