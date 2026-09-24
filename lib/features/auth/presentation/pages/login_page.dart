@@ -1,4 +1,5 @@
 import 'package:flutter_starter_app/header.dart';
+import 'package:flutter_starter_app/app/navigation/pending_navigation_coordinator.dart';
 
 import '../viewmodels/auth_viewmodel.dart';
 
@@ -161,9 +162,7 @@ final class _LoginPageLogic extends PageLogic {
     if (_redirecting) return;
     if (ref.read(authSessionProvider)?.isValid != true) return;
     _redirecting = true;
-    if (ref
-        .read(appCapabilityRegistryProvider)
-        .dispatchAuthenticatedCommand()) {
+    if (ref.read(pendingNavigationCoordinatorProvider).dispatchIfReady()) {
       return;
     }
     ref

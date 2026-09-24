@@ -17,6 +17,9 @@ enum AppNavigationSource {
 }
 
 /// 可由 Deep Link、Push 和其他入口共同使用的 App 导航命令。
+///
+/// 外部入口先转换为该宿主级命令，再由 PendingNavigationCoordinator 统一处理
+/// bootstrap、认证和最终导航。
 final class AppNavigationCommand {
   const AppNavigationCommand({
     required this.path,

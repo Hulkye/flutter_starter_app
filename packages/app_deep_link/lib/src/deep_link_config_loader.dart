@@ -5,10 +5,10 @@ import 'package:flutter/services.dart';
 
 import 'deep_link_config.dart';
 
-/// 深链配置文件路径。
+/// App 资源中 Deep Link 配置文件的固定路径。
 const deepLinkConfigAssetPath = 'config/deep_links.json';
 
-/// 从与原生构建配置相同的 JSON 资源读取当前环境深链配置。
+/// 从配置资源中读取指定环境的 Deep Link 配置。
 Future<DeepLinkConfig> loadDeepLinkConfig({
   required String environment,
   AssetBundle? bundle,
@@ -29,7 +29,10 @@ Future<DeepLinkConfig> loadDeepLinkConfig({
   return DeepLinkConfig.fromJson(environmentConfig);
 }
 
-/// 尝试加载可选的深链配置；文件不存在表示未启用 Deep Link。
+/// 尝试读取可选配置。
+///
+/// 配置资源不存在表示宿主未启用 Deep Link，其他格式或环境错误继续抛出，
+/// 避免把错误配置静默当成未启用。
 Future<DeepLinkConfig?> tryLoadDeepLinkConfig({
   required String environment,
   AssetBundle? bundle,

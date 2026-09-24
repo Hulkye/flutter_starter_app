@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'deep_link_config.dart';
+import 'package:app_deep_link/app_deep_link.dart';
 
 enum EnvTag {
   dev, // 开发环境
@@ -45,7 +45,7 @@ class EnvConfig {
   /// 用户协议URL
   final String userAgreementUrl;
 
-  /// Deep Link 配置；为 null 时表示未启用 Deep Link。
+  /// 可选 Deep Link 配置；为 null 时表示不装配 Deep Link 平台能力。
   final DeepLinkConfig? deepLinkConfig;
 
   const EnvConfig({

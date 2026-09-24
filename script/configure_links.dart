@@ -4,6 +4,11 @@ import 'dart:io';
 const _configPath = 'config/deep_links.json';
 const _androidOutputPath = 'android/deep_links.properties';
 const _iosOutputPath = 'ios/Flutter/DeepLinks.generated.xcconfig';
+const _androidManifestPath = 'android/app/src/main/AndroidManifest.xml';
+const _iosInfoPlistPath = 'ios/Runner/Info.plist';
+const _iosEntitlementsPath = 'ios/Runner/Runner.entitlements';
+const _deepLinkStartMarker = 'DEEP_LINK_START';
+const _deepLinkEndMarker = 'DEEP_LINK_END';
 
 void main(List<String> args) {
   final options = _Options.parse(args);
@@ -27,6 +32,21 @@ void main(List<String> args) {
     return;
   }
   _validate(environment, options.environment);
+  if (options.check) {
+    final nativeErrors = _validateNativeConfiguration(
+      root,
+      enabled: true,
+      config: environment,
+    );
+    if (nativeErrors.isNotEmpty) {
+      stderr.writeln('Native deep link configuration is out of date:');
+      for (final error in nativeErrors) {
+        stderr.writeln('  - $error');
+      }
+      exitCode = 1;
+      return;
+    }
+  }
   if (!options.check && !options.dryRun) {
     _setNativeConfigurationEnabled(root, environment);
   }
@@ -83,13 +103,18 @@ void _disableNativeConfiguration(Directory root, _Options options) {
   }
 
   if (options.check) {
-    final hasGeneratedFiles = generatedPaths.any(
-      (relativePath) => File(_path(root, relativePath)).existsSync(),
-    );
-    if (hasGeneratedFiles) {
-      stderr.writeln(
-        'Deep link generated files must be removed when configuration is missing.',
-      );
+    final nativeErrors = _validateNativeConfiguration(root, enabled: false);
+    final hasGeneratedFiles = generatedPaths
+        .where((relativePath) => File(_path(root, relativePath)).existsSync())
+        .toList();
+    if (hasGeneratedFiles.isNotEmpty || nativeErrors.isNotEmpty) {
+      stderr.writeln('Deep Link native configuration is not clean:');
+      for (final path in hasGeneratedFiles) {
+        stderr.writeln('  - Generated file must be removed: $path');
+      }
+      for (final error in nativeErrors) {
+        stderr.writeln('  - $error');
+      }
       exitCode = 1;
       return;
     }
@@ -141,7 +166,10 @@ void _syncMarkedBlock(
   required String before,
 }) {
   final file = File(_path(root, relativePath));
-  if (!file.existsSync()) return;
+  if (!file.existsSync()) {
+    stderr.writeln('Missing native configuration file: $relativePath.');
+    exit(66);
+  }
   var content = _removeMarkedBlockContent(file.readAsStringSync());
   final index = content.indexOf(before);
   if (index < 0) {
@@ -160,6 +188,53 @@ String _removeMarkedBlockContent(String content) {
     ),
     '\n',
   );
+}
+
+List<String> _validateNativeConfiguration(
+  Directory root, {
+  required bool enabled,
+  Map<String, dynamic>? config,
+}) {
+  final paths = <String, String>{
+    _androidManifestPath: enabled ? _androidManifestBlock(config!) : '',
+    _iosInfoPlistPath: enabled ? _iosInfoPlistBlock() : '',
+    _iosEntitlementsPath: enabled ? _iosEntitlementsBlock() : '',
+  };
+  final errors = <String>[];
+
+  for (final entry in paths.entries) {
+    final file = File(_path(root, entry.key));
+    if (!file.existsSync()) {
+      if (enabled) {
+        errors.add('Missing native configuration file: ${entry.key}.');
+      }
+      continue;
+    }
+
+    final content = file.readAsStringSync();
+    final hasStartMarker = content.contains(_deepLinkStartMarker);
+    final hasEndMarker = content.contains(_deepLinkEndMarker);
+    if (!enabled) {
+      if (hasStartMarker || hasEndMarker) {
+        errors.add('Deep Link markers must be removed from ${entry.key}.');
+      }
+      continue;
+    }
+
+    if (!hasStartMarker || !hasEndMarker) {
+      errors.add('Deep Link markers are missing from ${entry.key}.');
+      continue;
+    }
+    if (content.indexOf(_deepLinkStartMarker) >
+        content.indexOf(_deepLinkEndMarker)) {
+      errors.add('Deep Link markers are out of order in ${entry.key}.');
+      continue;
+    }
+    if (!content.contains(entry.value)) {
+      errors.add('Deep Link block is out of date in ${entry.key}.');
+    }
+  }
+  return errors;
 }
 
 void _removeMarkedBlock(Directory root, String relativePath) {

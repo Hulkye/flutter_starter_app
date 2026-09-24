@@ -13,9 +13,6 @@ final class TodoRoute extends AppPageRoute {
   bool get public => true;
 
   @override
-  bool get deepLinkEnabled => true;
-
-  @override
   Widget buildPage(BuildContext context, AppRouteState state) {
     return const TodoPage();
   }

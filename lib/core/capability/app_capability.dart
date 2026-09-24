@@ -14,9 +14,3 @@ abstract interface class AppCapability {
   /// 释放平台事件和其他资源。
   Future<void> dispose();
 }
-
-/// App 可选深链能力协议。
-abstract interface class DeepLinkCapability implements AppCapability {
-  /// 登录成功后尝试消费一次待处理命令。
-  bool dispatchAuthenticatedCommand();
-}

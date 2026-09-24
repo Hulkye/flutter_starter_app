@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +9,7 @@ import '../../features/auth/presentation/auth_routes.dart';
 import 'app_lifecycle_coordinator.dart';
 import '../navigation/shell/root_shell_route.dart';
 import '../navigation/splash/splash_route.dart';
+import '../navigation/pending_navigation_coordinator.dart';
 import 'app_bootstrap_coordinator.dart';
 import 'app_session_coordinator.dart';
 
@@ -60,9 +63,18 @@ class _AppHostState extends ConsumerState<AppHost> {
       AppBootstrapTarget.login => const LoginRoute().location,
     };
     ref.read(appBootstrapCompletedProvider.notifier).state = true;
-    if (appRouter.location != targetLocation) {
+    final pendingNavigationDispatched = ref
+      .read(pendingNavigationCoordinatorProvider)
+      .onBootstrapCompleted();
+    if (!pendingNavigationDispatched && appRouter.location != targetLocation) {
       appRouter.replaceAll(targetLocation);
     }
     _lifecycleCoordinator.onBootstrapCompleted();
+  }
+
+  @override
+  void dispose() {
+    unawaited(_lifecycleCoordinator.dispose());
+    super.dispose();
   }
 }

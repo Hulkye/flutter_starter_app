@@ -181,13 +181,18 @@ await Application.run(
 
 模板在 App 层统一接收 App Scheme、Universal Links、Android App Links 和外部网页链接。
 页面不需要自行解析 URL。每个允许被外部打开的 `AppPageRoute` 必须显式覆盖
-`deepLinkEnabled`，默认值为 `false`。链接的 path 和 query 会统一转换为
+Deep Link 目标由 App 组合层显式注册。链接的 path 和 query 会统一转换为
 `AppNavigationCommand`，页面只通过 `AppRouteState` 读取自己需要的参数，未知参数忽略。
 
-Deep Link 实现位于 `lib/integrations/deep_link/`，属于可选的外部集成能力，不属于
-`lib/features/` 业务 Feature。App 组合层通过 `DeepLinkCapability` 和
-`AppCapabilityRegistry` 装配它；未装配时使用禁用能力，不启动平台链接监听，也不影响
-普通路由和登录流程。
+Deep Link 实现位于独立 package `packages/app_deep_link/`，当前模板的
+`lib/integrations/deep_link_host/` 只负责把 package 解析结果适配为本项目的认证、导航和
+WebView 行为。它属于可选的外部集成能力，不属于 `lib/features/` 业务 Feature。
+未装配时不启动平台链接监听，也不影响普通路由和登录流程。
+
+需要 Deep Link 的项目保留主工程中的 path dependency 和宿主适配层；不需要 Deep Link 的
+项目可以移除 `app_deep_link` dependency、`lib/integrations/deep_link_host/` 以及对应的
+环境配置。package 不依赖 `AppPageRoute`、Riverpod 或 GoRouter，业务路由由宿主转换为
+`DeepLinkRoute` 后注册。
 
 在各环境的 `EnvConfig` 中填写可选的 Deep Link 配置：
 
@@ -221,7 +226,7 @@ flutter build apk -t lib/main_dev.dart
 配置存在但格式或值非法时，脚本会报错。有效配置时，脚本会生成 `android/deep_links.properties` 和
 `ios/Flutter/DeepLinks.generated.xcconfig`，这两个文件已加入 `.gitignore`，由 Android
 Gradle 和 iOS xcconfig 自动读取。CI 应在构建前执行对应环境的生成命令，并使用
-`--check` 检查生成文件没有被手工修改或过期；不同环境必须分别执行脚本。
+`--check` 检查生成文件以及 Android/iOS 原生标记块没有被手工修改或过期；不同环境必须分别执行脚本。
 
 链接解析失败只返回分类错误，不自动回首页、不自动打开任意网页；产品层可以通过
 `DeepLinkResolution` 的失效原因决定后续展示策略。

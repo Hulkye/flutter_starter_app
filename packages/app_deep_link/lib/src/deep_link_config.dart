@@ -1,13 +1,14 @@
-/// 当前环境的 Deep Link 配置。
+/// Deep Link 允许使用的应用 Scheme 和 App Link host。
 final class DeepLinkConfig {
   const DeepLinkConfig({required this.appScheme, required this.appLinkHost});
 
-  /// App 自定义 URL Scheme。
+  /// 自定义 Scheme，例如 `starter`。
   final String appScheme;
 
-  /// Universal Links 和 Android App Links 关联 host。
+  /// Universal Links 或 Android App Links 关联的 host。
   final String appLinkHost;
 
+  /// 从环境配置 JSON 读取并校验 Deep Link 配置。
   factory DeepLinkConfig.fromJson(Map<String, dynamic> json) {
     final appScheme = json['appScheme'];
     final appLinkHost = json['appLinkHost'];

@@ -156,10 +156,10 @@ AppRouterConfig createAppRouterConfig(AppFeatureRegistry featureRegistry) {
 - `featureRegistry.routes`：当前环境启用的普通业务页面路由；已挂到 Shell Tab 的根路由不会重复注册到顶层。
 - `WebPageRoute` / `AuthWebPageRoute`：来自 `shared/webview` 的通用 WebView 公共路由，由 App 组合层注册，不作为业务 Feature。
 
-外部链接由 `integrations/deep_link` 可选集成在 App 层统一处理。`AppPageRoute.deepLinkEnabled`
-默认关闭，只有显式开启的路由才可以成为深链目标。Deep Link、Push 和其他入口最终统一
-转换为 `AppNavigationCommand`，其中的 path 参数和 query 参数由命令直接承载；页面不应
-自行解析外部 URI。
+外部链接由可选 package `app_deep_link` 和 App 层宿主适配共同处理。
+Deep Link 目标由 App 组合层的外部入口注册表显式声明，页面路由本身不感知 Deep Link。
+Deep Link、Push 和其他入口最终统一转换为 `AppNavigationCommand`，其中的 path 参数和
+query 参数由命令直接承载；页面不应自行解析外部 URI。
 
 同时，`RootShellRoute` 不再手写 tab 分支，而是从当前环境的 Feature 注册表自动装配：
 

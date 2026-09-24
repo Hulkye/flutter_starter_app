@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/capability/app_capability.dart';
 
 /// App 级可选能力的统一生命周期注册表。
+///
+/// 这里只管理生命周期广播，不了解 Deep Link、Push 或其他具体能力的业务语义。
 final class AppCapabilityRegistry {
   const AppCapabilityRegistry({this.capabilities = const <AppCapability>[]});
 
@@ -28,17 +30,6 @@ final class AppCapabilityRegistry {
     for (final capability in capabilities) {
       capability.onAuthenticationChanged();
     }
-  }
-
-  /// 登录完成后让能力尝试消费待处理命令。
-  bool dispatchAuthenticatedCommand() {
-    for (final capability in capabilities) {
-      if (capability is DeepLinkCapability &&
-          capability.dispatchAuthenticatedCommand()) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /// 释放所有已装配能力。
