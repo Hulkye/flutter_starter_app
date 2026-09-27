@@ -180,8 +180,8 @@ await Application.run(
 ### 配置深链和外链
 
 模板在 App 层统一接收 App Scheme、Universal Links、Android App Links 和外部网页链接。
-页面不需要自行解析 URL。每个允许被外部打开的 `AppPageRoute` 必须显式覆盖
-Deep Link 目标由 App 组合层显式注册。链接的 path 和 query 会统一转换为
+页面不需要自行解析 URL。每个允许被外部打开的页面由所属 `XxxFeature.externalRoutes`
+通过 `AppExternalRoute` 显式声明。链接的 path 和 query 会统一转换为
 `AppNavigationCommand`，页面只通过 `AppRouteState` 读取自己需要的参数，未知参数忽略。
 
 Deep Link 实现位于独立 package `packages/app_deep_link/`，当前模板的
@@ -192,7 +192,8 @@ WebView 行为。它属于可选的外部集成能力，不属于 `lib/features/
 需要 Deep Link 的项目保留主工程中的 path dependency 和宿主适配层；不需要 Deep Link 的
 项目可以移除 `app_deep_link` dependency、`lib/integrations/deep_link_host/` 以及对应的
 环境配置。package 不依赖 `AppPageRoute`、Riverpod 或 GoRouter，业务路由由宿主转换为
-`DeepLinkRoute` 后注册。
+环境唯一的 `AppFeatureRegistry.externalRoutes` 转换为 `DeepLinkRoute` 后注册，不得直接
+import 或硬编码 Feature 页面路由。
 
 在各环境的 `EnvConfig` 中填写可选的 Deep Link 配置：
 
@@ -384,7 +385,7 @@ final class OrderFeature extends AppFeature {
 }
 ```
 
-如果该 Feature 需要作为底部 Tab 入口，再额外覆盖 `tabs` 并返回 `AppTabEntry`。默认没有 Tab 的 Feature 只需要暴露 `routes`。Repository 的默认 data 实现在 `XxxFeature.providerOverrides` 中装配，ViewModel 仍只依赖 domain 抽象 Provider，不直接 import data 层。
+如果该 Feature 需要作为底部 Tab 入口，再额外覆盖 `tabs` 并返回 `AppTabEntry`。如果页面允许被 Deep Link 等外部入口打开，再额外覆盖 `externalRoutes` 并返回 `AppExternalRoute`。默认没有 Tab 或外部入口的 Feature 只需要暴露 `routes`。Repository 的默认 data 实现在 `XxxFeature.providerOverrides` 中装配，ViewModel 仍只依赖 domain 抽象 Provider，不直接 import data 层。
 
 `metadata.key` 在 App 内必须唯一；`priority` 越小越靠前，相同时按 key 排序。`enabledEnvironments` 声明允许启用的环境，默认覆盖 dev、sit、prod。`permissions` 只记录业务权限 key，不执行鉴权；`experimental` 只作为实验功能标识。
 
@@ -403,7 +404,7 @@ const List<AppFeature> appFeatures = [
 ];
 ```
 
-`Application.run()` 会按 `EnvConfig.envTag` 从 `appFeatures` 构建一次 `AppFeatureRegistry`。`lib/app/navigation/app_router_config.dart` 和根 `ProviderScope` 共同消费该注册表的 routes、tabs 与 provider overrides。注册表会在启动时校验 Feature key、route path、Tab key 唯一，并校验 Tab route 由所属 Feature 声明。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart` 或 App 启动入口。
+`Application.run()` 会按 `EnvConfig.envTag` 从 `appFeatures` 构建一次 `AppFeatureRegistry`。`lib/app/navigation/app_router_config.dart`、外部入口适配层和根 `ProviderScope` 共同消费该注册表的 routes、tabs、externalRoutes 与 provider overrides。注册表会在启动时校验 Feature key、route path、Tab key、外部入口 key/path 唯一，并校验 Tab/外部入口 route 由所属 Feature 声明。通常新增业务 Feature 时不需要修改 `core/router/router_provider.dart` 或 App 启动入口。
 
 如果 route class 或公开类型需要给业务页面通过 `header.dart` 使用，在 `lib/features/exports.dart` 补充导出：
 

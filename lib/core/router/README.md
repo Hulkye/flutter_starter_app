@@ -157,7 +157,10 @@ AppRouterConfig createAppRouterConfig(AppFeatureRegistry featureRegistry) {
 - `WebPageRoute` / `AuthWebPageRoute`：来自 `shared/webview` 的通用 WebView 公共路由，由 App 组合层注册，不作为业务 Feature。
 
 外部链接由可选 package `app_deep_link` 和 App 层宿主适配共同处理。
-Deep Link 目标由 App 组合层的外部入口注册表显式声明，页面路由本身不感知 Deep Link。
+业务 Deep Link 目标由所属 Feature 通过 `AppExternalRoute` 显式声明，并由当前环境的
+`AppFeatureRegistry.externalRoutes` 汇总。App 集成适配层只把这份注册结果转换为
+`DeepLinkRoute`，不得重新 import 或硬编码业务 Feature 路由；因此被环境禁用的 Feature
+不会继续出现在 Deep Link 入口中。页面路由本身不感知具体 Deep Link package。
 Deep Link、Push 和其他入口最终统一转换为 `AppNavigationCommand`，其中的 path 参数和
 query 参数由命令直接承载；页面不应自行解析外部 URI。
 
@@ -172,9 +175,10 @@ buildRootRouteNodes(tabs: featureRegistry.tabs);
 - 提供多个 Tab 入口，例如 `ptt`。
 - 只提供普通页面路由、不提供 Tab，例如 `auth`。
 - 通过 `providerOverrides` 提供默认 data 实现装配，例如 Repository binding。
+- 通过 `externalRoutes` 声明允许外部入口打开的页面。
 - 由 App Shell 统一决定展示顺序，而不是把业务页面写死在 Shell 内部。
 
-`Application.run()` 会按当前环境构建一次 `AppFeatureRegistry`，把其中的 `providerOverrides` 与 `createAppRouterOverrides(featureRegistry)` 加入 `ProviderScope.overrides`。路由、Tab 和依赖注入因此始终来自同一批启用 Feature。`goRouterProvider` 只消费注入后的 `AppRouterConfig` 创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。
+`Application.run()` 会按当前环境构建一次 `AppFeatureRegistry`，把其中的 routes、tabs、externalRoutes、providerOverrides 分别交给 App 路由、外部入口适配层和根 `ProviderScope`。这些能力因此始终来自同一批启用 Feature。`goRouterProvider` 只消费注入后的 `AppRouterConfig` 创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。
 
 ## 导航用法
 
@@ -253,7 +257,9 @@ final class DemoFeature extends AppFeature {
 }
 ```
 
-如果该 Feature 还需要占用底部 Tab，再额外声明 `tabs`。`AppTabEntry` 是抽象协议，负责声明 tab 的稳定 key、文案、图标和根路由：
+如果该 Feature 还需要占用底部 Tab，再额外声明 `tabs`。若页面需要接受 Deep Link 等 App 外部入口，再声明 `externalRoutes`；只将确实允许外部打开的路由加入，不要把所有页面默认暴露。`AppExternalRoute` 负责声明外部入口稳定 key 与所属页面路由，不依赖具体外部入口 package。
+
+`AppTabEntry` 是抽象协议，负责声明 tab 的稳定 key、文案、图标和根路由：
 
 ```dart
 final class DemoFeature extends AppFeature {
@@ -308,7 +314,7 @@ const List<AppFeature> appFeatures = [
 ];
 ```
 
-完成后，`AppFeatureRegistry` 会按环境筛选、按 priority 和 key 排序，并展开普通页面路由、Tab 与 Provider overrides。已作为 Tab 根路由挂到 `RootShellRoute` 的页面不会再重复加入顶层路由表。Feature key、route path、Tab key 冲突以及 Tab route 来源不匹配会在注册表构建时立即失败。
+完成后，`AppFeatureRegistry` 会按环境筛选、按 priority 和 key 排序，并展开普通页面路由、Tab、外部入口与 Provider overrides。已作为 Tab 根路由挂到 `RootShellRoute` 的页面不会再重复加入顶层路由表。Feature key、route path、Tab key、外部入口 key/path 冲突以及 Tab/外部入口引用非所属 Feature 路由时，会在注册表构建时立即失败。
 
 如果业务页面需要通过 `header.dart` 使用新 route class，再把它加入公共导出文件：
 

@@ -7,6 +7,7 @@ import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_starter_app/core/theme/theme.dart';
 
 import '../../core/feature/app_feature.dart';
+import '../../core/feature/app_external_route.dart';
 import '../../core/feature/app_feature_metadata.dart';
 import 'data/datasources/todo_local_datasource.dart';
 import 'data/repositories/todo_repository_impl.dart';
@@ -25,6 +26,11 @@ final class TodoFeature extends AppFeature {
 
   @override
   List<AppTabEntry> get tabs => const [_TodoTabEntry()];
+
+  @override
+  List<AppExternalRoute> get externalRoutes => const [
+    AppExternalRoute(key: 'todo', route: TodoRoute()),
+  ];
 
   @override
   List<Override> get providerOverrides {

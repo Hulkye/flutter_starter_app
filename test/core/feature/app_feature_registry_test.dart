@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/feature/app_feature.dart';
+import 'package:flutter_starter_app/core/feature/app_external_route.dart';
 import 'package:flutter_starter_app/core/feature/app_feature_metadata.dart';
 import 'package:flutter_starter_app/core/feature/app_feature_registry.dart';
 import 'package:flutter_starter_app/core/feature/app_tab_entry.dart';
@@ -23,6 +24,9 @@ void main() {
             ),
             routes: const <AppPageRoute>[_TestRoute('/dev')],
             tabs: const <AppTabEntry>[_TestTab('dev.tab', '/dev')],
+            externalRoutes: const <AppExternalRoute>[
+              AppExternalRoute(key: 'dev', route: _TestRoute('/dev')),
+            ],
             providerOverrides: <Override>[
               _bindingProvider.overrideWithValue('dev'),
             ],
@@ -34,6 +38,9 @@ void main() {
               _TestRoute('/prod/detail'),
             ],
             tabs: const <AppTabEntry>[_TestTab('prod.tab', '/prod')],
+            externalRoutes: const <AppExternalRoute>[
+              AppExternalRoute(key: 'prod', route: _TestRoute('/prod')),
+            ],
             providerOverrides: <Override>[
               _bindingProvider.overrideWithValue('prod'),
             ],
@@ -46,6 +53,10 @@ void main() {
       expect(registry.routes.map((route) => route.path), <String>[
         '/prod/detail',
       ]);
+      expect(
+        registry.externalRoutes.map((route) => route.key),
+        <String>['prod'],
+      );
       expect(registry.providerOverrides, hasLength(1));
     });
 
@@ -158,6 +169,64 @@ void main() {
         ),
       );
     });
+
+    test('rejects duplicate external route keys with feature sources', () {
+      expect(
+        () => AppFeatureRegistry(
+          environment: EnvTag.dev,
+          candidates: <AppFeature>[
+            _TestFeature(
+              metadata: const AppFeatureMetadata(key: 'first'),
+              routes: const <AppPageRoute>[_TestRoute('/first')],
+              externalRoutes: const <AppExternalRoute>[
+                AppExternalRoute(key: 'shared', route: _TestRoute('/first')),
+              ],
+            ),
+            _TestFeature(
+              metadata: const AppFeatureMetadata(key: 'second'),
+              routes: const <AppPageRoute>[_TestRoute('/second')],
+              externalRoutes: const <AppExternalRoute>[
+                AppExternalRoute(key: 'shared', route: _TestRoute('/second')),
+              ],
+            ),
+          ],
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            allOf(contains('shared'), contains('first and second')),
+          ),
+        ),
+      );
+    });
+
+    test('rejects an external route not declared by its feature', () {
+      expect(
+        () => AppFeatureRegistry(
+          environment: EnvTag.dev,
+          candidates: <AppFeature>[
+            _TestFeature(
+              metadata: const AppFeatureMetadata(key: 'invalid'),
+              routes: const <AppPageRoute>[_TestRoute('/declared')],
+              externalRoutes: const <AppExternalRoute>[
+                AppExternalRoute(
+                  key: 'invalid',
+                  route: _TestRoute('/missing'),
+                ),
+              ],
+            ),
+          ],
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            allOf(contains('invalid'), contains('/missing')),
+          ),
+        ),
+      );
+    });
   });
 }
 
@@ -181,6 +250,7 @@ final class _TestFeature extends AppFeature {
     required this.metadata,
     required this.routes,
     this.tabs = const <AppTabEntry>[],
+    this.externalRoutes = const <AppExternalRoute>[],
     this.providerOverrides = const <Override>[],
   });
 
@@ -192,6 +262,9 @@ final class _TestFeature extends AppFeature {
 
   @override
   final List<AppTabEntry> tabs;
+
+  @override
+  final List<AppExternalRoute> externalRoutes;
 
   @override
   final List<Override> providerOverrides;

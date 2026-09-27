@@ -64,7 +64,7 @@ class Application {
     return <Override>[
       ...featureRegistry.providerOverrides,
       _createPendingNavigationOverride(),
-      ..._createOptionalCapabilityOverrides(envConfig),
+      ..._createOptionalCapabilityOverrides(envConfig, featureRegistry),
       _createCapabilityRegistryOverride(envConfig),
       ...createAppRouterOverrides(featureRegistry),
     ];
@@ -92,10 +92,11 @@ class Application {
   /// 平台 URI；其他可选能力可以在这里按同样方式扩展。
   static List<Override> _createOptionalCapabilityOverrides(
     EnvConfig envConfig,
+    AppFeatureRegistry featureRegistry,
   ) {
     // Deep Link 未配置时，不创建 engine，也不开始平台 URI 监听。
     if (envConfig.deepLinkConfig == null) return const <Override>[];
-    return createDeepLinkAppOverrides();
+    return createDeepLinkAppOverrides(featureRegistry);
   }
 
   /// 注册当前环境已启用的 App 能力生命周期实例。

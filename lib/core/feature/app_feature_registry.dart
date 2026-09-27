@@ -3,6 +3,7 @@ import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 
 import 'app_feature.dart';
+import 'app_external_route.dart';
 import 'app_tab_entry.dart';
 
 /// 当前环境下的 Feature 注册结果。
@@ -26,6 +27,11 @@ final class AppFeatureRegistry {
   /// 当前环境启用的 Tab。
   late final List<AppTabEntry> tabs = [
     for (final feature in features) ...feature.tabs,
+  ];
+
+  /// 当前环境启用的外部入口路由。
+  late final List<AppExternalRoute> externalRoutes = [
+    for (final feature in features) ...feature.externalRoutes,
   ];
 
   /// 当前环境启用的普通路由。
@@ -96,6 +102,40 @@ final class AppFeatureRegistry {
           throw StateError(
             'Tab "${tab.key}" in Feature "${feature.key}" references '
             'route "${tab.route.path}" not declared by that Feature',
+          );
+        }
+      }
+    }
+
+    final externalRoutes = <String, String>{};
+    final externalRoutePaths = <String, String>{};
+    for (final feature in features) {
+      final routePaths = {for (final route in feature.routes) route.path};
+      for (final externalRoute in feature.externalRoutes) {
+        final previousKeyFeature = externalRoutes[externalRoute.key];
+        if (previousKeyFeature != null) {
+          throw StateError(
+            'External route key conflict "${externalRoute.key}": '
+            '$previousKeyFeature and ${feature.key}',
+          );
+        }
+        externalRoutes[externalRoute.key] = feature.key;
+
+        final path = externalRoute.route.path;
+        final previousPathFeature = externalRoutePaths[path];
+        if (previousPathFeature != null) {
+          throw StateError(
+            'External route path conflict "$path": '
+            '$previousPathFeature and ${feature.key}',
+          );
+        }
+        externalRoutePaths[path] = feature.key;
+
+        if (!routePaths.contains(path)) {
+          throw StateError(
+            'External route "${externalRoute.key}" in Feature '
+            '"${feature.key}" references route "$path" not declared by '
+            'that Feature',
           );
         }
       }

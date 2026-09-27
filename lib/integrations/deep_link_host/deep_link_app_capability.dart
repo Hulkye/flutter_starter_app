@@ -9,6 +9,7 @@ import 'package:flutter_starter_app/shared/webview/domain/web_page_config.dart';
 import 'package:flutter_starter_app/shared/webview/presentation/webview_routes.dart';
 
 import '../../app/navigation/app_external_route_registry.dart';
+import '../../core/feature/app_feature_registry.dart';
 import '../../app/navigation/pending_navigation_coordinator.dart';
 
 /// 当前宿主对独立 Deep Link package 的适配层。
@@ -91,7 +92,9 @@ final class DeepLinkAppCapability implements AppCapability {
 ///
 /// 只有存在 [EnvConfig.deepLinkConfig] 时才调用此方法，因此未启用 Deep Link
 /// 的宿主不会创建 engine，也不会订阅平台 URI。
-List<Override> createDeepLinkAppOverrides() {
+List<Override> createDeepLinkAppOverrides(
+  AppFeatureRegistry featureRegistry,
+) {
   return <Override>[
     deepLinkAppCapabilityProvider.overrideWith((ref) {
       final config = appConfig.deepLinkConfig;
@@ -101,7 +104,7 @@ List<Override> createDeepLinkAppOverrides() {
       return DeepLinkAppCapability(
         engine: DeepLinkEngine(
           config: config,
-          routes: createExternalDeepLinkRoutes(),
+          routes: createExternalDeepLinkRoutes(featureRegistry),
         ),
         pendingNavigation: ref.read(pendingNavigationCoordinatorProvider),
       );

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../core/feature/app_feature.dart';
+import '../../core/feature/app_external_route.dart';
 import '../../core/feature/app_feature_metadata.dart';
 import '../../core/feature/app_tab_entry.dart';
 import '../../core/l10n/l10n.dart';
@@ -17,6 +18,11 @@ final class ProfileFeature extends AppFeature {
 
   @override
   List<AppPageRoute> get routes => const [ProfileRoute()];
+
+  @override
+  List<AppExternalRoute> get externalRoutes => const [
+    AppExternalRoute(key: 'profile', route: ProfileRoute()),
+  ];
 
   @override
   List<AppTabEntry> get tabs => const [_ProfileTabEntry()];

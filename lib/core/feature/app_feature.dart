@@ -3,6 +3,7 @@ import 'package:flutter_starter_app/core/router/router.dart';
 
 import 'app_tab_entry.dart';
 import 'app_feature_metadata.dart';
+import 'app_external_route.dart';
 
 /// Feature 对 App 暴露能力的统一协议。
 ///
@@ -22,6 +23,9 @@ abstract class AppFeature {
 
   /// 模块下的tab入口
   List<AppTabEntry> get tabs => const [];
+
+  /// 模块允许由 App 外部入口打开的路由。
+  List<AppExternalRoute> get externalRoutes => const [];
 
   /// 模块默认 Provider 覆盖项。
   ///
