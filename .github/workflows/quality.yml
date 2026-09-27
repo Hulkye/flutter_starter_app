@@ -24,6 +24,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Install deep link package dependencies
+        working-directory: packages/app_deep_link
+        run: flutter pub get
+
       - name: Generate deep link native configuration
         run: dart run script/configure_links.dart --env dev
 
@@ -42,5 +46,13 @@ jobs:
       - name: Analyze project
         run: flutter analyze
 
+      - name: Analyze deep link package
+        working-directory: packages/app_deep_link
+        run: flutter analyze
+
       - name: Run tests
+        run: flutter test
+
+      - name: Run deep link package tests
+        working-directory: packages/app_deep_link
         run: flutter test
