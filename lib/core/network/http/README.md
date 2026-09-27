@@ -20,7 +20,11 @@ import 'package:flutter_starter_app/core/network/http/http_provider.dart';
 final client = ref.read(httpClientProvider);
 ```
 
-`httpClientProvider` 会读取 `appConfig`、国际化错误文案和 `authSessionProvider`，生成当前环境的 `HttpConfig`。认证 Header 在每次请求前懒读取会话状态，401 或业务 token 过期会通过 `authSessionControllerProvider` 清理会话。
+`httpClientProvider` 会读取 `appConfig`、国际化错误文案和
+`httpAuthSessionAccessProvider`，生成当前环境的 `HttpConfig`。认证 Header 在每次请求前
+懒读取会话状态，401 或业务 token 过期会通过该端口请求清理会话。HTTP 层不依赖具体认证
+模块；App 组合层负责把 Shared Auth 或其他认证实现适配为 `HttpAuthSessionAccess`，并覆盖
+该 Provider。
 
 ## 目录职责
 
@@ -28,7 +32,8 @@ final client = ref.read(httpClientProvider);
 |---|---|
 | `base_http_client.dart` | 网络客户端抽象接口 |
 | `http_client.dart` | Dio 适配实现，集中处理请求、缓存、重试、下载、异常映射 |
-| `http_provider.dart` | Riverpod Provider 装配，连接环境配置、认证会话和 HTTP 客户端 |
+| `http_provider.dart` | Riverpod Provider 装配，连接环境配置、认证端口和 HTTP 客户端 |
+| `http_auth_session.dart` | HTTP 所需认证能力端口及其 Provider 装配点 |
 | `config/` | `HttpConfig`、认证、业务状态码、提示文案、重试、证书配置 |
 | `request/` | `HttpRequest<T>` 一等请求模型 |
 | `response/` | `HttpResponse<T>` 与业务 `ApiResponse` 模型 |

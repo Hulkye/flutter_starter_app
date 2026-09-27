@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/env_config.dart';
-import '../../../shared/services/auth/auth_provider.dart';
-import '../../../shared/services/auth/auth_session_controller.dart';
 import '../../constant/duration_const.dart';
 import '../../l10n/l10n.dart';
 import 'config/http_auth_config.dart';
@@ -12,6 +10,7 @@ import 'config/http_response_config.dart';
 import 'config/http_security_config.dart';
 import 'config/retry_policy.dart';
 import 'http_client.dart';
+import 'http_auth_session.dart';
 
 // =============================================================================
 // HTTP 配置 → 客户端 Provider 链
@@ -70,14 +69,16 @@ final httpConfigProvider = Provider<HttpConfig>((ref) {
           'X-App-Channel': 'flutter_starter_app',
           'X-App-Env': appConfig.envTag.name,
         };
-        final token = ref.read(authSessionProvider)?.bearerToken;
-        if (token != null) {
-          headers['Authorization'] = token;
+        final authorization = ref
+            .read(httpAuthSessionAccessProvider)
+            .authorization;
+        if (authorization != null) {
+          headers['Authorization'] = authorization;
         }
         return headers;
       },
       onAuthFailed: () async {
-        await ref.read(authSessionControllerProvider).clearSession();
+        await ref.read(httpAuthSessionAccessProvider).clearSession();
       },
     ),
   );

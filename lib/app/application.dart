@@ -4,11 +4,12 @@ import 'package:app_deep_link/app_deep_link.dart';
 import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_starter_app/features/features.dart';
-import 'package:flutter_starter_app/shared/services/auth/auth_store.dart';
+import 'package:flutter_starter_app/shared/services/auth/auth.dart';
 
 import '../core/exception/app_exception_catcher.dart';
 import '../core/capability/app_capability.dart';
 import '../core/feature/app_feature_registry.dart';
+import '../core/network/http/http.dart';
 import '../core/router/router.dart';
 import '../features/auth/presentation/auth_routes.dart';
 import '../integrations/deep_link_host/deep_link_app_capability.dart';
@@ -63,11 +64,19 @@ class Application {
   ) {
     return <Override>[
       ...featureRegistry.providerOverrides,
+      _createHttpAuthSessionOverride(),
       _createPendingNavigationOverride(),
       ..._createOptionalCapabilityOverrides(envConfig, featureRegistry),
       _createCapabilityRegistryOverride(envConfig),
       ...createAppRouterOverrides(featureRegistry),
     ];
+  }
+
+  /// 将 Shared Auth 适配为 HTTP 层所需的最小认证能力。
+  static Override _createHttpAuthSessionOverride() {
+    return httpAuthSessionAccessProvider.overrideWith(
+      (ref) => _AppHttpAuthSessionAccess(ref),
+    );
   }
 
   /// 注入认证失败时的统一登录跳转策略。
@@ -111,5 +120,22 @@ class Application {
             : <AppCapability>[ref.read(deepLinkAppCapabilityProvider)],
       ),
     );
+  }
+}
+
+final class _AppHttpAuthSessionAccess implements HttpAuthSessionAccess {
+  const _AppHttpAuthSessionAccess(this._ref);
+
+  final Ref _ref;
+
+  @override
+  String? get authorization {
+    final session = _ref.read(authSessionProvider);
+    return session?.isValid == true ? session!.bearerToken : null;
+  }
+
+  @override
+  Future<void> clearSession() {
+    return _ref.read(authSessionControllerProvider).clearSession();
   }
 }

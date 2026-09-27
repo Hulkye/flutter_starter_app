@@ -60,6 +60,7 @@ export 'config/http_auth_config.dart';
 export 'config/http_hint_config.dart';
 export 'config/retry_policy.dart';
 export 'config/http_security_config.dart';
+export 'http_auth_session.dart';
 
 // 拦截器
 export 'interceptor/http_interceptor.dart';

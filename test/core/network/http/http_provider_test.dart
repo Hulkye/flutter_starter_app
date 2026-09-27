@@ -1,8 +1,7 @@
 import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/network/http/http_provider.dart';
+import 'package:flutter_starter_app/core/network/http/http_auth_session.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
-import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
-import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,10 +18,8 @@ void main() {
     test('reads bearer token from authSessionProvider for headers', () async {
       final container = createTestContainer(
         overrides: [
-          authSessionProvider.overrideWith(
-            () => _TestAuthSessionNotifier(
-              const AuthSession(token: 'provider-token'),
-            ),
+          httpAuthSessionAccessProvider.overrideWithValue(
+            _TestHttpAuthSessionAccess('Bearer provider-token'),
           ),
         ],
       );
@@ -38,34 +35,36 @@ void main() {
     test('clears authSessionProvider when auth fails', () async {
       final container = createTestContainer(
         overrides: [
-          authSessionProvider.overrideWith(
-            () => _TestAuthSessionNotifier(
-              const AuthSession(token: 'provider-token'),
-            ),
+          httpAuthSessionAccessProvider.overrideWithValue(
+            _TestHttpAuthSessionAccess('Bearer provider-token'),
           ),
         ],
       );
 
       final config = container.read(httpConfigProvider);
-      expect(container.read(authSessionProvider)?.token, 'provider-token');
+      expect(
+        container.read(httpAuthSessionAccessProvider).authorization,
+        'Bearer provider-token',
+      );
 
       await config.authConfig!.onAuthFailed!();
 
-      expect(container.read(authSessionProvider), isNull);
+      expect(
+        container.read(httpAuthSessionAccessProvider).authorization,
+        isNull,
+      );
     });
   });
 }
 
-final class _TestAuthSessionNotifier extends AuthSessionNotifier {
-  _TestAuthSessionNotifier(this._initialSession);
-
-  final AuthSession? _initialSession;
+final class _TestHttpAuthSessionAccess implements HttpAuthSessionAccess {
+  _TestHttpAuthSessionAccess(this.authorization);
 
   @override
-  AuthSession? build() => _initialSession;
+  String? authorization;
 
   @override
-  Future<void> clear() async {
-    state = null;
+  Future<void> clearSession() async {
+    authorization = null;
   }
 }
