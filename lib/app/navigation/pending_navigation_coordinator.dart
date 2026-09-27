@@ -56,15 +56,21 @@ final class PendingNavigationCoordinator {
 typedef ProviderListenableReader =
     T Function<T>(ProviderListenable<T> provider);
 
-/// 为没有外部入口的 App 提供无待处理命令的空实现。
+/// PendingNavigationCoordinator 的默认装配点。
 ///
-/// 这样直接构造 [App] 的 widget test 或不启用外部入口的宿主不需要额外覆盖，
-/// 同时不会启动任何平台监听。
+/// App 组合层必须通过 [createPendingNavigationOverride] 提供认证失败后的
+/// 登录跳转策略。默认 Provider 允许无外部入口的宿主读取协调器，但不会掩盖
+/// 缺少认证导航装配的问题。
 final pendingNavigationCoordinatorProvider =
     Provider<PendingNavigationCoordinator>(
       (ref) => PendingNavigationCoordinator(
         read: ref.read,
-        requestAuthentication: () {},
+        requestAuthentication: () {
+          throw StateError(
+            'PendingNavigationCoordinator requires an App composition '
+            'override. Call createPendingNavigationOverride().',
+          );
+        },
       ),
     );
 
