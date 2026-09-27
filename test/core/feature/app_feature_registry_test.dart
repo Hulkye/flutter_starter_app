@@ -53,10 +53,9 @@ void main() {
       expect(registry.routes.map((route) => route.path), <String>[
         '/prod/detail',
       ]);
-      expect(
-        registry.externalRoutes.map((route) => route.key),
-        <String>['prod'],
-      );
+      expect(registry.externalRoutes.map((route) => route.key), <String>[
+        'prod',
+      ]);
       expect(registry.providerOverrides, hasLength(1));
     });
 
@@ -210,10 +209,7 @@ void main() {
               metadata: const AppFeatureMetadata(key: 'invalid'),
               routes: const <AppPageRoute>[_TestRoute('/declared')],
               externalRoutes: const <AppExternalRoute>[
-                AppExternalRoute(
-                  key: 'invalid',
-                  route: _TestRoute('/missing'),
-                ),
+                AppExternalRoute(key: 'invalid', route: _TestRoute('/missing')),
               ],
             ),
           ],

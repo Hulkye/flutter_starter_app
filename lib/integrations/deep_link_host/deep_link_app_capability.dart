@@ -92,9 +92,7 @@ final class DeepLinkAppCapability implements AppCapability {
 ///
 /// 只有存在 [EnvConfig.deepLinkConfig] 时才调用此方法，因此未启用 Deep Link
 /// 的宿主不会创建 engine，也不会订阅平台 URI。
-List<Override> createDeepLinkAppOverrides(
-  AppFeatureRegistry featureRegistry,
-) {
+List<Override> createDeepLinkAppOverrides(AppFeatureRegistry featureRegistry) {
   return <Override>[
     deepLinkAppCapabilityProvider.overrideWith((ref) {
       final config = appConfig.deepLinkConfig;

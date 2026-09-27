@@ -64,8 +64,8 @@ class _AppHostState extends ConsumerState<AppHost> {
     };
     ref.read(appBootstrapCompletedProvider.notifier).state = true;
     final pendingNavigationDispatched = ref
-      .read(pendingNavigationCoordinatorProvider)
-      .onBootstrapCompleted();
+        .read(pendingNavigationCoordinatorProvider)
+        .onBootstrapCompleted();
     if (!pendingNavigationDispatched && appRouter.location != targetLocation) {
       appRouter.replaceAll(targetLocation);
     }
