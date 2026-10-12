@@ -11,5 +11,5 @@ final class AppExternalRoute {
   final String key;
 
   /// 对应的 App 页面路由。
-  final AppPageRoute route;
+  final AppPageRoute<dynamic> route;
 }

@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 
-import '../constant/duration_const.dart';
-import 'definitions/router_definitions.dart';
+import '../../constant/duration_const.dart';
+import '../definitions/router_definitions.dart';
 
 /// GoRouter 适配器：把框架无关的 [AppRouteNode] 转换为 [RouteBase]。
 RouteBase toRouteBase(AppRouteNode node) {
@@ -14,7 +14,7 @@ RouteBase toRouteBase(AppRouteNode node) {
 }
 
 /// GoRouter 适配器：把框架无关的 [AppPageRoute] 转换为 [GoRoute]。
-GoRoute toGoRoute(AppPageRoute route) {
+GoRoute toGoRoute(AppPageRoute<dynamic> route) {
   return GoRoute(
     path: route.path,
     name: route.path,
@@ -22,7 +22,10 @@ GoRoute toGoRoute(AppPageRoute route) {
       return _swipeablePage(
         context: context,
         state: state,
-        builder: (context) => route.buildPage(context, toAppRouteState(state)),
+        builder: (context) {
+          final routeState = toAppRouteState(state);
+          return route.buildPage(context, route.parse(routeState));
+        },
       );
     },
   );

@@ -445,10 +445,12 @@ Router Guard / AuthInterceptor / UI
 
 ```dart
 ref.read(appRouterProvider).push(
-  const WebPageRoute(
-    url: 'https://example.com/privacy',
-    title: '隐私政策',
-  ).location,
+  const WebPageTarget(
+    WebPageConfig(
+      url: 'https://example.com/privacy',
+      title: '隐私政策',
+    ),
+  ),
 );
 ```
 
@@ -456,7 +458,9 @@ ref.read(appRouterProvider).push(
 
 ```dart
 ref.read(appRouterProvider).push(
-  const AuthWebPageRoute(url: 'https://example.com/member').location,
+  const AuthWebPageTarget(
+    WebPageConfig(url: 'https://example.com/member'),
+  ),
 );
 ```
 
@@ -464,11 +468,12 @@ ref.read(appRouterProvider).push(
 
 ```dart
 ref.read(appRouterProvider).push(
-  const AuthWebPageRoute().location,
-  extra: const WebPageConfig(
-    url: 'https://example.com/member',
-    allowedHosts: ['example.com'],
-    headers: {'X-Source': 'app'},
+  const AuthWebPageTarget(
+    WebPageConfig(
+      url: 'https://example.com/member',
+      allowedHosts: ['example.com'],
+      headers: {'X-Source': 'app'},
+    ),
   ),
 );
 ```

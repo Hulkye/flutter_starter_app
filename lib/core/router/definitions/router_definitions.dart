@@ -1,7 +1,12 @@
 export 'app_page_route.dart';
+export 'app_route_metadata.dart';
+export 'app_route_error.dart';
 export 'app_redirect_route.dart';
 export 'app_route_node.dart';
 export 'app_route_state.dart';
+export 'app_route_state_reading.dart';
+export 'app_route_target.dart';
+export 'app_route_target_resolver.dart';
 export 'app_shell_branch.dart';
 export 'app_shell_navigator.dart';
 export 'app_shell_route.dart';

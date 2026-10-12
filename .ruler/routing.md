@@ -5,6 +5,7 @@
 - 业务层不直接依赖 `go_router`。
 - 业务导航通过 `BaseNavigator` 与 `appRouterProvider` 完成。
 - 一个 Route class 表达一个路由目标和页面构建方式。
+- `AppPageRoute` 只描述无状态的注册信息；Feature 的 `XxxRouteTarget` 构造本次导航 location，`XxxRouteArgs.fromState` 从 `AppRouteState` 解析页面参数。
 - 页面 Route class 继承 `AppPageRoute`，Shell/Redirect 使用对应的 `AppRouteNode` 子类。
 - Feature 通过 `XxxFeature extends AppFeature` 暴露路由。
 - `features/features.dart` 保留候选 Feature，`AppFeatureRegistry` 按环境筛选并统一派生普通业务路由、可选底部 Tab 入口与 Provider 覆盖项。
@@ -21,12 +22,14 @@
 1. 在 `lib/features/<feature>/presentation/<feature>_routes.dart` 创建 `XxxRoute extends AppPageRoute`。
 2. 在 `lib/features/<feature>/<feature>_feature.dart` 创建 `XxxFeature extends AppFeature`，声明 `AppFeatureMetadata` 的唯一 key、priority 与允许环境。
 3. 在 `XxxFeature.routes` 中返回当前 Feature 的路由列表。
-4. 如需底部 Tab，在 `XxxFeature.tabs` 中返回 `AppTabEntry`，由 `RootShellRoute` 自动装配。
-5. 如存在默认 data 实现，在 `XxxFeature.providerOverrides` 中装配 domain binding Provider。
-6. 在 `lib/features/features.dart` import `XxxFeature` 并加入 `appFeatures`。
-7. `lib/app/navigation/app_router_config.dart` 会从 `appFeatures` 自动组合到 App 路由图，通常无需修改 `core/router/router_provider.dart`。
-8. 如 route class 需要给业务页面使用，在 `lib/features/exports.dart` 导出。
-9. 业务页面通过 `package:flutter_starter_app/header.dart` 使用 route class 和 `appRouterProvider`。
+4. 在 Feature 中定义独立的 `XxxRouteTarget.location(...)`；带参数地址使用 `AppRouteLocation` 编码 path/query。
+5. `buildPage` 只接收 `BuildContext` 和 `AppRouteState`，并调用 `XxxRouteArgs.fromState(state)` 解析页面参数。
+6. 如需底部 Tab，在 `XxxFeature.tabs` 中返回 `AppTabEntry`，由 `RootShellRoute` 自动装配。
+7. 如存在默认 data 实现，在 `XxxFeature.providerOverrides` 中装配 domain binding Provider。
+8. 在 `lib/features/features.dart` import `XxxFeature` 并加入 `appFeatures`。
+9. `lib/app/navigation/app_router_config.dart` 会从 `appFeatures` 自动组合到 App 路由图，通常无需修改 `core/router/router_provider.dart`。
+10. 如 route class 需要给业务页面使用，在 `lib/features/exports.dart` 导出。
+11. 业务页面通过 `package:flutter_starter_app/header.dart` 使用 route class 和 `appRouterProvider`。
 
 ## 禁止事项
 
@@ -34,22 +37,22 @@
 - 不要在 `core/router` 中 import `app/` 或 `features/` 来装配具体路由；应用路由图必须由 App 组合层注入。
 - 不要在业务页面直接 import `go_router`。
 - 不要在 `app/`、`core/`、`shared/` 内部通过 `header.dart` 获取路由或公共能力；这些层应使用精确 import。
-- 不要把 `path` 和 `location` 混用：
+- 不要把 Route 注册对象和 Target 混用：
   - `path` 用于路由匹配，例如 `/profile/:userId`；
-  - `location` 用于实际跳转，例如 `/profile/42`。
+  - `XxxRouteTarget.location(...)` 用于实际跳转，例如 `/profile/42`。
 
 ## 导航示例
 
 ```dart
 import 'package:flutter_starter_app/header.dart';
 
-ref.read(appRouterProvider).push(const LoginRoute().location);
+ref.read(appRouterProvider).push(LoginRouteTarget.location);
 ```
 
 带参数路由：
 
 ```dart
-ref.read(appRouterProvider).push(ProfileDetailRoute(userId: '42').location);
+ref.read(appRouterProvider).push(ProfileDetailRouteTarget.location(userId: '42'));
 ```
 
 ## 文档同步

@@ -124,18 +124,41 @@ final class _RecordingNavigator implements BaseNavigator {
   bool canBack() => false;
 
   @override
-  void go(String location, {Object? extra}) {}
+  void go(AppRouteTarget target) {
+    goLocation(target.location, extra: target.extra);
+  }
 
   @override
-  Future<T?> push<T extends Object?>(String location, {Object? extra}) async {
+  void goLocation(String location, {Object? extra}) {}
+
+  @override
+  Future<T?> push<T extends Object?>(AppRouteTarget target) {
+    return pushLocation<T>(target.location, extra: target.extra);
+  }
+
+  @override
+  Future<T?> pushLocation<T extends Object?>(
+    String location, {
+    Object? extra,
+  }) async {
     return null;
   }
 
   @override
-  void replace(String location, {Object? extra}) {}
+  void replace(AppRouteTarget target) {
+    replaceLocation(target.location, extra: target.extra);
+  }
 
   @override
-  void replaceAll(String location, {Object? extra}) {
+  void replaceLocation(String location, {Object? extra}) {}
+
+  @override
+  void replaceAll(AppRouteTarget target) {
+    replaceAllLocation(target.location, extra: target.extra);
+  }
+
+  @override
+  void replaceAllLocation(String location, {Object? extra}) {
     replaceAllCount++;
     lastReplaceAllLocation = location;
   }

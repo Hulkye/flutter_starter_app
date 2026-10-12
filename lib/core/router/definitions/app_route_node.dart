@@ -4,7 +4,4 @@
 /// 不同类型的路由结构。
 abstract class AppRouteNode {
   const AppRouteNode();
-
-  /// 该节点是否无需登录即可访问。
-  bool get public => false;
 }

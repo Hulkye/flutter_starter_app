@@ -87,9 +87,10 @@ class Application {
     return createPendingNavigationOverride(
       requestAuthentication: (ref) {
         final router = ref.read(appRouterProvider);
-        final loginLocation = const LoginRoute().location;
+        const loginTarget = LoginTarget();
+        final loginLocation = loginTarget.location;
         if (router.location != loginLocation) {
-          router.replaceAll(loginLocation);
+          router.replaceAll(loginTarget);
         }
       },
     );

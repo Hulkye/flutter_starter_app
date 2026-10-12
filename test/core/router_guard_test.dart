@@ -5,10 +5,12 @@ void main() {
   String? redirect({
     required String location,
     required RouteAccessDecision decision,
+    String? matchedRoutePath,
     List<String> publicPaths = const <String>['/login', '/article/:id'],
   }) {
     return resolveAccessRedirect(
       currentLocation: location,
+      matchedRoutePath: matchedRoutePath ?? Uri.parse(location).path,
       decision: decision,
       publicPaths: publicPaths,
     );
@@ -17,7 +19,10 @@ void main() {
   test('redirects unauthenticated protected routes with original location', () {
     final result = redirect(
       location: '/todo?filter=open',
-      decision: const RedirectRoute(location: '/login', preserveTarget: true),
+      decision: const RedirectRoute(
+        target: AppRouteTargetValue(location: '/login'),
+        preserveTarget: true,
+      ),
     );
 
     expect(result, '/login?redirect=%2Ftodo%3Ffilter%3Dopen');
@@ -27,7 +32,9 @@ void main() {
     expect(
       redirect(
         location: '/login',
-        decision: const AllowRoute(redirects: {'/login': '/todo'}),
+        decision: const AllowRoute(
+          redirects: {'/login': AppRouteTargetValue(location: '/todo')},
+        ),
       ),
       '/todo',
     );
@@ -37,7 +44,11 @@ void main() {
     expect(
       redirect(
         location: '/article/42',
-        decision: const RedirectRoute(location: '/login', preserveTarget: true),
+        matchedRoutePath: '/article/:id',
+        decision: const RedirectRoute(
+          target: AppRouteTargetValue(location: '/login'),
+          preserveTarget: true,
+        ),
       ),
       isNull,
     );
@@ -47,7 +58,9 @@ void main() {
     expect(
       redirect(
         location: '/todo',
-        decision: const RedirectRoute(location: '/reauthenticate'),
+        decision: const RedirectRoute(
+          target: AppRouteTargetValue(location: '/reauthenticate'),
+        ),
       ),
       '/reauthenticate',
     );
@@ -58,7 +71,7 @@ void main() {
       redirect(
         location: '/todo',
         decision: const RedirectRoute(
-          location: '/upgrade',
+          target: AppRouteTargetValue(location: '/upgrade'),
           appliesToPublicRoutes: true,
         ),
       ),
@@ -71,7 +84,7 @@ void main() {
       redirect(
         location: '/upgrade',
         decision: const RedirectRoute(
-          location: '/upgrade',
+          target: AppRouteTargetValue(location: '/upgrade'),
           appliesToPublicRoutes: true,
         ),
       ),
@@ -83,8 +96,9 @@ void main() {
     expect(
       redirect(
         location: '/article/42',
+        matchedRoutePath: '/article/:id',
         decision: const RedirectRoute(
-          location: '/upgrade',
+          target: AppRouteTargetValue(location: '/upgrade'),
           appliesToPublicRoutes: true,
         ),
       ),
@@ -102,7 +116,10 @@ void main() {
     expect(
       () => resolveAccessRedirect(
         currentLocation: '/todo',
-        decision: const RedirectRoute(location: 'https://example.com'),
+        matchedRoutePath: '/todo',
+        decision: const RedirectRoute(
+          target: AppRouteTargetValue(location: 'https://example.com'),
+        ),
       ),
       throwsStateError,
     );
@@ -110,8 +127,11 @@ void main() {
     expect(
       () => resolveAccessRedirect(
         currentLocation: '/login',
+        matchedRoutePath: '/login',
         decision: const AllowRoute(
-          redirects: {'/login': 'https://example.com'},
+          redirects: {
+            '/login': AppRouteTargetValue(location: 'https://example.com'),
+          },
         ),
       ),
       throwsStateError,
@@ -122,6 +142,7 @@ void main() {
     expect(
       resolveAccessRedirect(
         currentLocation: '/todo',
+        matchedRoutePath: '/todo',
         decision: const AllowRoute(),
       ),
       isNull,

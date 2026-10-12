@@ -1,7 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_starter_app/app/navigation/app_router_config.dart';
 import 'package:flutter_starter_app/app/host/app_bootstrap_coordinator.dart';
 import 'package:flutter_starter_app/core/config/env_config.dart';
+import 'package:flutter_starter_app/core/feature/app_feature.dart';
+import 'package:flutter_starter_app/core/feature/app_feature_registry.dart';
+import 'package:flutter_starter_app/core/feature/app_feature_metadata.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_starter_app/features/features.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
@@ -22,7 +26,20 @@ void main() {
     addTearDown(container.dispose);
 
     expect(container.read(appRouterConfigProvider), isA<AppRouterConfig>());
-    expect(container.read(routeAccessDecisionProvider), isA<RedirectRoute>());
+    final config = container.read(appRouterConfigProvider);
+    expect(
+      config.publicRoutePatterns,
+      containsAll(<String>['/login', '/todo', '/splash', '/web']),
+    );
+    final decision = container.read(routeAccessDecisionProvider)(
+      const AppRouteRequest(
+        location: '/todo',
+        routeKey: 'todo',
+        metadata: AppRouteMetadata(key: 'todo', path: '/todo'),
+        state: AppRouteState(location: '/todo'),
+      ),
+    );
+    expect(decision, isA<RedirectRoute>());
   });
 
   test('authenticated app router decision allows login redirect to home', () {
@@ -37,9 +54,112 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final decision = container.read(routeAccessDecisionProvider);
+    final decision = container.read(routeAccessDecisionProvider)(
+      const AppRouteRequest(
+        location: '/login',
+        routeKey: 'auth.login',
+        metadata: AppRouteMetadata(key: 'auth.login', path: '/login'),
+        state: AppRouteState(location: '/login'),
+      ),
+    );
     expect(decision, isA<AllowRoute>());
-    expect((decision as AllowRoute).redirects, containsPair('/login', '/'));
+    final redirects = (decision as AllowRoute).redirects;
+    expect(redirects, contains('/login'));
+    expect(redirects['/login']?.location, '/');
+  });
+
+  test('feature guards participate in the final app access decision', () {
+    final registry = AppFeatureRegistry(
+      environment: EnvTag.dev,
+      candidates: <AppFeature>[...appFeatures, const _GuardedFeature()],
+    );
+    final container = ProviderContainer(
+      overrides: [
+        ...createAppRouterOverrides(registry),
+        appBootstrapCompletedProvider.overrideWith((ref) => true),
+        authSessionProvider.overrideWith(
+          () => _TestAuthSessionNotifier(const AuthSession(token: 'token')),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final decision = container.read(routeAccessDecisionProvider)(
+      const AppRouteRequest(
+        location: '/guarded',
+        routeKey: '/guarded',
+        metadata: AppRouteMetadata(key: '/guarded', path: '/guarded'),
+        state: AppRouteState(location: '/guarded'),
+      ),
+    );
+
+    expect(decision, isA<RedirectRoute>());
+    expect((decision as RedirectRoute).target.location, '/upgrade');
+  });
+
+  testWidgets('router provider mounts the injected route error builder', (
+    tester,
+  ) async {
+    var renderedErrorLocation = '';
+    final container = ProviderContainer(
+      overrides: [
+        appRouterConfigProvider.overrideWith(
+          (ref) => AppRouterConfig(
+            routeNodes: const <AppRouteNode>[_GuardedRoute()],
+            initialLocation: '/guarded',
+            errorBuilder: (context, error) {
+              renderedErrorLocation = error.location;
+              return Text('Route error: ${error.location}');
+            },
+          ),
+        ),
+        routeAccessDecisionProvider.overrideWith(
+          (ref) =>
+              (request) => const AllowRoute(),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final router = container.read(goRouterProvider);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    router.go('/missing');
+    await tester.pumpAndSettle();
+
+    expect(renderedErrorLocation, '/missing');
+    expect(find.text('Route error: /missing'), findsOneWidget);
+  });
+
+  testWidgets('access decision uses GoRouter matched dynamic route path', (
+    tester,
+  ) async {
+    AppRouteRequest? capturedRequest;
+    final container = ProviderContainer(
+      overrides: [
+        appRouterConfigProvider.overrideWith(
+          (ref) => const AppRouterConfig(
+            routeNodes: <AppRouteNode>[_DynamicRoute()],
+            initialLocation: '/member/42',
+          ),
+        ),
+        routeAccessDecisionProvider.overrideWith(
+          (ref) => (request) {
+            capturedRequest = request;
+            return const AllowRoute();
+          },
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final router = container.read(goRouterProvider);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+
+    expect(capturedRequest?.routeKey, 'member.detail');
+    expect(capturedRequest?.metadata.path, '/member/:memberId');
+    expect(capturedRequest?.state.pathParameter('memberId'), '42');
+    expect(find.text('Member 42'), findsOneWidget);
   });
 
   test(
@@ -65,11 +185,16 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    expect(container.read(routeAccessDecisionProvider), isA<RedirectRoute>());
-    expect(
-      (container.read(routeAccessDecisionProvider) as RedirectRoute).location,
-      '/splash',
+    final decision = container.read(routeAccessDecisionProvider)(
+      const AppRouteRequest(
+        location: '/splash',
+        routeKey: 'app.splash',
+        metadata: AppRouteMetadata(key: 'app.splash', path: '/splash'),
+        state: AppRouteState(location: '/splash'),
+      ),
     );
+    expect(decision, isA<RedirectRoute>());
+    expect((decision as RedirectRoute).target.location, '/splash');
   });
 }
 
@@ -80,4 +205,64 @@ final class _TestAuthSessionNotifier extends AuthSessionNotifier {
 
   @override
   AuthSession? build() => _initialSession;
+}
+
+final class _GuardedFeature extends AppFeature {
+  const _GuardedFeature();
+
+  @override
+  AppFeatureMetadata get metadata =>
+      const AppFeatureMetadata(key: 'guarded', priority: 500);
+
+  @override
+  List<AppPageRoute<dynamic>> get routes => const <AppPageRoute<dynamic>>[
+    _GuardedRoute(),
+  ];
+
+  @override
+  List<AppRouteGuard> get guards => const <AppRouteGuard>[_GuardedRouteGuard()];
+}
+
+final class _GuardedRoute extends AppPageRoute<void> {
+  const _GuardedRoute();
+
+  @override
+  String get path => '/guarded';
+
+  @override
+  void parse(AppRouteState state) {}
+
+  @override
+  Widget buildPage(BuildContext context, void args) => const SizedBox.shrink();
+}
+
+final class _GuardedRouteGuard implements AppRouteGuard {
+  const _GuardedRouteGuard();
+
+  @override
+  RouteAccessDecision evaluate(AppRouteRequest request) {
+    if (request.routeKey == '/guarded') {
+      return const RedirectRoute(
+        target: AppRouteTargetValue(location: '/upgrade'),
+      );
+    }
+    return const AllowRoute();
+  }
+}
+
+final class _DynamicRoute extends AppPageRoute<String> {
+  const _DynamicRoute();
+
+  @override
+  String get path => '/member/:memberId';
+
+  @override
+  AppRouteMetadata get metadata =>
+      const AppRouteMetadata(key: 'member.detail', path: '/member/:memberId');
+
+  @override
+  String parse(AppRouteState state) => state.requiredPathParameter('memberId');
+
+  @override
+  Widget buildPage(BuildContext context, String args) => Text('Member $args');
 }

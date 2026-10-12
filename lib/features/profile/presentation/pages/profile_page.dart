@@ -47,7 +47,7 @@ class ProfilePage extends BasePage {
     }
     scope.ref
         .read(appRouterProvider)
-        .push(WebPageRoute(url: url, title: title).location);
+        .push(WebPageTarget(WebPageConfig(url: url, title: title)));
   }
 
   // ── AppBar ──

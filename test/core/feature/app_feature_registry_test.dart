@@ -5,6 +5,7 @@ import 'package:flutter_starter_app/core/feature/app_feature.dart';
 import 'package:flutter_starter_app/core/feature/app_external_route.dart';
 import 'package:flutter_starter_app/core/feature/app_feature_metadata.dart';
 import 'package:flutter_starter_app/core/feature/app_feature_registry.dart';
+import 'package:flutter_starter_app/core/feature/app_route_policy.dart';
 import 'package:flutter_starter_app/core/feature/app_tab_entry.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -41,6 +42,7 @@ void main() {
             externalRoutes: const <AppExternalRoute>[
               AppExternalRoute(key: 'prod', route: _TestRoute('/prod')),
             ],
+            guards: const <AppRouteGuard>[_TestGuard()],
             providerOverrides: <Override>[
               _bindingProvider.overrideWithValue('prod'),
             ],
@@ -57,6 +59,10 @@ void main() {
         'prod',
       ]);
       expect(registry.providerOverrides, hasLength(1));
+      expect(registry.guards, hasLength(1));
+      expect(registry.routesByKey['/prod'], isA<_TestRoute>());
+      expect(registry.routesByPath['/prod/detail'], isA<_TestRoute>());
+      expect(registry.routesByPath, isNot(contains('/dev')));
     });
 
     test('sorts by priority and then key', () {
@@ -223,6 +229,30 @@ void main() {
         ),
       );
     });
+
+    test('rejects a route policy not declared by its feature', () {
+      expect(
+        () => AppFeatureRegistry(
+          environment: EnvTag.dev,
+          candidates: <AppFeature>[
+            _TestFeature(
+              metadata: const AppFeatureMetadata(key: 'invalid'),
+              routes: const <AppPageRoute>[_TestRoute('/declared')],
+              routePolicies: const <AppRoutePolicy>[
+                AppRoutePolicy(routeKey: 'missing'),
+              ],
+            ),
+          ],
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            allOf(contains('missing'), contains('invalid')),
+          ),
+        ),
+      );
+    });
   });
 }
 
@@ -247,6 +277,8 @@ final class _TestFeature extends AppFeature {
     required this.routes,
     this.tabs = const <AppTabEntry>[],
     this.externalRoutes = const <AppExternalRoute>[],
+    this.guards = const <AppRouteGuard>[],
+    this.routePolicies = const <AppRoutePolicy>[],
     this.providerOverrides = const <Override>[],
   });
 
@@ -263,19 +295,35 @@ final class _TestFeature extends AppFeature {
   final List<AppExternalRoute> externalRoutes;
 
   @override
+  final List<AppRouteGuard> guards;
+
+  @override
+  final List<AppRoutePolicy> routePolicies;
+
+  @override
   final List<Override> providerOverrides;
 }
 
-final class _TestRoute extends AppPageRoute {
+final class _TestRoute extends AppPageRoute<void> {
   const _TestRoute(this.path);
 
   @override
   final String path;
 
   @override
-  Widget buildPage(BuildContext context, AppRouteState state) {
+  void parse(AppRouteState state) {}
+
+  @override
+  Widget buildPage(BuildContext context, void args) {
     return const SizedBox.shrink();
   }
+}
+
+final class _TestGuard implements AppRouteGuard {
+  const _TestGuard();
+
+  @override
+  RouteAccessDecision evaluate(AppRouteRequest request) => const AllowRoute();
 }
 
 final class _TestTab extends AppTabEntry {
@@ -297,4 +345,14 @@ final class _TestTab extends AppTabEntry {
 
   @override
   AppPageRoute get route => _TestRoute(path);
+
+  @override
+  AppRouteTarget get initialTarget => _TestTarget(path);
+}
+
+final class _TestTarget extends AppRouteTargetBase {
+  const _TestTarget(this.location);
+
+  @override
+  final String location;
 }

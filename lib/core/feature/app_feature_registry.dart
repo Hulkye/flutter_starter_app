@@ -5,6 +5,7 @@ import 'package:flutter_starter_app/core/router/router.dart';
 import 'app_feature.dart';
 import 'app_external_route.dart';
 import 'app_tab_entry.dart';
+import 'app_route_policy.dart';
 
 /// 当前环境下的 Feature 注册结果。
 ///
@@ -34,19 +35,52 @@ final class AppFeatureRegistry {
     for (final feature in features) ...feature.externalRoutes,
   ];
 
+  /// 当前环境启用的 Feature 级访问规则。
+  late final List<AppRouteGuard> guards = [
+    for (final feature in features) ...feature.guards,
+  ];
+
+  /// 当前环境启用的路由访问策略。
+  late final List<AppRoutePolicy> routePolicies = [
+    for (final feature in features) ...feature.routePolicies,
+  ];
+
+  /// 按 route key 索引访问策略。
+  late final Map<String, AppRoutePolicy> routePoliciesByKey = Map.unmodifiable({
+    for (final policy in routePolicies) policy.routeKey: policy,
+  });
+
+  /// 当前环境允许匿名访问的路由匹配模板。
+  late final List<String> publicRoutePatterns = [
+    for (final route in allRoutes)
+      if (routePoliciesByKey[route.metadata.key]?.requiresAuthentication ==
+          false)
+        route.path,
+  ];
+
   /// 当前环境启用的普通路由。
-  late final List<AppPageRoute> routes = [
+  late final List<AppPageRoute<dynamic>> routes = [
     for (final feature in features)
       for (final route in feature.routes)
         if (!_tabRoutePaths.contains(route.path)) route,
   ];
 
   /// 当前环境所有已注册页面路由，包含底部 Tab 路由。
-  late final List<AppPageRoute> allRoutes = [
+  late final List<AppPageRoute<dynamic>> allRoutes = [
     ...routes,
     for (final tab in tabs)
       if (!routes.any((route) => route.path == tab.route.path)) tab.route,
   ];
+
+  /// 按稳定 route metadata key 索引的页面路由。
+  late final Map<String, AppPageRoute<dynamic>> routesByKey = Map.unmodifiable({
+    for (final route in allRoutes) route.metadata.key: route,
+  });
+
+  /// 按匹配 path 索引的页面路由。
+  late final Map<String, AppPageRoute<dynamic>> routesByPath = Map.unmodifiable(
+    {for (final route in allRoutes) route.path: route},
+  );
 
   /// 当前环境启用的 Provider 覆盖项。
   late final List<Override> providerOverrides = [
@@ -81,9 +115,40 @@ final class AppFeatureRegistry {
     }
 
     final routes = <String, String>{};
+    final routeKeys = <String, String>{};
     for (final feature in features) {
       for (final route in feature.routes) {
         _validateRoutePath(routes, route.path, feature.key);
+        _validateRouteKey(routeKeys, route.metadata.key, feature.key);
+        if (route.metadata.path != route.path) {
+          throw StateError(
+            'Route metadata path mismatch for "${route.metadata.key}": '
+            '${route.metadata.path} != ${route.path}',
+          );
+        }
+      }
+    }
+
+    final routePolicies = <String, String>{};
+    for (final feature in features) {
+      final featureRouteKeys = {
+        for (final route in feature.routes) route.metadata.key,
+      };
+      for (final policy in feature.routePolicies) {
+        if (!featureRouteKeys.contains(policy.routeKey)) {
+          throw StateError(
+            'Route policy "${policy.routeKey}" in Feature "${feature.key}" '
+            'references a route not declared by that Feature',
+          );
+        }
+        final previousFeature = routePolicies[policy.routeKey];
+        if (previousFeature != null) {
+          throw StateError(
+            'Route policy conflict "${policy.routeKey}": '
+            '$previousFeature and ${feature.key}',
+          );
+        }
+        routePolicies[policy.routeKey] = feature.key;
       }
     }
 
@@ -154,5 +219,19 @@ final class AppFeatureRegistry {
       );
     }
     routes[path] = featureKey;
+  }
+
+  static void _validateRouteKey(
+    Map<String, String> routeKeys,
+    String key,
+    String featureKey,
+  ) {
+    final previousFeature = routeKeys[key];
+    if (previousFeature != null) {
+      throw StateError(
+        'Route key conflict "$key": $previousFeature and $featureKey',
+      );
+    }
+    routeKeys[key] = featureKey;
   }
 }

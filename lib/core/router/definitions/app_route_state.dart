@@ -20,4 +20,28 @@ class AppRouteState {
 
   /// 路由附加参数。
   final Object? extra;
+
+  /// 读取可选的 path 参数。
+  String? pathParameter(String name) => pathParameters[name];
+
+  /// 读取必需的 path 参数；缺失时显式报告非法路由状态。
+  String requiredPathParameter(String name) {
+    final value = pathParameters[name];
+    if (value == null || value.isEmpty) {
+      throw FormatException('Missing required path parameter: $name');
+    }
+    return value;
+  }
+
+  /// 读取可选的 query 参数。
+  String? queryParameter(String name) => queryParameters[name];
+
+  /// 读取必需的 query 参数；缺失时显式报告非法路由状态。
+  String requiredQueryParameter(String name) {
+    final value = queryParameters[name];
+    if (value == null || value.isEmpty) {
+      throw FormatException('Missing required query parameter: $name');
+    }
+    return value;
+  }
 }

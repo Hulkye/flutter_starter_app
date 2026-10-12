@@ -4,11 +4,8 @@ import 'package:flutter_starter_app/core/router/router.dart';
 import '../domain/web_page_config.dart';
 import 'web_page.dart';
 
-final class WebPageRoute extends AppPageRoute {
-  const WebPageRoute({this.url, this.title});
-
-  final String? url;
-  final String? title;
+final class WebPageRoute extends AppPageRoute<WebPageConfig> {
+  const WebPageRoute();
 
   static const String pathValue = '/web';
 
@@ -16,27 +13,19 @@ final class WebPageRoute extends AppPageRoute {
   String get path => pathValue;
 
   @override
-  bool get public => true;
+  WebPageConfig parse(AppRouteState state) => WebPageConfig.fromRouteState(
+    queryParameters: state.queryParameters,
+    extra: state.extra,
+  );
 
   @override
-  String get location => _buildLocation(pathValue, url: url, title: title);
-
-  @override
-  Widget buildPage(BuildContext context, AppRouteState state) {
-    return WebPage(
-      config: WebPageConfig.fromRouteState(
-        queryParameters: state.queryParameters,
-        extra: state.extra,
-      ),
-    );
+  Widget buildPage(BuildContext context, WebPageConfig config) {
+    return WebPage(config: config);
   }
 }
 
-final class AuthWebPageRoute extends AppPageRoute {
-  const AuthWebPageRoute({this.url, this.title});
-
-  final String? url;
-  final String? title;
+final class AuthWebPageRoute extends AppPageRoute<WebPageConfig> {
+  const AuthWebPageRoute();
 
   static const String pathValue = '/auth-web';
 
@@ -44,17 +33,47 @@ final class AuthWebPageRoute extends AppPageRoute {
   String get path => pathValue;
 
   @override
-  String get location => _buildLocation(pathValue, url: url, title: title);
+  WebPageConfig parse(AppRouteState state) => WebPageConfig.fromRouteState(
+    queryParameters: state.queryParameters,
+    extra: state.extra,
+  );
 
   @override
-  Widget buildPage(BuildContext context, AppRouteState state) {
-    return WebPage(
-      config: WebPageConfig.fromRouteState(
-        queryParameters: state.queryParameters,
-        extra: state.extra,
-      ),
-    );
+  Widget buildPage(BuildContext context, WebPageConfig config) {
+    return WebPage(config: config);
   }
+}
+
+final class WebPageTarget extends AppRouteTargetBase {
+  const WebPageTarget(this.config);
+
+  final WebPageConfig config;
+
+  @override
+  String get location => _buildLocation(
+    WebPageRoute.pathValue,
+    url: config.url,
+    title: config.title,
+  );
+
+  @override
+  Object? get extra => config;
+}
+
+final class AuthWebPageTarget extends AppRouteTargetBase {
+  const AuthWebPageTarget(this.config);
+
+  final WebPageConfig config;
+
+  @override
+  String get location => _buildLocation(
+    AuthWebPageRoute.pathValue,
+    url: config.url,
+    title: config.title,
+  );
+
+  @override
+  Object? get extra => config;
 }
 
 String _buildLocation(String path, {String? url, String? title}) {
@@ -67,8 +86,5 @@ String _buildLocation(String path, {String? url, String? title}) {
   if (trimmedTitle != null && trimmedTitle.isNotEmpty) {
     queryParameters['title'] = trimmedTitle;
   }
-  if (queryParameters.isEmpty) {
-    return path;
-  }
-  return Uri(path: path, queryParameters: queryParameters).toString();
+  return AppRouteLocation.withQuery(path, queryParameters);
 }

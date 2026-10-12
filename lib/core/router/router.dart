@@ -5,7 +5,8 @@
 /// ```
 /// 业务层                               Infrastructure 层
 /// ═══════                             ═════════════════
-/// AppPageRoute (注册描述 + location helper)     GoRoute (配置)
+/// AppPageRoute (注册描述)                       GoRoute (配置)
+/// AppRouteTarget (导航目标)
 /// AppRouteState (路由状态)        ──→    GoRouterState
 ///
 /// BaseNavigator (导航接口)       ──→    RouterNavigator (GoRouter 实现)
@@ -17,8 +18,7 @@
 ///
 /// ```dart
 /// // Widget / ViewModel 中
-/// ref.read(appRouterProvider).push(const ProfileRoute().location);
-/// ref.read(appRouterProvider).go('/profile/42?tab=posts');
+/// ref.read(appRouterProvider).push(const ProfileTarget());
 /// ref.read(appRouterProvider).back();
 ///
 /// // Controller 中（无 BuildContext）
@@ -33,10 +33,12 @@
 /// 4. App 层 `app_router_config.dart` 会通过 `appFeatures` 自动组合到路由图
 library;
 
-export 'base_navigator.dart';
-export 'app_router_transfor.dart';
+export 'navigation/base_navigator.dart';
+export 'adapters/app_router_transform.dart';
 export 'definitions/router_definitions.dart';
-export 'router_provider.dart';
-export 'router_navigator.dart';
-export 'router_guard.dart';
-export 'route_access_decision.dart';
+export 'config/router_provider.dart';
+export 'adapters/router_navigator.dart';
+export 'guards/router_guard.dart';
+export 'guards/route_access_decision.dart';
+export 'guards/app_route_guard.dart';
+export 'guards/app_route_request.dart';

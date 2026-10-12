@@ -58,16 +58,17 @@ class _AppHostState extends ConsumerState<AppHost> {
     final target = await bootstrapCoordinator.start();
     if (!mounted) return;
 
-    final targetLocation = switch (target) {
-      AppBootstrapTarget.root => RootRoute.location,
-      AppBootstrapTarget.login => const LoginRoute().location,
+    final routeTarget = switch (target) {
+      AppBootstrapTarget.root => const RootTarget(),
+      AppBootstrapTarget.login => const LoginTarget(),
     };
     ref.read(appBootstrapCompletedProvider.notifier).state = true;
     final pendingNavigationDispatched = ref
         .read(pendingNavigationCoordinatorProvider)
         .onBootstrapCompleted();
-    if (!pendingNavigationDispatched && appRouter.location != targetLocation) {
-      appRouter.replaceAll(targetLocation);
+    if (!pendingNavigationDispatched &&
+        appRouter.location != routeTarget.location) {
+      appRouter.replaceAll(routeTarget);
     }
     _lifecycleCoordinator.onBootstrapCompleted();
   }

@@ -10,12 +10,16 @@ import '../../shared/webview/presentation/webview_routes.dart';
 List<DeepLinkRoute> createExternalDeepLinkRoutes(
   AppFeatureRegistry featureRegistry,
 ) {
+  final routePolicies = featureRegistry.routePoliciesByKey;
   return <DeepLinkRoute>[
     for (final externalRoute in featureRegistry.externalRoutes)
       DeepLinkRoute(
         key: externalRoute.key,
         path: externalRoute.route.path,
-        requiresAuthentication: !externalRoute.route.public,
+        requiresAuthentication:
+            routePolicies[externalRoute.route.metadata.key]
+                ?.requiresAuthentication ??
+            true,
       ),
     const DeepLinkRoute(
       key: WebPageRoute.pathValue,

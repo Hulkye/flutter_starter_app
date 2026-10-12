@@ -1,30 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../definitions/app_route_target.dart';
+import '../definitions/app_route_state.dart';
+import '../definitions/app_page_route.dart';
+import '../definitions/app_redirect_route.dart';
+import '../definitions/app_shell_route.dart';
+import '../definitions/app_route_metadata.dart';
+import '../definitions/app_route_node.dart';
+import 'app_route_request.dart';
 import 'route_access_decision.dart';
-
-bool _matchesRoutePattern(String pattern, String currentPath) {
-  if (pattern == currentPath) return true;
-
-  final patternSegments = pattern.split('/');
-  final currentSegments = currentPath.split('/');
-  if (patternSegments.length != currentSegments.length) return false;
-
-  for (var i = 0; i < patternSegments.length; i++) {
-    final patternSegment = patternSegments[i];
-    final currentSegment = currentSegments[i];
-    if (patternSegment.isEmpty && currentSegment.isEmpty) {
-      continue;
-    }
-    if (patternSegment.startsWith(':')) {
-      if (currentSegment.isEmpty) return false;
-      continue;
-    }
-    if (patternSegment != currentSegment) return false;
-  }
-
-  return true;
-}
 
 /// 创建认证路由守卫。
 ///
@@ -32,18 +17,18 @@ bool _matchesRoutePattern(String pattern, String currentPath) {
 ///
 /// [publicPaths] 中的路径无需登录即可访问，默认只放行主页 `/`。
 ///
-/// 支持 GoRouter 风格的动态片段匹配，例如 `/article/:id` 可以放行
-/// `/article/42`。
+/// 公开路由使用 GoRouter 已匹配的 [GoRouterState.fullPath] 判断，避免在
+/// Router Guard 内重复实现路径语法。
 GoRouterRedirect createAuthGuard({
   required String loginPath,
   required bool Function() isAuthenticated,
   List<String> publicPaths = const <String>['/'],
 }) {
   return (BuildContext context, GoRouterState state) {
-    final currentPath = state.uri.path;
+    final matchedRoutePath = state.fullPath;
 
     // 公开路径 → 放行
-    if (publicPaths.any((path) => _matchesRoutePattern(path, currentPath))) {
+    if (matchedRoutePath != null && publicPaths.contains(matchedRoutePath)) {
       return null;
     }
 
@@ -59,44 +44,88 @@ GoRouterRedirect createAuthGuard({
 
 /// 创建基于最终访问决策的路由守卫。
 GoRouterRedirect createAccessGuard({
-  required RouteAccessDecision Function() accessDecision,
+  required RouteAccessDecision Function(AppRouteRequest) accessDecision,
+  required List<AppRouteNode> routeNodes,
   List<String> publicPaths = const <String>['/'],
   String redirectQueryParameter = 'redirect',
 }) {
   return (BuildContext context, GoRouterState state) {
+    final routeState = AppRouteState(
+      location: state.uri.toString(),
+      pathParameters: state.pathParameters,
+      queryParameters: state.uri.queryParameters,
+      extra: state.extra,
+    );
+    final matchedRoutePath = state.fullPath;
+    if (matchedRoutePath == null) return null;
+    final route = _findRoute(routeNodes, matchedRoutePath);
+    // Unknown paths are handled by GoRouter's configured error builder.
+    if (route == null) return null;
+    final request = AppRouteRequest(
+      location: state.uri.toString(),
+      routeKey: route.key,
+      metadata: route.metadata,
+      state: routeState,
+    );
     return resolveAccessRedirect(
       currentLocation: state.uri.toString(),
-      decision: accessDecision(),
+      matchedRoutePath: matchedRoutePath,
+      decision: accessDecision(request),
       publicPaths: publicPaths,
       redirectQueryParameter: redirectQueryParameter,
     );
   };
 }
 
+_RouteReference? _findRoute(List<AppRouteNode> nodes, String matchedRoutePath) {
+  for (final node in nodes) {
+    if (node is AppPageRoute<dynamic> && node.path == matchedRoutePath) {
+      return _RouteReference(node.metadata.key, node.metadata);
+    }
+    if (node is AppRedirectRoute && node.path == matchedRoutePath) {
+      return _RouteReference(node.metadata.key, node.metadata);
+    }
+    if (node is AppShellRoute) {
+      final branchRoute = _findRoute([
+        for (final branch in node.branches) ...branch.routes,
+      ], matchedRoutePath);
+      if (branchRoute != null) return branchRoute;
+    }
+  }
+  return null;
+}
+
+final class _RouteReference {
+  const _RouteReference(this.key, this.metadata);
+
+  final String key;
+  final AppRouteMetadata metadata;
+}
+
 /// 根据当前 location 和最终访问决策计算重定向目标。
 String? resolveAccessRedirect({
   required String currentLocation,
+  required String matchedRoutePath,
   required RouteAccessDecision decision,
   List<String> publicPaths = const <String>['/'],
   String redirectQueryParameter = 'redirect',
 }) {
   final currentUri = Uri.parse(currentLocation);
-  final currentPath = currentUri.path;
 
   return switch (decision) {
     AllowRoute(:final redirects) => _resolveAllowedRedirect(
-      currentPath,
+      matchedRoutePath,
       redirects,
     ),
     RedirectRoute(
-      :final location,
+      :final target,
       :final preserveTarget,
       :final appliesToPublicRoutes,
     ) =>
       _resolveRequiredRedirect(
         currentUri: currentUri,
-        currentPath: currentPath,
-        targetLocation: location,
+        matchedRoutePath: matchedRoutePath,
+        targetLocation: target.location,
         preserveTarget: preserveTarget,
         appliesToPublicRoutes: appliesToPublicRoutes,
         publicPaths: publicPaths,
@@ -112,20 +141,22 @@ String? readInternalRedirect(String? value) {
 }
 
 String? _resolveAllowedRedirect(
-  String currentPath,
-  Map<String, String> redirects,
+  String matchedRoutePath,
+  Map<String, AppRouteTarget> redirects,
 ) {
   for (final entry in redirects.entries) {
     _requireInternalLocation(entry.key);
-    _requireInternalLocation(entry.value);
-    if (_matchesRoutePattern(entry.key, currentPath)) return entry.value;
+    _requireInternalLocation(entry.value.location);
+    if (entry.key == matchedRoutePath) {
+      return entry.value.location;
+    }
   }
   return null;
 }
 
 String? _resolveRequiredRedirect({
   required Uri currentUri,
-  required String currentPath,
+  required String matchedRoutePath,
   required String targetLocation,
   required bool preserveTarget,
   required bool appliesToPublicRoutes,
@@ -134,11 +165,9 @@ String? _resolveRequiredRedirect({
 }) {
   _requireInternalLocation(targetLocation);
   final targetUri = Uri.parse(targetLocation);
-  if (_matchesRoutePattern(targetUri.path, currentPath)) return null;
+  if (targetUri.path == currentUri.path) return null;
 
-  final isPublic = publicPaths.any(
-    (path) => _matchesRoutePattern(path, currentPath),
-  );
+  final isPublic = publicPaths.contains(matchedRoutePath);
   if (isPublic && !appliesToPublicRoutes) return null;
 
   if (!preserveTarget) return targetLocation;

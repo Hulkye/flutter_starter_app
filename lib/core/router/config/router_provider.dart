@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../shared/widgets/toast/toast_util.dart';
-import 'app_router_transfor.dart';
-import 'base_navigator.dart';
-import 'definitions/router_definitions.dart';
-import 'route_access_decision.dart';
-import 'router_guard.dart';
-import 'router_navigator.dart';
+import '../../../shared/widgets/toast/toast_util.dart';
+import '../adapters/app_router_transform.dart';
+import '../adapters/router_navigator.dart';
+import '../definitions/router_definitions.dart';
+import '../guards/route_access_decision.dart';
+import '../guards/app_route_request.dart';
+import '../guards/router_guard.dart';
+import '../navigation/base_navigator.dart';
 
 // =============================================================================
 // 路由配置 —— 由 App 组合层注入
@@ -21,6 +22,8 @@ final class AppRouterConfig {
   const AppRouterConfig({
     required this.routeNodes,
     required this.initialLocation,
+    this.publicRoutePatterns = const <String>[],
+    this.errorBuilder,
   });
 
   /// 完整应用路由节点。
@@ -28,6 +31,13 @@ final class AppRouterConfig {
 
   /// GoRouter 初始 location。
   final String initialLocation;
+
+  /// App 组合层根据 RoutePolicy 生成的匿名路由匹配模板。
+  final List<String> publicRoutePatterns;
+
+  /// App 组合层可注入的路由错误页面构建器。
+  final Widget Function(BuildContext context, AppRouteError error)?
+  errorBuilder;
 }
 
 /// 应用路由配置 Provider。
@@ -40,12 +50,13 @@ final appRouterConfigProvider = Provider<AppRouterConfig>((ref) {
   );
 });
 
-/// App 组合层可覆盖的最终路由访问决策。
-final routeAccessDecisionProvider = Provider<RouteAccessDecision>((ref) {
-  throw StateError(
-    'routeAccessDecisionProvider must be overridden by the app composition layer.',
-  );
-});
+/// App 组合层注入的路由访问决策函数。
+final routeAccessDecisionProvider =
+    Provider<RouteAccessDecision Function(AppRouteRequest)>((ref) {
+      throw StateError(
+        'routeAccessDecisionProvider must be overridden by the app composition layer.',
+      );
+    });
 
 // =============================================================================
 // Provider
@@ -62,9 +73,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   final routerConfig = ref.watch(appRouterConfigProvider);
   final refreshNotifier = _RouterRefreshNotifier();
   ref.onDispose(refreshNotifier.dispose);
-  ref.listen<RouteAccessDecision>(routeAccessDecisionProvider, (_, _) {
-    refreshNotifier.refresh();
-  });
+  ref.listen<RouteAccessDecision Function(AppRouteRequest)>(
+    routeAccessDecisionProvider,
+    (_, _) {
+      refreshNotifier.refresh();
+    },
+  );
 
   return GoRouter(
     navigatorKey: routerNavigatorKey,
@@ -72,32 +86,23 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     observers: [ToastUtil.navigatorObserver],
     refreshListenable: refreshNotifier,
     redirect: createAccessGuard(
-      accessDecision: () => ref.read(routeAccessDecisionProvider),
-      publicPaths: collectPublicRoutePatterns(routerConfig.routeNodes),
+      accessDecision: (request) =>
+          ref.read(routeAccessDecisionProvider)(request),
+      routeNodes: routerConfig.routeNodes,
+      publicPaths: routerConfig.publicRoutePatterns,
     ),
+    errorBuilder: (context, state) {
+      final error = AppRouteError(
+        location: state.uri.toString(),
+        message: state.error?.toString() ?? 'Unknown routing error',
+        exception: state.error,
+      );
+      return routerConfig.errorBuilder?.call(context, error) ??
+          AppRouteErrorView(error: error);
+    },
     routes: routerConfig.routeNodes.map(toRouteBase).toList(),
   );
 });
-
-List<String> collectPublicRoutePatterns(List<AppRouteNode> nodes) {
-  final publicRoutePatterns = <String>[];
-  for (final node in nodes) {
-    if (node is AppPageRoute && node.public) {
-      publicRoutePatterns.add(node.path);
-      continue;
-    }
-    if (node is AppRedirectRoute && node.public) {
-      publicRoutePatterns.add(node.path);
-      continue;
-    }
-    if (node is AppShellRoute) {
-      for (final branch in node.branches) {
-        publicRoutePatterns.addAll(collectPublicRoutePatterns(branch.routes));
-      }
-    }
-  }
-  return publicRoutePatterns;
-}
 
 /// 导航接口 Provider。
 ///
@@ -108,4 +113,28 @@ final appRouterProvider = Provider<BaseNavigator>((ref) {
 
 final class _RouterRefreshNotifier extends ChangeNotifier {
   void refresh() => notifyListeners();
+}
+
+final class AppRouteErrorView extends StatelessWidget {
+  const AppRouteErrorView({required this.error, super.key});
+
+  final AppRouteError error;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Icon(Icons.error_outline),
+            const SizedBox(height: 12),
+            const Text('页面无法打开'),
+            const SizedBox(height: 8),
+            Text(error.location),
+          ],
+        ),
+      ),
+    );
+  }
 }

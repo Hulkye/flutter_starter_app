@@ -8,6 +8,7 @@
 - 对业务层暴露导航接口：`BaseNavigator` 与 `appRouterProvider`。
 - 在基础设施层把 `AppRouteNode` 转换为 GoRouter 的 `RouteBase`。
 - 通过 `AppRouterConfig` 接收 App 组合层注入的路由图和初始页。
+- 通过 `AppRouterConfig.errorBuilder` 接收 App 组合层注入的错误页面构建器。
 - 在 `router_provider.dart` 创建 GoRouter、状态机守卫和导航 Provider。
 - App Shell 的 Tab 入口由 Feature 显式声明，Shell 只做装配。
 
@@ -24,6 +25,7 @@
 | `definitions/app_shell_branch.dart` | `AppShellBranch` Shell 分支定义 | ❌ |
 | `definitions/app_shell_navigator.dart` | `AppShellNavigator` Shell 分支导航接口 | ❌ |
 | `definitions/app_route_state.dart` | `AppRouteState` 框架无关路由状态 | ❌ |
+| `definitions/app_route_error.dart` | `AppRouteError` 框架无关路由错误上下文 | ❌ |
 | `base_navigator.dart` | `BaseNavigator` 导航抽象接口 | ❌ |
 | `router_navigator.dart` | `RouterNavigator` 的 GoRouter 导航实现 | ✅ |
 | `app_router_transfor.dart` | `AppRouteNode` 到 `RouteBase` 的适配器 | ✅ |
@@ -36,7 +38,7 @@
 ```text
 Feature / App Page
   import 'package:flutter_starter_app/header.dart'
-  ref.read(appRouterProvider).push(const TodoRoute().location)
+  ref.read(appRouterProvider).push(TodoRouteTarget.location)
         │
         ▼
 core/router definitions
@@ -63,7 +65,7 @@ GoRouter
 
 ### AppPageRoute
 
-`AppPageRoute` 同时描述路由匹配、导航目标和页面构建。
+`AppPageRoute` 是无状态路由注册定义；导航参数由独立 Target 构造，页面参数由具体 Args 从真实路由状态解析。
 
 ```dart
 final class SettingRoute extends AppPageRoute {
@@ -80,9 +82,28 @@ final class SettingRoute extends AppPageRoute {
 ```
 
 - `path`：GoRouter 匹配模式，例如 `/ptt/member/:memberId`。
-- `location`：实际跳转地址，默认等于 `path`，带参数路由应覆盖。
 - `public`：是否无需登录即可访问，默认 `false`。
 - `buildPage()`：构建页面，只接收框架无关的 `AppRouteState`。
+
+Target 负责生成本次导航地址，Args 负责从实际 `AppRouteState` 解析参数：
+
+```dart
+abstract final class ProfileRouteTarget {
+  static String location({required String userId}) =>
+      AppRouteLocation.withPathParameters(
+        '/profile/:userId',
+        {'userId': userId},
+      );
+}
+
+final class ProfileRouteArgs {
+  const ProfileRouteArgs({required this.userId});
+  final String userId;
+
+  factory ProfileRouteArgs.fromState(AppRouteState state) =>
+      ProfileRouteArgs(userId: state.requiredPathParameter('userId'));
+}
+```
 
 ### AppRouteState
 
@@ -96,6 +117,24 @@ class AppRouteState {
   final Object? extra;
 }
 ```
+
+### 路由错误页面
+
+未知路径、路由解析失败等错误由 `core/router` 转换为框架无关的
+`AppRouteError`。App 组合层可以通过 `AppRouterConfig.errorBuilder` 注入业务错误页：
+
+```dart
+AppRouterConfig(
+  routeNodes: routes,
+  initialLocation: '/splash',
+  errorBuilder: (context, error) => AppRouteErrorPage(
+    location: error.location,
+  ),
+)
+```
+
+`core/router` 不依赖具体业务错误页面；未注入构建器时使用通用错误页，保证错误状态不会落到
+GoRouter 默认页面。错误页构建器只负责展示，错误恢复、日志上报和返回目标由 App 组合层决定。
 
 ### AppShellRoute
 
@@ -186,7 +225,7 @@ buildRootRouteNodes(tabs: featureRegistry.tabs);
 App/Core/Shared 内部不要通过 `header.dart` 获取依赖，应直接 import 所需模块。
 
 ```dart
-ref.read(appRouterProvider).push(const TodoRoute().location);
+ref.read(appRouterProvider).push(TodoRouteTarget.location);
 ref.read(appRouterProvider).go(RootRoute.location);
 ref.read(appRouterProvider).back();
 ```
@@ -195,29 +234,42 @@ ref.read(appRouterProvider).back();
 
 ```dart
 ref.read(appRouterProvider).push(
-  const AuthWebPageRoute().location,
+  AuthWebPageRouteTarget.location(),
   extra: const WebPageConfig(url: 'https://example.com/member'),
 );
 ```
 
-带参数路由应让 `path` 和 `location` 分离：
+带参数路由的注册定义保持无状态，Target 生成 location，Args 从路由状态解析：
 
 ```dart
 final class MemberDetailRoute extends AppPageRoute {
-  const MemberDetailRoute({required this.memberId});
-
-  final String memberId;
-
+  const MemberDetailRoute();
   @override
   String get path => '/ptt/member/:memberId';
 
   @override
-  String get location => '/ptt/member/$memberId';
-
-  @override
   Widget buildPage(BuildContext context, AppRouteState state) {
-    return MemberDetailPage(memberId: state.pathParameters['memberId']!);
+    final args = MemberDetailRouteArgs.fromState(state);
+    return MemberDetailPage(memberId: args.memberId);
   }
+}
+
+abstract final class MemberDetailRouteTarget {
+  static String location({required String memberId}) =>
+      AppRouteLocation.withPathParameters(
+        '/ptt/member/:memberId',
+        {'memberId': memberId},
+      );
+}
+
+final class MemberDetailRouteArgs {
+  const MemberDetailRouteArgs({required this.memberId});
+  final String memberId;
+
+  factory MemberDetailRouteArgs.fromState(AppRouteState state) =>
+      MemberDetailRouteArgs(
+        memberId: state.requiredPathParameter('memberId'),
+      );
 }
 ```
 
@@ -357,6 +409,11 @@ lib/app/navigation/
 
 - `AllowRoute`：允许当前访问，也可声明已登录访问登录页等少量入口替代规则。
 - `RedirectRoute`：重定向到明确 location，可选择保留原始目标，或覆盖公开路由。
+
+Guard 使用 GoRouter 已匹配的 `GoRouterState.fullPath` 作为唯一当前路由模板。
+例如访问 `/article/42` 时，Guard 接收到的模板是 `/article/:id`；公开路由判断、
+路由元数据查找和入口替代规则都基于该模板精确比较。`core/router` 不再维护第二套
+路径语法或自行解释动态参数、通配符和嵌套路由。
 
 core/router 不枚举启动、Token、资料、升级、权限或租户等业务状态，也不维护状态到
 location 的映射。App 组合层监听各业务 Provider，按产品优先级生成一个最终决策，

@@ -12,14 +12,14 @@ description: "Use when: adding, changing, reviewing, or documenting app routes, 
 1. 在对应 Feature 的 `presentation/<feature>_routes.dart` 中创建 Route class。
 2. 页面 Route class 继承 `AppPageRoute`。
 3. `path` 表示 GoRoute 匹配路径。
-4. `location` 表示实际跳转路径；带参数路由必须正确覆盖。
-5. `buildPage` 只接收 `BuildContext` 和 `AppRouteState`。
+4. 在 Feature 中定义独立的 `XxxRouteTarget.location(...)`；使用 `AppRouteLocation` 构造并编码参数。
+5. `buildPage` 只接收 `BuildContext` 和 `AppRouteState`，通过 `XxxRouteArgs.fromState(state)` 解析参数。
 6. 在 `<feature>_feature.dart` 的 `routes` 中暴露该路由。
 7. 如果该路由是底部 Tab 根路由，在 `<feature>_feature.dart` 的 `tabs` 中暴露 `AppTabEntry`。
 8. 为 Feature 声明唯一 key、显式 priority 与允许环境，并在 `features/features.dart` 注册；如 route class 需要给业务页面使用，在 `features/exports.dart` 导出。
 9. App 层会按当前环境构建唯一 `AppFeatureRegistry`，从同一实例组合 routes、tabs 与 Provider overrides；不要为新增 Feature 修改 `core/router/router_provider.dart`。
 10. 确认 Feature key、route path、Tab key 唯一，且每个 Tab route 都由所属 Feature 的 routes 声明。
-10. 如果项目没有任何底部 Tab，不创建 `/` 的 Root redirect 或 Root Shell；应提供明确首页路由或自定义登录后的目标页。
+11. 如果项目没有任何底部 Tab，不创建 `/` 的 Root redirect 或 Root Shell；应提供明确首页路由或自定义登录后的目标页。
 
 ## 导航使用
 
@@ -28,7 +28,7 @@ description: "Use when: adding, changing, reviewing, or documenting app routes, 
 ```dart
 import 'package:flutter_starter_app/header.dart';
 
-ref.read(appRouterProvider).push(const LoginRoute().location);
+ref.read(appRouterProvider).push(LoginRouteTarget.location);
 ```
 
 ## 禁止事项

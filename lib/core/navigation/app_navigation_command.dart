@@ -1,3 +1,5 @@
+import '../router/definitions/router_definitions.dart';
+
 /// App 内统一导航命令的来源。
 enum AppNavigationSource {
   /// App Scheme、Universal Links 或 Android App Links。
@@ -48,16 +50,19 @@ final class AppNavigationCommand {
   /// 页面需要的类型化附加数据，例如 WebPageConfig。
   final Object? extra;
 
+  static const _targetResolver = AppRouteTargetResolver();
+
   /// 供 BaseNavigator 使用的完整内部 location。
-  String get location {
-    var resolvedPath = path;
-    for (final entry in pathParameters.entries) {
-      resolvedPath = resolvedPath.replaceAll(
-        ':${entry.key}',
-        Uri.encodeComponent(entry.value),
-      );
-    }
-    if (queryParameters.isEmpty) return resolvedPath;
-    return Uri(path: resolvedPath, queryParameters: queryParameters).toString();
-  }
+  String get location => target.location;
+
+  /// 将命令的导航载荷投影为类型化目标。
+  ///
+  /// 命令自身仍保留来源和认证要求等协调信息；Target 只承载最终导航
+  /// 所需的 location 与 extra。
+  AppRouteTarget get target => _targetResolver.resolve(
+    path: path,
+    pathParameters: pathParameters,
+    queryParameters: queryParameters,
+    extra: extra,
+  );
 }

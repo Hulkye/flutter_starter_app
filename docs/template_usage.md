@@ -416,12 +416,12 @@ export 'order/presentation/order_routes.dart';
 
 ### 4. 在页面中导航
 
-Presentation/Page 层建议依赖 `BaseNavigator` 抽象，并传入 route 的 `location`，而不是直接依赖 GoRouter：
+Presentation/Page 层建议依赖 `BaseNavigator` 抽象，并传入具体 Target 生成的 `location`，而不是直接依赖 GoRouter：
 
 ```dart
 import 'package:my_app/header.dart';
 
-ref.read(appRouterProvider).push(const OrderRoute().location);
+ref.read(appRouterProvider).push(OrderRouteTarget.location(orderId: '42'));
 ```
 
 ---

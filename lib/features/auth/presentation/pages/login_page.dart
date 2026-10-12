@@ -167,7 +167,11 @@ final class _LoginPageLogic extends PageLogic {
     }
     ref
         .read(appRouterProvider)
-        .replaceAll(redirectLocation ?? RootRoute.location);
+        .replaceAll(
+          redirectLocation == null
+              ? const RootTarget()
+              : AppRouteTargetValue(location: redirectLocation!),
+        );
   }
 
   @override

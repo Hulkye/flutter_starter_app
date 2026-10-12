@@ -4,13 +4,11 @@ import 'package:app_deep_link/app_deep_link.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_starter_app/core/capability/app_capability.dart';
 import 'package:flutter_starter_app/core/config/env_config.dart';
-import 'package:flutter_starter_app/core/navigation/app_navigation_command.dart';
-import 'package:flutter_starter_app/shared/webview/domain/web_page_config.dart';
-import 'package:flutter_starter_app/shared/webview/presentation/webview_routes.dart';
 
 import '../../app/navigation/app_external_route_registry.dart';
 import '../../core/feature/app_feature_registry.dart';
 import '../../app/navigation/pending_navigation_coordinator.dart';
+import 'deep_link_navigation_command_resolver.dart';
 
 /// 当前宿主对独立 Deep Link package 的适配层。
 ///
@@ -53,38 +51,11 @@ final class DeepLinkAppCapability implements AppCapability {
   /// 忽略无效结果，只把已校验的 URI 转换成宿主导航命令。
   void _handleResolution(DeepLinkResolution resolution) {
     if (resolution is! DeepLinkAccepted) return;
-    final command = _toCommand(resolution.match);
+    final command = const DeepLinkNavigationCommandResolver().resolve(
+      resolution.match,
+    );
     if (command == null) return;
     pendingNavigation.submit(command);
-  }
-
-  /// 宿主专属映射：WebView 参数和 AppNavigationCommand 不属于 package。
-  AppNavigationCommand? _toCommand(DeepLinkMatch match) {
-    if (match.route.key == WebPageRoute.pathValue) {
-      final rawUrl = match.queryParameters['url'];
-      if (rawUrl == null || rawUrl.trim().isEmpty) return null;
-      final normalizedUrl = _normalizeWebUrl(rawUrl);
-      if (normalizedUrl == null) return null;
-      return AppNavigationCommand(
-        source: AppNavigationSource.deepLink,
-        path: const WebPageRoute().path,
-        requiresAuthentication: false,
-        queryParameters: <String, String>{'url': normalizedUrl},
-        extra: WebPageConfig(url: normalizedUrl),
-      );
-    }
-    return AppNavigationCommand(
-      source: AppNavigationSource.deepLink,
-      path: match.route.path,
-      requiresAuthentication: match.route.requiresAuthentication,
-      queryParameters: match.queryParameters,
-    );
-  }
-
-  String? _normalizeWebUrl(String value) {
-    final trimmed = value.trim();
-    final candidate = trimmed.contains('://') ? trimmed : 'https://$trimmed';
-    return WebPageConfig.normalizeWebUri(candidate)?.toString();
   }
 }
 

@@ -4,7 +4,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 /// WebPage 入参配置。
 ///
-/// 常用场景可通过 [WebPageRoute.location] 使用 query 参数传入 URL 和标题；
+/// 常用场景可通过 WebPageRouteTarget 使用 query 参数传入 URL 和标题；
 /// 需要 headers、白名单、WebView 行为开关时，通过导航 extra 传入本对象。
 final class WebPageConfig {
   const WebPageConfig({

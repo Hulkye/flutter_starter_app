@@ -4,19 +4,39 @@ import 'package:flutter_starter_app/core/router/router.dart';
 import 'pages/login_page.dart';
 
 /// Auth 路由对象。
-final class LoginRoute extends AppPageRoute {
+final class LoginRoute extends AppPageRoute<LoginRouteArgs> {
   const LoginRoute();
 
-  @override
-  String get path => '/login';
+  static const String routeKey = 'auth.login';
+  static const String pathValue = '/login';
 
   @override
-  bool get public => true;
+  String get path => pathValue;
 
   @override
-  Widget buildPage(BuildContext context, AppRouteState state) {
-    return LoginPage(
-      redirectLocation: readInternalRedirect(state.queryParameters['redirect']),
-    );
+  AppRouteMetadata get metadata =>
+      const AppRouteMetadata(key: routeKey, path: pathValue);
+
+  @override
+  LoginRouteArgs parse(AppRouteState state) => LoginRouteArgs(
+    redirectLocation: readInternalRedirect(state.queryParameters['redirect']),
+  );
+
+  @override
+  Widget buildPage(BuildContext context, LoginRouteArgs args) {
+    return LoginPage(redirectLocation: args.redirectLocation);
   }
+}
+
+final class LoginRouteArgs {
+  const LoginRouteArgs({required this.redirectLocation});
+
+  final String? redirectLocation;
+}
+
+final class LoginTarget extends AppRouteTargetBase {
+  const LoginTarget();
+
+  @override
+  String get location => LoginRoute.pathValue;
 }

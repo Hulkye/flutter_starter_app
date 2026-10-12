@@ -17,5 +17,5 @@ final class AppShellBranch {
   final String? initialLocation;
 
   /// 当前分支下的页面路由。
-  final List<AppPageRoute> routes;
+  final List<AppPageRoute<dynamic>> routes;
 }

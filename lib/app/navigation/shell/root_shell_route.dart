@@ -6,7 +6,7 @@ List<AppRouteNode> buildRootRouteNodes({required List<AppTabEntry> tabs}) {
   if (tabs.isEmpty) return const <AppRouteNode>[];
 
   return <AppRouteNode>[
-    RootRoute(redirectTo: tabs.first.initialLocation),
+    RootRoute(redirectTo: tabs.first.initialTarget.location),
     RootShellRoute(tabs: tabs),
   ];
 }
@@ -16,6 +16,13 @@ final class RootRoute extends AppRedirectRoute {
 
   static const String pathValue = '/';
   static const String location = pathValue;
+}
+
+final class RootTarget extends AppRouteTargetBase {
+  const RootTarget();
+
+  @override
+  String get location => RootRoute.pathValue;
 }
 
 final class RootShellRoute extends AppShellRoute {
@@ -30,8 +37,8 @@ final class RootShellRoute extends AppShellRoute {
     return <AppShellBranch>[
       for (final tab in tabs)
         AppShellBranch(
-          initialLocation: tab.initialLocation,
-          routes: <AppPageRoute>[tab.route],
+          initialLocation: tab.initialTarget.location,
+          routes: <AppPageRoute<dynamic>>[tab.route],
         ),
     ];
   }

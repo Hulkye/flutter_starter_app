@@ -7,11 +7,7 @@ import 'app_shell_navigator.dart';
 
 /// Shell 路由节点。
 class AppShellRoute extends AppRouteNode {
-  const AppShellRoute({
-    required this.branches,
-    required this.builder,
-    this.public = false,
-  });
+  const AppShellRoute({required this.branches, required this.builder});
 
   /// Shell 下的分支列表。
   final List<AppShellBranch> branches;
@@ -23,7 +19,4 @@ class AppShellRoute extends AppRouteNode {
     AppShellNavigator shellNavigator,
   )
   builder;
-
-  @override
-  final bool public;
 }

@@ -4,14 +4,24 @@ import 'package:flutter_starter_app/core/router/router.dart';
 import 'pages/profile_page.dart';
 
 /// Profile 路由。
-final class ProfileRoute extends AppPageRoute {
+final class ProfileRoute extends AppPageRoute<void> {
   const ProfileRoute();
 
   @override
   String get path => '/profile';
 
   @override
-  Widget buildPage(BuildContext context, AppRouteState state) {
+  void parse(AppRouteState state) {}
+
+  @override
+  Widget buildPage(BuildContext context, void args) {
     return const ProfilePage();
   }
+}
+
+final class ProfileTarget extends AppRouteTargetBase {
+  const ProfileTarget();
+
+  @override
+  String get location => const ProfileRoute().path;
 }

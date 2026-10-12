@@ -12,7 +12,9 @@ abstract class AppTabEntry {
 
   String selectedIcon(BuildContext context);
 
-  AppPageRoute get route;
+  AppPageRoute<dynamic> get route;
 
-  String get initialLocation => route.location;
+  AppRouteTarget get initialTarget;
+
+  String get initialLocation => initialTarget.location;
 }

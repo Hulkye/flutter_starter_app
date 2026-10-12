@@ -22,7 +22,12 @@ AppRouterConfig createAppRouterConfig(AppFeatureRegistry featureRegistry) {
       const WebPageRoute(),
       const AuthWebPageRoute(),
     ],
-    initialLocation: const SplashRoute().location,
+    initialLocation: const SplashTarget().location,
+    publicRoutePatterns: <String>[
+      ...featureRegistry.publicRoutePatterns,
+      const SplashRoute().path,
+      WebPageRoute.pathValue,
+    ],
   );
 }
 
@@ -34,24 +39,36 @@ List<Override> createAppRouterOverrides(AppFeatureRegistry featureRegistry) {
     ),
     routeAccessDecisionProvider.overrideWith((ref) {
       if (!ref.watch(appBootstrapCompletedProvider)) {
-        return RedirectRoute(
-          location: SplashRoute().location,
+        return (AppRouteRequest request) => RedirectRoute(
+          target: const SplashTarget(),
           appliesToPublicRoutes: true,
         );
       }
 
       final authenticated = ref.watch(authSessionProvider)?.isValid == true;
-      if (authenticated) {
-        return AllowRoute(
-          redirects: <String, String>{
-            const LoginRoute().location: RootRoute.location,
-          },
-        );
-      }
-      return RedirectRoute(
-        location: const LoginRoute().location,
-        preserveTarget: true,
-      );
+      final guardChain = AppRouteGuardChain([
+        ...featureRegistry.guards,
+        _AuthenticationRouteGuard(authenticated: authenticated),
+      ]);
+      return guardChain.evaluate;
     }),
   ];
+}
+
+final class _AuthenticationRouteGuard implements AppRouteGuard {
+  const _AuthenticationRouteGuard({required this.authenticated});
+
+  final bool authenticated;
+
+  @override
+  RouteAccessDecision evaluate(AppRouteRequest request) {
+    if (authenticated) {
+      return AllowRoute(
+        redirects: <String, AppRouteTarget>{
+          const LoginTarget().location: const RootTarget(),
+        },
+      );
+    }
+    return const RedirectRoute(target: LoginTarget(), preserveTarget: true);
+  }
 }

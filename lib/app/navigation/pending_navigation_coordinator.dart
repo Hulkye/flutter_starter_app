@@ -48,7 +48,7 @@ final class PendingNavigationCoordinator {
     }
 
     _pendingCommand = null;
-    read(appRouterProvider).replaceAll(command.location, extra: command.extra);
+    read(appRouterProvider).replaceAll(command.target);
     return true;
   }
 }

@@ -55,7 +55,7 @@ void main() {
         listen: false,
       ).read(appRouterProvider);
 
-      router.go(const WebPageRoute(url: 'ftp://example.com').location);
+      router.go(const WebPageTarget(WebPageConfig(url: 'ftp://example.com')));
       await _pumpMs(tester, 1000);
 
       expect(find.text('网页地址无效'), findsOneWidget);
@@ -76,7 +76,7 @@ void main() {
       ).read(appRouterProvider);
 
       final routeResult = router.push<Object?>(
-        const WebPageRoute(url: 'ftp://example.com').location,
+        const WebPageTarget(WebPageConfig(url: 'ftp://example.com')),
       );
       await _pumpMs(tester, 1000);
 
@@ -103,7 +103,9 @@ void main() {
       listen: false,
     ).read(appRouterProvider);
 
-    router.go(const AuthWebPageRoute(url: 'https://example.com').location);
+    router.go(
+      const AuthWebPageTarget(WebPageConfig(url: 'https://example.com')),
+    );
     await _pumpMs(tester, 1000);
 
     expect(find.text('登录'), findsAtLeastNWidgets(1));

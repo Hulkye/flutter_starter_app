@@ -21,7 +21,7 @@ void main() {
         isA<RootRoute>().having(
           (route) => route.redirectTo,
           'redirectTo',
-          const _TestRoute().location,
+          '/test',
         ),
       );
 
@@ -49,17 +49,30 @@ final class _TestTab extends AppTabEntry {
   String selectedIcon(BuildContext context) => 'test_selected';
 
   @override
-  AppPageRoute get route => const _TestRoute();
+  AppPageRoute<dynamic> get route => const _TestRoute();
+
+  @override
+  AppRouteTarget get initialTarget => const _TestTarget();
 }
 
-final class _TestRoute extends AppPageRoute {
+final class _TestRoute extends AppPageRoute<void> {
   const _TestRoute();
 
   @override
   String get path => '/test';
 
   @override
-  Widget buildPage(BuildContext context, AppRouteState state) {
+  void parse(AppRouteState state) {}
+
+  @override
+  Widget buildPage(BuildContext context, void args) {
     return const SizedBox.shrink();
   }
+}
+
+final class _TestTarget extends AppRouteTargetBase {
+  const _TestTarget();
+
+  @override
+  String get location => '/test';
 }

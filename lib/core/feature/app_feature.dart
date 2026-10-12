@@ -4,6 +4,7 @@ import 'package:flutter_starter_app/core/router/router.dart';
 import 'app_tab_entry.dart';
 import 'app_feature_metadata.dart';
 import 'app_external_route.dart';
+import 'app_route_policy.dart';
 
 /// Feature 对 App 暴露能力的统一协议。
 ///
@@ -19,13 +20,22 @@ abstract class AppFeature {
   String get key => metadata.key;
 
   /// 模块下的路由
-  List<AppPageRoute> get routes;
+  List<AppPageRoute<dynamic>> get routes;
 
   /// 模块下的tab入口
   List<AppTabEntry> get tabs => const [];
 
   /// 模块允许由 App 外部入口打开的路由。
   List<AppExternalRoute> get externalRoutes => const [];
+
+  /// 模块下路由的静态访问策略。
+  List<AppRoutePolicy> get routePolicies => const [];
+
+  /// 模块级路由访问规则。
+  ///
+  /// App 组合层会按 Feature 注册顺序汇聚这些 Guard，并与 App 级 Guard
+  /// 一起组成最终的 [AppRouteGuardChain]。
+  List<AppRouteGuard> get guards => const [];
 
   /// 模块默认 Provider 覆盖项。
   ///

@@ -3,17 +3,31 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 import 'pages/todo_page.dart';
 
-final class TodoRoute extends AppPageRoute {
+final class TodoRoute extends AppPageRoute<void> {
   const TodoRoute();
 
-  @override
-  String get path => '/todo';
+  static const String routeKey = 'todo.home';
+  static const String pathValue = '/todo';
 
   @override
-  bool get public => true;
+  String get path => pathValue;
 
   @override
-  Widget buildPage(BuildContext context, AppRouteState state) {
+  AppRouteMetadata get metadata =>
+      const AppRouteMetadata(key: routeKey, path: pathValue);
+
+  @override
+  void parse(AppRouteState state) {}
+
+  @override
+  Widget buildPage(BuildContext context, void args) {
     return const TodoPage();
   }
+}
+
+final class TodoTarget extends AppRouteTargetBase {
+  const TodoTarget();
+
+  @override
+  String get location => TodoRoute.pathValue;
 }

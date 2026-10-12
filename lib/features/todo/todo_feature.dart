@@ -5,6 +5,7 @@ import 'package:flutter_starter_app/core/feature/app_tab_entry.dart';
 import 'package:flutter_starter_app/core/l10n/l10n.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_starter_app/core/theme/theme.dart';
+import 'package:flutter_starter_app/core/feature/app_route_policy.dart';
 
 import '../../core/feature/app_feature.dart';
 import '../../core/feature/app_external_route.dart';
@@ -22,7 +23,12 @@ final class TodoFeature extends AppFeature {
       const AppFeatureMetadata(key: 'todo', priority: 200);
 
   @override
-  List<AppPageRoute> get routes => const [TodoRoute()];
+  List<AppPageRoute<dynamic>> get routes => const [TodoRoute()];
+
+  @override
+  List<AppRoutePolicy> get routePolicies => const [
+    AppRoutePolicy(routeKey: TodoRoute.routeKey, requiresAuthentication: false),
+  ];
 
   @override
   List<AppTabEntry> get tabs => const [_TodoTabEntry()];
@@ -58,5 +64,8 @@ final class _TodoTabEntry extends AppTabEntry {
   String selectedIcon(BuildContext context) => context.appAsset.tabTodoSelected;
 
   @override
-  AppPageRoute get route => const TodoRoute();
+  AppPageRoute<dynamic> get route => const TodoRoute();
+
+  @override
+  AppRouteTarget get initialTarget => const TodoTarget();
 }

@@ -13,6 +13,8 @@ void main() {
       );
 
       expect(command.location, '/profile/user%2F1?tab=posts');
+      expect(command.target.location, command.location);
+      expect(command.target.extra, isNull);
     });
 
     test('keeps plain path when no parameters exist', () {
@@ -23,6 +25,7 @@ void main() {
       );
 
       expect(command.location, '/todo');
+      expect(command.target.location, '/todo');
     });
   });
 }

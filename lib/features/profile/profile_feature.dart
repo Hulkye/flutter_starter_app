@@ -17,7 +17,7 @@ final class ProfileFeature extends AppFeature {
       const AppFeatureMetadata(key: 'profile', priority: 300);
 
   @override
-  List<AppPageRoute> get routes => const [ProfileRoute()];
+  List<AppPageRoute<dynamic>> get routes => const [ProfileRoute()];
 
   @override
   List<AppExternalRoute> get externalRoutes => const [
@@ -45,5 +45,8 @@ final class _ProfileTabEntry extends AppTabEntry {
       context.appAsset.tabProfileSelected;
 
   @override
-  AppPageRoute get route => const ProfileRoute();
+  AppPageRoute<dynamic> get route => const ProfileRoute();
+
+  @override
+  AppRouteTarget get initialTarget => const ProfileTarget();
 }
