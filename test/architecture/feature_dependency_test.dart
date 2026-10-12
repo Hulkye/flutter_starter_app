@@ -28,6 +28,35 @@ void main() {
       reason: 'Presentation must depend on domain abstractions, not data.',
     );
   });
+
+  test('core router does not import app, features, or toast', () {
+    final offenders = <String>[];
+    final importPattern = RegExp(
+      r"""^\s*import\s+['"]([^'"]+)['"]""",
+      multiLine: true,
+    );
+    const forbiddenPrefixes = <String>[
+      'package:flutter_starter_app/app/',
+      'package:flutter_starter_app/features/',
+      'package:flutter_starter_app/shared/widgets/toast/',
+    ];
+
+    for (final file in _coreRouterDartFiles()) {
+      final content = file.readAsStringSync();
+      for (final match in importPattern.allMatches(content)) {
+        final importUri = match.group(1)!;
+        if (forbiddenPrefixes.any(importUri.startsWith)) {
+          offenders.add('${file.path}: $importUri');
+        }
+      }
+    }
+
+    expect(
+      offenders,
+      isEmpty,
+      reason: 'core/router must stay decoupled from app, features, and toast.',
+    );
+  });
 }
 
 Iterable<File> _presentationDartFiles() {
@@ -36,6 +65,14 @@ Iterable<File> _presentationDartFiles() {
   ).listSync(recursive: true).whereType<File>().where((file) {
     final path = file.path.replaceAll('\\', '/');
     return path.endsWith('.dart') && path.contains('/presentation/');
+  });
+}
+
+Iterable<File> _coreRouterDartFiles() {
+  return Directory(
+    'lib/core/router',
+  ).listSync(recursive: true).whereType<File>().where((file) {
+    return file.path.replaceAll('\\', '/').endsWith('.dart');
   });
 }
 

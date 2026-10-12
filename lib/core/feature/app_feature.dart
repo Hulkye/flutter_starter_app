@@ -33,8 +33,8 @@ abstract class AppFeature {
 
   /// 模块级路由访问规则。
   ///
-  /// App 组合层会按 Feature 注册顺序汇聚这些 Guard，并与 App 级 Guard
-  /// 一起组成最终的 [AppRouteGuardChain]。
+  /// App 组合层会按 Feature 注册顺序汇聚这些 Guard。最终链顺序为：
+  /// Bootstrap（最先短路）→ Authentication → Feature Guards。
   List<AppRouteGuard> get guards => const [];
 
   /// 模块默认 Provider 覆盖项。

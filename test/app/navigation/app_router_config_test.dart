@@ -10,6 +10,7 @@ import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_starter_app/features/features.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
+import 'package:flutter_starter_app/shared/widgets/toast/toast_util.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -31,6 +32,7 @@ void main() {
       config.publicRoutePatterns,
       containsAll(<String>['/login', '/todo', '/splash', '/web']),
     );
+    expect(config.observers, contains(ToastUtil.navigatorObserver));
     final decision = container.read(routeAccessDecisionProvider)(
       const AppRouteRequest(
         location: '/todo',
@@ -96,6 +98,40 @@ void main() {
     expect(decision, isA<RedirectRoute>());
     expect((decision as RedirectRoute).target.location, '/upgrade');
   });
+
+  test(
+    'unauthenticated access redirects to login before feature guards',
+    () {
+      final registry = AppFeatureRegistry(
+        environment: EnvTag.dev,
+        candidates: <AppFeature>[...appFeatures, const _GuardedFeature()],
+      );
+      final container = ProviderContainer(
+        overrides: [
+          ...createAppRouterOverrides(registry),
+          appBootstrapCompletedProvider.overrideWith((ref) => true),
+          authSessionProvider.overrideWith(
+            () => _TestAuthSessionNotifier(null),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final decision = container.read(routeAccessDecisionProvider)(
+        const AppRouteRequest(
+          location: '/guarded',
+          routeKey: '/guarded',
+          metadata: AppRouteMetadata(key: '/guarded', path: '/guarded'),
+          state: AppRouteState(location: '/guarded'),
+        ),
+      );
+
+      expect(decision, isA<RedirectRoute>());
+      final redirect = decision as RedirectRoute;
+      expect(redirect.target.location, '/login');
+      expect(redirect.preserveTarget, isTrue);
+    },
+  );
 
   testWidgets('router provider mounts the injected route error builder', (
     tester,

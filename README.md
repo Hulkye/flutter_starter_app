@@ -409,16 +409,17 @@ Page Navigation    → BaseNavigator                 → RouterNavigator
 
 特点：
 
-- 每个 Feature 自己维护路由定义
-- 每个 Feature 通过 `XxxFeature` 暴露元数据、模块路由、可选底部 Tab 入口与默认 Provider 装配
+- 每个 Feature 自己维护 `AppPageRoute` 注册定义与独立 `AppRouteTarget` 导航目标
+- 每个 Feature 通过 `XxxFeature` 暴露元数据、模块路由、可选底部 Tab 入口、访问策略、Feature Guards 与默认 Provider 装配
 - `features/features.dart` 保留候选列表，并按当前环境创建唯一的 `AppFeatureRegistry`
-- 注册表按 `priority` 升序、Feature key 升序稳定排序，并校验 Feature key、route path 与 Tab key 唯一
+- 注册表按 `priority` 升序、Feature key 升序稳定排序，并校验 Feature key、route key/path 与 Tab key 唯一
 - `features/exports.dart` 只导出业务页面需要的 route class 与公开类型，并由 `header.dart` 汇总
 - `lib/app/navigation/app_router_config.dart` 组合 Splash、Root/Shell、Feature 路由与 App 公共路由，并注入 `core/router`
 - `header.dart` 只作为业务页面便捷入口，App/Core/Shared 内部使用精确 import，避免隐式依赖 Feature
 - App Shell 从当前环境注册表的 tabs 自动装配底部 Tab 分支；无 Tab 时不创建 Root redirect / Shell
-- 支持公开路由与登录态路由
-- 未登录访问受保护页面时自动跳转登录页
+- 公开路由由 Feature 的 `AppRoutePolicy` 声明，再由注册表派生匹配模板；不要在 `AppPageRoute` 上写 `public`
+- 守卫顺序为 Bootstrap → Authentication → Feature Guards；未登录访问受保护页面时先跳登录页
+- Toast 等 NavigatorObserver 由 App 组合层通过 `AppRouterConfig.observers` 注入，`core/router` 不绑定具体 UI
 - 提供 root navigator key，支持非 UI 场景导航
 
 ### 🔐 登录会话

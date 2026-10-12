@@ -11,11 +11,13 @@ import 'app_route_state.dart';
 /// ## 使用
 ///
 /// ```dart
-/// // 路由注册（在 router_provider.dart 中集中管理）
-/// final List<AppPageRoute<dynamic>> _allRoutes = [
-///   HomeRoute(),
-///   ProfileRoute(),
-/// ];
+/// // 路由注册由 Feature 声明，再经 AppFeatureRegistry 汇入 AppRouterConfig
+/// final class HomeFeature extends AppFeature {
+///   const HomeFeature();
+///
+///   @override
+///   List<AppPageRoute<dynamic>> get routes => const [HomeRoute()];
+/// }
 /// ```
 ///
 /// ## 自定义路由

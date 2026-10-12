@@ -11,37 +11,6 @@ import '../definitions/app_route_node.dart';
 import 'app_route_request.dart';
 import 'route_access_decision.dart';
 
-/// 创建认证路由守卫。
-///
-/// 返回的函数直接传给 [GoRouter.redirect]。
-///
-/// [publicPaths] 中的路径无需登录即可访问，默认只放行主页 `/`。
-///
-/// 公开路由使用 GoRouter 已匹配的 [GoRouterState.fullPath] 判断，避免在
-/// Router Guard 内重复实现路径语法。
-GoRouterRedirect createAuthGuard({
-  required String loginPath,
-  required bool Function() isAuthenticated,
-  List<String> publicPaths = const <String>['/'],
-}) {
-  return (BuildContext context, GoRouterState state) {
-    final matchedRoutePath = state.fullPath;
-
-    // 公开路径 → 放行
-    if (matchedRoutePath != null && publicPaths.contains(matchedRoutePath)) {
-      return null;
-    }
-
-    // 已登录 → 放行
-    if (isAuthenticated()) {
-      return null;
-    }
-
-    // 未登录 → 重定向到登录页
-    return loginPath;
-  };
-}
-
 /// 创建基于最终访问决策的路由守卫。
 GoRouterRedirect createAccessGuard({
   required RouteAccessDecision Function(AppRouteRequest) accessDecision,
@@ -194,18 +163,4 @@ void _requireInternalLocation(String value) {
   if (!isInternalLocation(value)) {
     throw StateError('Route location must be an internal root path: $value');
   }
-}
-
-/// 未登录时禁止访问的便捷守卫。
-///
-/// 与 [createAuthGuard] 相同，但 publicPaths 默认为空（所有路径都需要登录）。
-GoRouterRedirect createStrictAuthGuard({
-  required String loginPath,
-  required bool Function() isAuthenticated,
-}) {
-  return createAuthGuard(
-    loginPath: loginPath,
-    isAuthenticated: isAuthenticated,
-    publicPaths: const <String>[],
-  );
 }

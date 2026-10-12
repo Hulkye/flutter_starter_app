@@ -7,7 +7,7 @@
 - Clean Architecture 依赖方向为：`presentation -> domain <- data`。
 - `core` 提供全局基础设施，不依赖具体 Feature。
 - `core/config` 承载 App 环境配置，供 `main_*`、`app`、`core/network` 与业务页面读取；避免 `core` 反向依赖 `app`。
-- `core/router` 不装配具体 App/Feature 路由；App 层通过 `AppRouterConfig` 注入路由图。
+- `core/router` 不装配具体 App/Feature 路由，也不绑定 Toast 等 UI 组件；App 层通过 `AppRouterConfig` 注入路由图、公开策略和 observers。
 - `shared` 提供跨 Feature 可复用能力，不承载具体业务流程；较完整的通用能力可按能力名建目录，例如 `shared/webview/`；跨页面、跨模块的低频业务通知使用 `shared/services/event_bus`。
 
 ## Feature 内部分层
@@ -20,7 +20,7 @@
 - `presentation/pages/`：页面与 UI 组合。
 - `presentation/viewmodels/`：页面状态与业务动作。
 - `presentation/<feature>_routes.dart`：当前 Feature 的路由定义。
-- `<feature>_feature.dart`：当前 Feature 对 App 暴露的模块声明，包括路由、Tab 入口和默认 Provider 覆盖项。
+- `<feature>_feature.dart`：当前 Feature 对 App 暴露的模块声明，包括路由、Tab 入口、访问策略、Feature Guards 和默认 Provider 覆盖项。
 - `lib/core/feature/`：定义 `AppFeatureMetadata` 与 `AppFeatureRegistry`；注册表统一负责环境筛选、稳定排序、冲突校验和 routes/tabs/provider overrides 派生。
 - `lib/features/features.dart`：保留 App Feature 候选列表，并按 `EnvTag` 创建唯一注册表实例。
 - `lib/features/exports.dart`：业务页面公共导出入口，只导出 route class 和明确需要跨模块使用的公开类型，避免通过 `header.dart` 暴露默认 data 装配。
@@ -47,6 +47,7 @@
 - 退出登录这类 App 级会话能力应通过 `AuthSessionController` 或共享服务暴露。
 - 路由守卫只消费 App 组合层注入的 `RouteAccessDecision`，不直接枚举具体业务状态；
   登录、启动、升级、资料、权限和租户等状态由组合层按业务优先级解析为最终决策。
+- 模板默认 Guard 顺序为 Bootstrap → Authentication → Feature Guards；公开路由由 Feature 的 `AppRoutePolicy` 声明。
 
 ## MVVM 边界
 

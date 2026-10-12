@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/feature/app_feature_registry.dart';
@@ -5,6 +6,7 @@ import '../../core/router/router.dart';
 import '../../features/auth/presentation/auth_routes.dart';
 import '../../shared/services/auth/auth.dart';
 import '../../shared/webview/webview.dart';
+import '../../shared/widgets/toast/toast_util.dart';
 import '../host/app_bootstrap_coordinator.dart';
 import 'shell/root_shell_route.dart';
 import 'splash/splash_route.dart';
@@ -28,6 +30,7 @@ AppRouterConfig createAppRouterConfig(AppFeatureRegistry featureRegistry) {
       const SplashRoute().path,
       WebPageRoute.pathValue,
     ],
+    observers: <NavigatorObserver>[ToastUtil.navigatorObserver],
   );
 }
 
@@ -47,8 +50,8 @@ List<Override> createAppRouterOverrides(AppFeatureRegistry featureRegistry) {
 
       final authenticated = ref.watch(authSessionProvider)?.isValid == true;
       final guardChain = AppRouteGuardChain([
-        ...featureRegistry.guards,
         _AuthenticationRouteGuard(authenticated: authenticated),
+        ...featureRegistry.guards,
       ]);
       return guardChain.evaluate;
     }),

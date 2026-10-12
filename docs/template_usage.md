@@ -320,30 +320,64 @@ import 'package:flutter/widgets.dart';
 import '../../../core/router/router.dart';
 import 'pages/order_page.dart';
 
-final class OrderRoute extends AppPageRoute {
+final class OrderRoute extends AppPageRoute<OrderRouteArgs> {
   const OrderRoute();
 
-  @override
-  String get path => '/order';
+  static const String routeKey = 'order.detail';
+  static const String pathValue = '/order/:orderId';
 
   @override
-  bool get public => false;
+  String get path => pathValue;
 
   @override
-  Widget buildPage(BuildContext context, AppRouteState state) {
-    return const OrderPage();
+  AppRouteMetadata get metadata =>
+      const AppRouteMetadata(key: routeKey, path: pathValue);
+
+  @override
+  OrderRouteArgs parse(AppRouteState state) => OrderRouteArgs(
+    orderId: state.requiredPathParameter('orderId'),
+  );
+
+  @override
+  Widget buildPage(BuildContext context, OrderRouteArgs args) {
+    return OrderPage(orderId: args.orderId);
   }
+}
+
+final class OrderRouteArgs {
+  const OrderRouteArgs({required this.orderId});
+
+  final String orderId;
+}
+
+final class OrderTarget extends AppRouteTargetBase {
+  const OrderTarget({required this.orderId});
+
+  final String orderId;
+
+  @override
+  String get location => AppRouteLocation.withPathParameters(
+    OrderRoute.pathValue,
+    {'orderId': orderId},
+  );
 }
 ```
 
-`public` 含义：
+`AppPageRoute` 只负责注册匹配路径、解析参数和构建页面。实际跳转使用独立的 `AppRouteTarget`，不要把 Route 对象或 `.location` 字符串当成正式导航 API。
 
-| 值 | 说明 |
-| --- | --- |
-| `true` | 公开页面，未登录也可以访问 |
-| `false` | 受保护页面，未登录会跳转到登录页 |
+公开路由不在 Route 上标记 `public`。需要免登录访问时，在 Feature 中覆盖 `routePolicies`：
 
-公开路由按 `path` 模式匹配，支持 `/article/:id` 这类动态路径。只要 Route 本身声明 `public = true`，实际访问 `/article/42` 也会被放行。
+```dart
+@override
+List<AppRoutePolicy> get routePolicies => const [
+  AppRoutePolicy(
+    routeKey: OrderRoute.routeKey,
+    requiresAuthentication: false,
+  ),
+];
+```
+
+公开路由按 `path` 模板精确比较。例如 `path = '/order/:orderId'` 时，实际访问 `/order/42` 的匹配模板仍是 `/order/:orderId`，会被识别为公开路由。
 
 ### 2. 在 Feature 中暴露路由
 
@@ -416,12 +450,12 @@ export 'order/presentation/order_routes.dart';
 
 ### 4. 在页面中导航
 
-Presentation/Page 层建议依赖 `BaseNavigator` 抽象，并传入具体 Target 生成的 `location`，而不是直接依赖 GoRouter：
+Presentation/Page 层建议依赖 `BaseNavigator` 抽象，并传入 `AppRouteTarget`，而不是直接依赖 GoRouter：
 
 ```dart
 import 'package:my_app/header.dart';
 
-ref.read(appRouterProvider).push(OrderRouteTarget.location(orderId: '42'));
+ref.read(appRouterProvider).push(const OrderTarget(orderId: '42'));
 ```
 
 ---
@@ -722,24 +756,27 @@ Android 构建前会执行 `flutter clean`，并在构建完成后校验发布�
 
 ```dart
 ref.read(appRouterProvider).push(
-  const WebPageRoute(
-    url: 'https://example.com/privacy',
-    title: '隐私政策',
-  ).location,
+  const WebPageTarget(
+    WebPageConfig(
+      url: 'https://example.com/privacy',
+      title: '隐私政策',
+    ),
+  ),
 );
 ```
 
-复杂配置通过 `extra` 传入 `WebPageConfig`：
+需要登录的业务 H5 使用 `AuthWebPageTarget`，高级配置放在 Target 的 `extra` 上：
 
 ```dart
 ref.read(appRouterProvider).push(
-  const AuthWebPageRoute().location,
-  extra: const WebPageConfig(
-    url: 'https://example.com/member',
-    title: '会员中心',
-    allowedHosts: ['example.com'],
-    headers: {'X-App-Source': 'flutter'},
-    showToolbarActions: true,
+  const AuthWebPageTarget(
+    WebPageConfig(
+      url: 'https://example.com/member',
+      title: '会员中心',
+      allowedHosts: ['example.com'],
+      headers: {'X-App-Source': 'flutter'},
+      showToolbarActions: true,
+    ),
   ),
 );
 ```

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../shared/widgets/toast/toast_util.dart';
 import '../adapters/app_router_transform.dart';
 import '../adapters/router_navigator.dart';
 import '../definitions/router_definitions.dart';
@@ -23,6 +22,7 @@ final class AppRouterConfig {
     required this.routeNodes,
     required this.initialLocation,
     this.publicRoutePatterns = const <String>[],
+    this.observers = const <NavigatorObserver>[],
     this.errorBuilder,
   });
 
@@ -34,6 +34,11 @@ final class AppRouterConfig {
 
   /// App 组合层根据 RoutePolicy 生成的匿名路由匹配模板。
   final List<String> publicRoutePatterns;
+
+  /// App 组合层注入的 NavigatorObserver，例如 Toast。
+  ///
+  /// core/router 不绑定具体 UI 组件；未注入时使用空列表。
+  final List<NavigatorObserver> observers;
 
   /// App 组合层可注入的路由错误页面构建器。
   final Widget Function(BuildContext context, AppRouteError error)?
@@ -83,7 +88,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: routerNavigatorKey,
     initialLocation: routerConfig.initialLocation,
-    observers: [ToastUtil.navigatorObserver],
+    observers: routerConfig.observers,
     refreshListenable: refreshNotifier,
     redirect: createAccessGuard(
       accessDecision: (request) =>
