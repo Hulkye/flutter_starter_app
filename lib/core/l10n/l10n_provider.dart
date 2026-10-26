@@ -32,15 +32,21 @@ final appLocaleProvider = NotifierProvider<AppLocaleNotifier, AppLocale>(
 );
 
 final appLocaleValueProvider = Provider<Locale?>((ref) {
-  return ref.watch(appLocaleProvider).locale;
+  final preference = ref.watch(appLocaleProvider);
+  if (preference == AppLocale.system) {
+    return null;
+  }
+  return resolveAppLocale(
+    preference,
+    WidgetsBinding.instance.platformDispatcher.locales,
+    AppLocalizations.supportedLocales,
+  );
 });
 
 final appLocalizationsProvider = Provider<AppLocalizations>((ref) {
-  final selectedLocale = ref.watch(appLocaleProvider).locale;
-  final locale = basicLocaleListResolution(
-    selectedLocale == null
-        ? WidgetsBinding.instance.platformDispatcher.locales
-        : [selectedLocale],
+  final locale = resolveAppLocale(
+    ref.watch(appLocaleProvider),
+    WidgetsBinding.instance.platformDispatcher.locales,
     AppLocalizations.supportedLocales,
   );
   return lookupAppLocalizations(locale);

@@ -37,3 +37,15 @@ extension AppLocaleX on AppLocale {
     }
   }
 }
+
+Locale resolveAppLocale(
+  AppLocale preference,
+  List<Locale> systemLocales,
+  List<Locale> supportedLocales,
+) {
+  final preferredLocale = preference.locale;
+  return basicLocaleListResolution(
+    preferredLocale == null ? systemLocales : [preferredLocale],
+    supportedLocales,
+  );
+}
