@@ -16,7 +16,7 @@ export 'core/l10n/l10n.dart';
 export 'core/network/connection/connection_manager.dart';
 export 'core/network/connection/enum/connection_type.dart';
 export 'core/network/http/http.dart';
-export 'core/router/router.dart';
+export 'core/router/export.dart';
 export 'core/capability/app_capability.dart';
 export 'core/navigation/app_navigation_command.dart';
 export 'app/capabilities/app_capability_registry.dart';

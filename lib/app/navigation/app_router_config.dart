@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/feature/app_feature_registry.dart';
-import '../../core/router/router.dart';
+import '../../core/router/export.dart';
 import '../../features/auth/presentation/auth_routes.dart';
 import '../../shared/services/auth/auth.dart';
 import '../../shared/webview/webview.dart';

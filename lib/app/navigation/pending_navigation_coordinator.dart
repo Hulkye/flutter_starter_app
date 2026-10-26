@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/navigation/app_navigation_command.dart';
-import '../../core/router/router.dart';
+import '../../core/router/export.dart';
 import '../../shared/services/auth/auth.dart';
 
 /// 管理需要等待 App bootstrap 或认证完成后才能执行的导航命令。

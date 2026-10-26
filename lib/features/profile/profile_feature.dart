@@ -5,7 +5,7 @@ import '../../core/feature/app_external_route.dart';
 import '../../core/feature/app_feature_metadata.dart';
 import '../../core/feature/app_tab_entry.dart';
 import '../../core/l10n/l10n.dart';
-import 'package:flutter_starter_app/core/router/router.dart';
+import 'package:flutter_starter_app/core/router/export.dart';
 import '../../core/theme/theme.dart';
 import 'presentation/profile_routes.dart';
 

@@ -10,7 +10,7 @@ import '../core/exception/app_exception_catcher.dart';
 import '../core/capability/app_capability.dart';
 import '../core/feature/app_feature_registry.dart';
 import '../core/network/http/http.dart';
-import '../core/router/router.dart';
+import '../core/router/export.dart';
 import '../features/auth/presentation/auth_routes.dart';
 import '../integrations/deep_link_host/deep_link_app_capability.dart';
 import 'app.dart';

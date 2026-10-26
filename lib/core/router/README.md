@@ -1,11 +1,14 @@
 # Router 模块
 
-`core/router` 面向业务提供框架无关的路由协议；GoRouter 是当前默认 runtime，封装在 `adapters/go_router/`。业务代码通过 `router.dart` 和 `BaseNavigator` 导航，不直接 import `go_router`。
+`core/router` 面向业务提供路由协议与 Flutter 页面定义。业务层统一导入
+`package:flutter_starter_app/core/router/export.dart`；GoRouter 是当前默认 runtime，封装在
+`adapters/go_router/`；Riverpod Provider 与生命周期装配单独位于
+`integrations/riverpod/`。核心 `router.dart` 不依赖 Riverpod 或 GoRouter。
 
 ## 当前职责
 
 - 对业务层暴露框架无关的路由定义：`AppPageRoute`、`AppRouteTarget`、`AppRedirectRoute`、`AppShellRoute`。
-- 对业务层暴露导航接口：`BaseNavigator` 与 `appRouterProvider`。
+- 对外暴露导航协议与门面：`BaseNavigator`、`RouterNavigator`。
 - 在基础设施层把 `AppRouteNode` 转换为 GoRouter 的 `RouteBase`。
 - 通过 `AppRouterDefinition` 接收 App 组合层注入的路由图、公开路由模板、NavigatorObserver 和错误页。
 - 通过 GoRouter Guard adapter 执行 App 组合层注入的 `RouteAccessDecision`，不枚举登录、升级、租户等业务状态。
@@ -28,14 +31,14 @@
 | `definitions/app_route_state.dart` | `AppRouteState` 框架无关路由状态 | ❌ |
 | `definitions/app_route_error.dart` | `AppRouteError` 框架无关路由错误上下文 | ❌ |
 | `navigation/base_navigator.dart` | `BaseNavigator` 导航抽象接口 | ❌ |
-| `navigation/router_provider.dart` | 框架无关的 `appRouterProvider` 与 runtime binding | ❌ |
+| `navigation/router_navigator.dart` | 框架无关的 `RouterNavigator` 稳定门面 | ❌ |
 | `config/app_router_definition.dart` | App 提供的中立路由图与访问决策 Provider | ❌ |
-| `config/router_runtime.dart` | 默认 Router runtime 的中立 overrides 工厂 | ❌ |
-| `adapters/router_navigator.dart` | 对外稳定的 `RouterNavigator` 门面 | ❌ |
 | `adapters/go_router/router_navigator.dart` | `RouterNavigator` 的 GoRouter 导航实现 | ✅ |
 | `adapters/go_router/route_transform.dart` | `AppRouteNode` 到 `RouteBase` 的适配器 | ✅ |
 | `adapters/go_router/access_guard.dart` | GoRouter 状态到访问请求及 redirect 的适配器 | ✅ |
-| `adapters/go_router/router_provider.dart` | GoRouter runtime Provider 与默认实现装配 | ✅ |
+| `adapters/go_router/router_factory.dart` | 从中立路由定义创建 GoRouter runtime | ✅ |
+| `integrations/riverpod/router_providers.dart` | Riverpod Provider 与 `appRouterProvider` | ❌ |
+| `integrations/riverpod/router_runtime.dart` | Riverpod 管理默认 Router runtime 生命周期及绑定 | ✅ |
 | `guards/route_access_decision.dart` | `AllowRoute` / `RedirectRoute` 最终访问决策 | ❌ |
 | `guards/app_route_guard.dart` | `AppRouteGuard` / `AppRouteGuardChain` | ❌ |
 | `guards/app_route_request.dart` | Guard 判断当前访问时的路由上下文 | ❌ |
@@ -62,9 +65,9 @@ GoRouter
   GoRoute / StatefulShellRoute / GoRouterState
 ```
 
-`core/router` 不 import `app/`、`features/` 或具体业务 UI。Toast 这类 NavigatorObserver 由 App 组合层通过 `AppRouterDefinition.observers` 注入。GoRouter adapter/runtime 不经 `router.dart` 导出；App 组合层只通过 `createRouterRuntimeOverrides()` 和 `routerConfigProvider` 使用默认 runtime，不直接创建或引用 GoRouter。
+`core/router` 不 import `app/`、`features/` 或具体业务 UI。Toast 这类 NavigatorObserver 由 App 组合层通过 `AppRouterDefinition.observers` 注入。GoRouter adapter/runtime 不经 `router.dart` 导出。使用 Riverpod 的 App 显式导入 `integrations/riverpod/router.dart`，通过 `createRouterRuntimeOverrides()` 装配默认 runtime，并使用 `routerConfigProvider` 与 `appRouterProvider`。
 
-业务代码通过 `BaseNavigator` 的类型化 `AppRouteTarget` 方法导航。对外稳定门面 `adapters/router_navigator.dart` 中的 `RouterNavigator` 委托给具体实现；GoRouter 的同名实现位于 `adapters/go_router/router_navigator.dart`，不经 `router.dart` 公共 barrel 导出。组合层负责选择并注入实现，通用访问决策与内部 location 校验仍位于 `guards/`。
+业务代码通过 `BaseNavigator` 的类型化 `AppRouteTarget` 方法导航。稳定门面 `navigation/router_navigator.dart` 中的 `RouterNavigator` 委托给具体实现；GoRouter 的同名实现位于 `adapters/go_router/router_navigator.dart`。Riverpod 不属于 Router 核心依赖，使用 Riverpod 的调用方需显式导入集成 barrel。通用访问决策与内部 location 校验仍位于 `guards/`。
 
 ## 定义类型
 
@@ -342,7 +345,7 @@ buildRootRouteNodes(tabs: featureRegistry.tabs);
 - 通过 `guards` 声明 Feature 级运行态访问规则。
 - 由 App Shell 统一决定展示顺序，而不是把业务页面写死在 Shell 内部。
 
-`Application.run()` 会按当前环境构建一次 `AppFeatureRegistry`，把其中的 routes、tabs、externalRoutes、guards、routePolicies、providerOverrides 分别交给 App 路由、外部入口适配层和根 `ProviderScope`。App 组合层只提供 `AppRouterDefinition` 和访问决策；`createRouterRuntimeOverrides()` 在 Router 模块内部装配默认 GoRouter runtime。根组件读取中立的 `routerConfigProvider`，业务导航使用 `appRouterProvider`。
+`Application.run()` 会按当前环境构建一次 `AppFeatureRegistry`，把其中的 routes、tabs、externalRoutes、guards、routePolicies、providerOverrides 分别交给 App 路由、外部入口适配层和根 `ProviderScope`。App 组合层只提供 `AppRouterDefinition` 和访问决策；Riverpod 集成层装配默认 GoRouter runtime。根组件读取 `routerConfigProvider`，业务导航使用 `appRouterProvider`。
 
 ## 导航用法
 

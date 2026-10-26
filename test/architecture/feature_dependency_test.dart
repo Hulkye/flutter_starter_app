@@ -58,6 +58,31 @@ void main() {
     );
   });
 
+  test('Riverpod imports are isolated to the Riverpod integration', () {
+    final offenders = <String>[];
+    final importPattern = RegExp(
+      r'''^\s*import\s+['"]([^'"]+)['"]''',
+      multiLine: true,
+    );
+
+    for (final file in _coreRouterDartFiles()) {
+      final relativePath = file.path.replaceAll('\\', '/');
+      if (relativePath.contains('/integrations/riverpod/')) continue;
+      for (final match in importPattern.allMatches(file.readAsStringSync())) {
+        final importUri = match.group(1)!;
+        if (importUri == 'package:flutter_riverpod/flutter_riverpod.dart') {
+          offenders.add('${file.path}: $importUri');
+        }
+      }
+    }
+
+    expect(
+      offenders,
+      isEmpty,
+      reason: 'Riverpod dependencies must stay in integrations/riverpod.',
+    );
+  });
+
   test('features use typed navigation and do not import GoRouter', () {
     final offenders = <String>[];
     final stringNavigationPattern = RegExp(

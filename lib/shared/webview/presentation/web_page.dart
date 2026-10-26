@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_starter_app/core/l10n/l10n.dart';
-import 'package:flutter_starter_app/core/router/router.dart';
+import 'package:flutter_starter_app/core/router/export.dart';
 import 'package:flutter_starter_app/core/theme/theme.dart';
 import 'package:flutter_starter_app/core/util/screen_util.dart';
 import 'package:flutter_starter_app/shared/presentation/presentation.dart';

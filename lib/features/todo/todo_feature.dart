@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_starter_app/core/feature/app_tab_entry.dart';
 import 'package:flutter_starter_app/core/l10n/l10n.dart';
-import 'package:flutter_starter_app/core/router/router.dart';
+import 'package:flutter_starter_app/core/router/export.dart';
 import 'package:flutter_starter_app/core/theme/theme.dart';
 import 'package:flutter_starter_app/core/feature/app_route_policy.dart';
 

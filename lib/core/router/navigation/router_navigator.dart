@@ -1,9 +1,9 @@
 import '../definitions/app_route_target.dart';
-import '../navigation/base_navigator.dart';
+import 'base_navigator.dart';
 
 /// Router 导航门面，向模块外提供稳定的导航入口。
 ///
-/// 具体路由引擎由组合层选择并注入，业务调用方不依赖引擎实现。
+/// 具体路由引擎由集成层选择并注入，调用方不依赖引擎实现。
 final class RouterNavigator implements BaseNavigator {
   const RouterNavigator(this._delegate);
 

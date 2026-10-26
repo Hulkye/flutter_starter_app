@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/router/router.dart';
+import '../../core/router/export.dart';
 import '../capabilities/app_capability_registry.dart';
 import '../../features/auth/presentation/auth_routes.dart';
 import 'app_lifecycle_coordinator.dart';

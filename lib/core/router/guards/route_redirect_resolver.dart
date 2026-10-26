@@ -21,15 +21,16 @@ String? resolveAccessRedirect({
       :final target,
       :final preserveTarget,
       :final appliesToPublicRoutes,
-    ) => _resolveRequiredRedirect(
-      currentUri: currentUri,
-      matchedRoutePath: matchedRoutePath,
-      targetLocation: target.location,
-      preserveTarget: preserveTarget,
-      appliesToPublicRoutes: appliesToPublicRoutes,
-      publicPaths: publicPaths,
-      redirectQueryParameter: redirectQueryParameter,
-    ),
+    ) =>
+      _resolveRequiredRedirect(
+        currentUri: currentUri,
+        matchedRoutePath: matchedRoutePath,
+        targetLocation: target.location,
+        preserveTarget: preserveTarget,
+        appliesToPublicRoutes: appliesToPublicRoutes,
+        publicPaths: publicPaths,
+        redirectQueryParameter: redirectQueryParameter,
+      ),
   };
 }
 

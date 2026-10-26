@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:flutter_starter_app/core/router/router.dart';
+import 'package:flutter_starter_app/core/router/export.dart';
 import 'pages/profile_page.dart';
 
 /// Profile 路由。

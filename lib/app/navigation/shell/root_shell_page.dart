@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/feature/app_tab_entry.dart';
-import '../../../core/router/router.dart';
+import '../../../core/router/export.dart';
 import '../../../core/theme/theme_context_ext.dart';
 import '../../../core/util/screen_util.dart';
 import '../../../shared/widgets/image_view/image_view.dart';

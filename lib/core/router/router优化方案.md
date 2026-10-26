@@ -34,10 +34,12 @@ AppFeatureRegistry
 ```text
 lib/core/router/
 ├── definitions/       路由结构、状态、Target、Codec、Metadata
-├── navigation/        BaseNavigator 与框架无关 Provider binding
+├── navigation/        BaseNavigator 与稳定 RouterNavigator 门面
 ├── guards/            框架无关的 Guard 协议、决策模型与重定向解析
 ├── adapters/          稳定导航门面与具体 Router runtime 适配器
 │   └── go_router/     GoRouter 导航、路由转换、Guard 与 Provider
+├── integrations/      状态管理与 Router runtime 的集成
+│   └── riverpod/      Riverpod Provider、生命周期与默认 runtime 装配
 └── router.dart        对外 barrel export
 ```
 
@@ -427,7 +429,11 @@ lib/core/router/
 │       ├── router_navigator.dart
 │       ├── route_transform.dart
 │       ├── access_guard.dart
-│       └── router_provider.dart
+│       └── router_factory.dart
+├── integrations/
+│   └── riverpod/
+│       ├── router_providers.dart
+│       └── router_runtime.dart
 ├── README.md
 └── router.dart
 ```

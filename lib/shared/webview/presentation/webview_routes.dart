@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:flutter_starter_app/core/router/router.dart';
+import 'package:flutter_starter_app/core/router/export.dart';
 import '../domain/web_page_config.dart';
 import 'web_page.dart';
 

@@ -7,7 +7,8 @@ import 'package:flutter_starter_app/core/feature/app_feature.dart';
 import 'package:flutter_starter_app/core/feature/app_feature_registry.dart';
 import 'package:flutter_starter_app/core/feature/app_feature_metadata.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
-import 'package:flutter_starter_app/core/router/adapters/go_router/router_provider.dart'
+import 'package:flutter_starter_app/core/router/integrations/riverpod/router.dart';
+import 'package:flutter_starter_app/core/router/integrations/riverpod/router_runtime.dart'
     as go_router;
 import 'package:flutter_starter_app/features/features.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';

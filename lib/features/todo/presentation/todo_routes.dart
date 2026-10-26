@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:flutter_starter_app/core/router/router.dart';
+import 'package:flutter_starter_app/core/router/export.dart';
 import 'pages/todo_page.dart';
 
 final class TodoRoute extends AppPageRoute<void> {
