@@ -504,8 +504,8 @@ context.appAsset.logo
 
 国际化使用 Flutter 官方 `gen-l10n`：
 
-- 源文件：`lib/core/l10n/arb/app_en.arb`
-- 源文件：`lib/core/l10n/arb/app_zh.arb`
+- 源文件：`lib/l10n/arb/app_en.arb`
+- 源文件：`lib/l10n/arb/app_zh.arb`
 - 配置文件：`l10n.yaml`
 - 生成脚本：`./script/gen_l10n.sh`
 

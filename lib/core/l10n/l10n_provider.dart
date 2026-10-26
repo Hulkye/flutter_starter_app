@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:ui';
-
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../storage/storage.dart';
 import 'app_locale.dart';
-import 'gen/app_localizations.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 const String _localeStorageKey = 'app_locale_code';
 
@@ -37,7 +36,12 @@ final appLocaleValueProvider = Provider<Locale?>((ref) {
 });
 
 final appLocalizationsProvider = Provider<AppLocalizations>((ref) {
-  final locale =
-      ref.watch(appLocaleProvider).locale ?? PlatformDispatcher.instance.locale;
+  final selectedLocale = ref.watch(appLocaleProvider).locale;
+  final locale = basicLocaleListResolution(
+    selectedLocale == null
+        ? WidgetsBinding.instance.platformDispatcher.locales
+        : [selectedLocale],
+    AppLocalizations.supportedLocales,
+  );
   return lookupAppLocalizations(locale);
 });

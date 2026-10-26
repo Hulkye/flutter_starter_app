@@ -108,7 +108,7 @@ dart run script/rename_project.dart my_app \
 - Flutter：`pubspec.yaml` 包名、`package:` imports、ARB 的 `appTitle`。
 - VS Code：如果 `.vscode/launch.json` 已存在，自动更新启动配置名；脚本不会主动创建本地 IDE 配置。
 
-脚本默认不直接修改 `lib/core/l10n/gen/` 下的国际化生成物。修改 ARB 后需要重新生成：
+脚本默认不直接修改 `lib/l10n/gen/` 下的国际化生成物。修改 ARB 后需要重新生成：
 
 ```bash
 ./script/gen_l10n.sh
@@ -688,8 +688,8 @@ context.appAsset.logo
 国际化源文件：
 
 ```text
-lib/core/l10n/arb/app_en.arb
-lib/core/l10n/arb/app_zh.arb
+lib/l10n/arb/app_en.arb
+lib/l10n/arb/app_zh.arb
 ```
 
 修改或新增文案后执行：

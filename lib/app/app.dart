@@ -4,7 +4,7 @@ import 'package:flutter_starter_app/core/util/screen_util.dart';
 import 'package:flutter_starter_app/shared/widgets/toast/toast_util.dart';
 
 import '../core/l10n/l10n.dart';
-import '../core/l10n/gen/app_localizations.dart';
+import '../l10n/gen/app_localizations.dart';
 import '../core/router/export.dart';
 import '../core/theme/theme.dart';
 import 'host/app_host.dart';

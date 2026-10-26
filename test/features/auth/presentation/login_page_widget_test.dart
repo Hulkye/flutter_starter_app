@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_starter_app/core/l10n/gen/app_localizations.dart';
+import 'package:flutter_starter_app/l10n/gen/app_localizations.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_starter_app/core/router/integrations/riverpod/router.dart';
 import 'package:flutter_starter_app/core/theme/theme.dart';
