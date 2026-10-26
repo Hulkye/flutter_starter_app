@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_starter_app/core/router/definitions/app_page_route.dart';
+import 'package:flutter_starter_app/core/router/export.dart';
 
 import '../../core/feature/app_feature.dart';
 import '../../core/feature/app_feature_metadata.dart';

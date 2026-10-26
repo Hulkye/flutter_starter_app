@@ -1,4 +1,4 @@
-import '../definitions/app_route_target.dart';
+import '../definitions/navigation/app_route_target.dart';
 
 /// 路由守卫消费的最终访问决策。
 sealed class RouteAccessDecision {

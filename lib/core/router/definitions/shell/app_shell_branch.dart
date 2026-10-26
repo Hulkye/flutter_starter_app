@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'app_page_route.dart';
+import '../route/app_page_route.dart';
 
 /// StatefulShellRoute 分支定义。
 final class AppShellBranch {

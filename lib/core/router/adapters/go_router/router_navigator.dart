@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 
-import '../../definitions/app_route_target.dart';
+import '../../definitions/navigation/app_route_target.dart';
 import '../../guards/internal_route_location.dart';
 import '../../navigation/base_navigator.dart';
 

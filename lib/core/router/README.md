@@ -19,17 +19,11 @@
 | 文件 | 职责 | 引用 GoRouter? |
 |:---|:---|:---:|
 | `router.dart` | router 模块对外 barrel export | — |
-| `definitions/router_definitions.dart` | 路由定义类型内部 barrel export | ❌ |
-| `definitions/app_route_node.dart` | `AppRouteNode` 路由节点基类 | ❌ |
-| `definitions/app_page_route.dart` | `AppPageRoute` 普通页面路由 | ❌ |
-| `definitions/app_route_target.dart` | `AppRouteTarget` 导航目标与 location 工具 | ❌ |
-| `definitions/app_route_metadata.dart` | `AppRouteMetadata` 稳定 key 与匹配模板 | ❌ |
-| `definitions/app_redirect_route.dart` | `AppRedirectRoute` 重定向路由 | ❌ |
-| `definitions/app_shell_route.dart` | `AppShellRoute` Shell 路由 | ❌ |
-| `definitions/app_shell_branch.dart` | `AppShellBranch` Shell 分支定义 | ❌ |
-| `definitions/app_shell_navigator.dart` | `AppShellNavigator` Shell 分支导航接口 | ❌ |
-| `definitions/app_route_state.dart` | `AppRouteState` 框架无关路由状态 | ❌ |
-| `definitions/app_route_error.dart` | `AppRouteError` 框架无关路由错误上下文 | ❌ |
+| `definitions/router_definitions.dart` | 分组路由定义的统一 barrel | ❌ |
+| `definitions/route/` | Route 节点、页面/重定向与 metadata | ❌ |
+| `definitions/navigation/` | Target 与 location resolver | ❌ |
+| `definitions/state/` | Route state、读取扩展与错误上下文 | ❌ |
+| `definitions/shell/` | Shell、分支与 Shell navigator 协议 | ❌ |
 | `navigation/base_navigator.dart` | `BaseNavigator` 导航抽象接口 | ❌ |
 | `navigation/router_navigator.dart` | 框架无关的 `RouterNavigator` 稳定门面 | ❌ |
 | `config/app_router_definition.dart` | App 提供的中立路由图与访问决策 Provider | ❌ |

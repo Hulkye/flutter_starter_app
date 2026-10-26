@@ -1,12 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../definitions/app_page_route.dart';
-import '../../definitions/app_redirect_route.dart';
-import '../../definitions/app_route_metadata.dart';
-import '../../definitions/app_route_node.dart';
-import '../../definitions/app_route_state.dart';
-import '../../definitions/app_shell_route.dart';
+import '../../definitions/route/app_page_route.dart';
+import '../../definitions/route/app_redirect_route.dart';
+import '../../definitions/route/app_route_metadata.dart';
+import '../../definitions/route/app_route_node.dart';
+import '../../definitions/state/app_route_state.dart';
+import '../../definitions/shell/app_shell_route.dart';
 import '../../guards/app_route_request.dart';
 import '../../guards/route_access_decision.dart';
 import '../../guards/route_redirect_resolver.dart';

@@ -1,4 +1,4 @@
-import '../definitions/app_route_target.dart';
+import '../definitions/navigation/app_route_target.dart';
 import 'route_access_decision.dart';
 import 'app_route_request.dart';
 

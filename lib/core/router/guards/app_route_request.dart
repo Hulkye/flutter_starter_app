@@ -1,5 +1,5 @@
-import '../definitions/app_route_metadata.dart';
-import '../definitions/app_route_state.dart';
+import '../definitions/route/app_route_metadata.dart';
+import '../definitions/state/app_route_state.dart';
 
 /// Guard 判断当前访问时使用的路由上下文。
 final class AppRouteRequest {

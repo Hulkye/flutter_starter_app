@@ -1,4 +1,4 @@
-import '../definitions/app_route_target.dart';
+import '../definitions/navigation/app_route_target.dart';
 import 'base_navigator.dart';
 
 /// Router 导航门面，向模块外提供稳定的导航入口。

@@ -1,4 +1,4 @@
-import '../definitions/app_route_target.dart';
+import '../definitions/navigation/app_route_target.dart';
 
 /// 应用导航接口。
 ///

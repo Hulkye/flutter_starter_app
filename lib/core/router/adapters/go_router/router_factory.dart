@@ -5,7 +5,7 @@ import 'access_guard.dart';
 import 'route_transform.dart';
 import 'router_navigator.dart';
 import '../../config/app_router_definition.dart';
-import '../../definitions/app_route_error.dart';
+import '../../definitions/state/app_route_error.dart';
 import '../../guards/app_route_request.dart';
 import '../../guards/route_access_decision.dart';
 

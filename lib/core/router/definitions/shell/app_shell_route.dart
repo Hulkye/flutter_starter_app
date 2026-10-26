@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import 'app_route_node.dart';
-import 'app_route_state.dart';
+import '../route/app_route_node.dart';
+import '../state/app_route_state.dart';
 import 'app_shell_branch.dart';
 import 'app_shell_navigator.dart';
 

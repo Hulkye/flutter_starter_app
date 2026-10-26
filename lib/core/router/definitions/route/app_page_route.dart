@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'app_route_node.dart';
 import 'app_route_metadata.dart';
-import 'app_route_state.dart';
+import '../state/app_route_state.dart';
 
 /// 应用页面路由定义。
 ///
