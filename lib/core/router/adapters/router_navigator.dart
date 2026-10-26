@@ -1,53 +1,34 @@
-import 'package:go_router/go_router.dart';
-
-import '../navigation/base_navigator.dart';
 import '../definitions/app_route_target.dart';
-import '../guards/internal_route_location.dart';
+import '../navigation/base_navigator.dart';
 
-/// [BaseNavigator] 的 GoRouter 实现。
+/// Router 导航门面，向模块外提供稳定的导航入口。
 ///
-/// 这是项目中唯一直接调用 GoRouter 导航 API 的类。
+/// 具体路由引擎由组合层选择并注入，业务调用方不依赖引擎实现。
 final class RouterNavigator implements BaseNavigator {
-  RouterNavigator(this._router);
+  const RouterNavigator(this._delegate);
 
-  final GoRouter _router;
-
-  @override
-  String get location => _router.state.uri.toString();
+  final BaseNavigator _delegate;
 
   @override
-  void go(AppRouteTarget target) {
-    _router.go(requireInternalLocation(target.location), extra: target.extra);
-  }
+  String get location => _delegate.location;
+
+  @override
+  void go(AppRouteTarget target) => _delegate.go(target);
 
   @override
   Future<T?> push<T extends Object?>(AppRouteTarget target) {
-    return _router.push<T>(
-      requireInternalLocation(target.location),
-      extra: target.extra,
-    );
+    return _delegate.push<T>(target);
   }
 
   @override
-  void replace(AppRouteTarget target) {
-    _router.replace(
-      requireInternalLocation(target.location),
-      extra: target.extra,
-    );
-  }
+  void replace(AppRouteTarget target) => _delegate.replace(target);
 
   @override
-  void replaceAll(AppRouteTarget target) {
-    _router.go(requireInternalLocation(target.location), extra: target.extra);
-  }
+  void replaceAll(AppRouteTarget target) => _delegate.replaceAll(target);
 
   @override
-  void back<T extends Object?>([T? result]) {
-    if (_router.canPop()) {
-      _router.pop<T>(result);
-    }
-  }
+  void back<T extends Object?>([T? result]) => _delegate.back<T>(result);
 
   @override
-  bool canBack() => _router.canPop();
+  bool canBack() => _delegate.canBack();
 }

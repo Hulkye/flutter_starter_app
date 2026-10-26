@@ -28,9 +28,10 @@
 | `definitions/app_route_state.dart` | `AppRouteState` 框架无关路由状态 | ❌ |
 | `definitions/app_route_error.dart` | `AppRouteError` 框架无关路由错误上下文 | ❌ |
 | `navigation/base_navigator.dart` | `BaseNavigator` 导航抽象接口 | ❌ |
-| `adapters/router_navigator.dart` | `RouterNavigator` 的 GoRouter 导航实现 | ✅ |
-| `adapters/app_router_transform.dart` | `AppRouteNode` 到 `RouteBase` 的适配器 | ✅ |
-| `adapters/go_router_access_guard.dart` | GoRouter 状态到访问请求及 redirect 的适配器 | ✅ |
+| `adapters/router_navigator.dart` | 对外稳定的 `RouterNavigator` 门面 | ❌ |
+| `adapters/go_router/router_navigator.dart` | `RouterNavigator` 的 GoRouter 导航实现 | ✅ |
+| `adapters/go_router/route_transform.dart` | `AppRouteNode` 到 `RouteBase` 的适配器 | ✅ |
+| `adapters/go_router/access_guard.dart` | GoRouter 状态到访问请求及 redirect 的适配器 | ✅ |
 | `config/router_provider.dart` | `AppRouterConfig`、GoRouter、导航接口 Provider | ✅ |
 | `guards/route_access_decision.dart` | `AllowRoute` / `RedirectRoute` 最终访问决策 | ❌ |
 | `guards/app_route_guard.dart` | `AppRouteGuard` / `AppRouteGuardChain` | ❌ |
@@ -50,7 +51,7 @@ core/router definitions
   AppRouteNode / AppPageRoute / AppRouteTarget / AppShellRoute / AppRouteState
         │
         ▼
-core/router adapters
+core/router/adapters/go_router
   toRouteBase() / RouterNavigator / createGoRouterAccessGuard()
         │
         ▼
@@ -58,9 +59,9 @@ GoRouter
   GoRoute / StatefulShellRoute / GoRouterState
 ```
 
-`core/router` 不 import `app/`、`features/` 或具体 UI 组件。Toast 这类 NavigatorObserver 由 App 组合层通过 `AppRouterConfig.observers` 注入。
+`core/router` 不 import `app/`、`features/` 或具体 UI 组件。Toast 这类 NavigatorObserver 由 App 组合层通过 `AppRouterConfig.observers` 注入。GoRouter adapter 不经 `router.dart` 导出；Router 配置实现通过具体文件路径引用它们。
 
-业务导航只通过 `BaseNavigator` 的类型化 `AppRouteTarget` 方法完成；不要在业务层拼接 location，也不要调用字符串导航入口。GoRouter 专属的状态转换、Navigator 和 redirect callback 保留在 `adapters/`，通用访问决策与内部 location 校验保留在 `guards/`。
+业务代码通过 `BaseNavigator` 的类型化 `AppRouteTarget` 方法导航。对外稳定门面 `adapters/router_navigator.dart` 中的 `RouterNavigator` 委托给具体实现；GoRouter 的同名实现位于 `adapters/go_router/router_navigator.dart`，不经 `router.dart` 公共 barrel 导出。组合层负责选择并注入实现，通用访问决策与内部 location 校验仍位于 `guards/`。
 
 ## 定义类型
 
@@ -250,7 +251,7 @@ AppRouterConfig(
 
 ### AppShellRoute
 
-`AppShellRoute` 用来表达 App Shell 的分支结构。底层会在 `app_router_transform.dart` 中转换为 `StatefulShellRoute.indexedStack`。
+`AppShellRoute` 用来表达 App Shell 的分支结构。底层会在 `route_transform.dart` 中转换为 `StatefulShellRoute.indexedStack`。
 
 ```dart
 final class RootShellRoute extends AppShellRoute {
@@ -530,7 +531,7 @@ lib/app/navigation/
 - `RootShellRoute` 从当前环境 `AppFeatureRegistry.tabs` 自动装配底部 Tab 分支。
 - 没有 Tab 时，不注册 `RootRoute` 和 `RootShellRoute`，避免 `/` 自重定向；模板使用者应提供明确的首页路由或自定义启动后的目标页。
 - `app_router_config.dart` 负责把 Splash、Root/Shell、Feature 路由与 App 公共路由组合成 `AppRouterConfig` 并注入 core/router。
-- GoRouter 的 `StatefulShellRoute` 只存在于 `app_router_transform.dart`，不会暴露给业务 Feature。
+- GoRouter 的 `StatefulShellRoute` 只存在于 `route_transform.dart`，不会暴露给业务 Feature。
 
 ## 访问决策守卫
 
@@ -619,7 +620,7 @@ List<AppRoutePolicy> get routePolicies => const [
 - `features/features.dart` 是 App 注册表，`features/exports.dart` 是业务公共导出入口；不要让 `header.dart` 间接导出 Feature 默认 data 装配。
 - `header.dart` 只服务业务页面便捷导入，App/Core/Shared 内部使用精确 import，避免形成 `shared -> header -> features`。
 - `RouterNavigator` 是唯一调用 GoRouter 导航 API 的类。
-- `app_router_transform.dart` 是唯一把项目路由定义转换为 GoRouter RouteBase 的适配层。
+- `route_transform.dart` 是唯一把项目路由定义转换为 GoRouter RouteBase 的适配层。
 - `createAccessGuard` 是正式守卫入口；不要再引入 `createAuthGuard` / `createStrictAuthGuard`。
 - `router.dart` 是 router 模块对外入口；业务常用导出再由 `header.dart` 汇总。
 

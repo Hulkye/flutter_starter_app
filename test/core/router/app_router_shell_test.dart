@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_starter_app/core/router/adapters/go_router/route_transform.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';

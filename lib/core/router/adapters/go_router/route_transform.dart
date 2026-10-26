@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 
-import '../../constant/duration_const.dart';
-import '../definitions/router_definitions.dart';
+import '../../../constant/duration_const.dart';
+import '../../definitions/router_definitions.dart';
 
 /// GoRouter 适配器：把框架无关的 [AppRouteNode] 转换为 [RouteBase]。
 RouteBase toRouteBase(AppRouteNode node) {
@@ -93,16 +93,10 @@ Page<dynamic> _swipeablePage({
   required WidgetBuilder builder,
 }) {
   final textDirection = Directionality.of(context);
-  // 触发边缘滑动返回的区域宽度
   const backGestureDetectionWidth = 48.0;
-  // 触发边缘滑动返回的区域起始横坐标
-  double backGestureDetectionStartOffset;
-  if (textDirection == TextDirection.rtl) {
-    backGestureDetectionStartOffset =
-        MediaQuery.of(context).size.width - backGestureDetectionWidth;
-  } else {
-    backGestureDetectionStartOffset = 0.0;
-  }
+  final backGestureDetectionStartOffset = textDirection == TextDirection.rtl
+      ? MediaQuery.of(context).size.width - backGestureDetectionWidth
+      : 0.0;
   return SwipeablePage<dynamic>(
     key: state.pageKey,
     name: state.name,

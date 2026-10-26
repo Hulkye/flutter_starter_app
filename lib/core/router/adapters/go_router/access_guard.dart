@@ -1,15 +1,15 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
-import '../definitions/app_page_route.dart';
-import '../definitions/app_redirect_route.dart';
-import '../definitions/app_route_metadata.dart';
-import '../definitions/app_route_node.dart';
-import '../definitions/app_route_state.dart';
-import '../definitions/app_shell_route.dart';
-import '../guards/app_route_request.dart';
-import '../guards/route_access_decision.dart';
-import '../guards/router_guard.dart';
+import '../../definitions/app_page_route.dart';
+import '../../definitions/app_redirect_route.dart';
+import '../../definitions/app_route_metadata.dart';
+import '../../definitions/app_route_node.dart';
+import '../../definitions/app_route_state.dart';
+import '../../definitions/app_shell_route.dart';
+import '../../guards/app_route_request.dart';
+import '../../guards/route_access_decision.dart';
+import '../../guards/router_guard.dart';
 
 /// GoRouter redirect 回调与项目访问决策之间的适配器。
 GoRouterRedirect createGoRouterAccessGuard({

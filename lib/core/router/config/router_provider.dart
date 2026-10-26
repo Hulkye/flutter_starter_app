@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../adapters/app_router_transform.dart';
-import '../adapters/go_router_access_guard.dart';
+import '../adapters/go_router/route_transform.dart';
+import '../adapters/go_router/access_guard.dart';
+import '../adapters/go_router/router_navigator.dart' as go_router;
 import '../adapters/router_navigator.dart';
 import '../definitions/router_definitions.dart';
 import '../guards/route_access_decision.dart';
@@ -113,7 +114,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 ///
 /// 业务层依赖此 Provider 执行导航，不直接引用 [GoRouter]。
 final appRouterProvider = Provider<BaseNavigator>((ref) {
-  return RouterNavigator(ref.watch(goRouterProvider));
+  return RouterNavigator(
+    go_router.RouterNavigator(ref.watch(goRouterProvider)),
+  );
 });
 
 final class _RouterRefreshNotifier extends ChangeNotifier {

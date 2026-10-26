@@ -423,7 +423,7 @@ lib/core/router/
 │   ├── route_access_decision.dart
 │   └── router_guard.dart
 ├── adapters/
-│   ├── app_router_transform.dart
+│   ├── route_transform.dart
 │   └── router_navigator.dart
 ├── config/
 │   └── router_provider.dart
