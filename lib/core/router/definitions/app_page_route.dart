@@ -11,7 +11,7 @@ import 'app_route_state.dart';
 /// ## 使用
 ///
 /// ```dart
-/// // 路由注册由 Feature 声明，再经 AppFeatureRegistry 汇入 AppRouterConfig
+/// // 路由注册由 Feature 声明，再经 AppFeatureRegistry 汇入 App 的 Router runtime config
 /// final class HomeFeature extends AppFeature {
 ///   const HomeFeature();
 ///

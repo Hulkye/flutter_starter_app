@@ -11,12 +11,12 @@ import '../host/app_bootstrap_coordinator.dart';
 import 'shell/root_shell_route.dart';
 import 'splash/splash_route.dart';
 
-/// 构建 App 的完整路由配置。
+/// 构建框架无关的 App 路由定义，不绑定具体 Router runtime。
 ///
 /// 应用层负责组合 Splash、Root Shell 和业务 Feature 路由；
-/// core/router 只消费 [AppRouterConfig]，不直接依赖具体 Feature。
-AppRouterConfig createAppRouterConfig(AppFeatureRegistry featureRegistry) {
-  return AppRouterConfig(
+/// core/router runtime 接收该定义，不直接依赖具体 Feature。
+AppRouterDefinition createAppRouterConfig(AppFeatureRegistry featureRegistry) {
+  return AppRouterDefinition(
     routeNodes: <AppRouteNode>[
       const SplashRoute(),
       ...buildRootRouteNodes(tabs: featureRegistry.tabs),
@@ -37,7 +37,8 @@ AppRouterConfig createAppRouterConfig(AppFeatureRegistry featureRegistry) {
 /// App 路由配置的 Provider 覆盖项。
 List<Override> createAppRouterOverrides(AppFeatureRegistry featureRegistry) {
   return <Override>[
-    appRouterConfigProvider.overrideWith(
+    ...createRouterRuntimeOverrides(),
+    appRouterDefinitionProvider.overrideWith(
       (ref) => createAppRouterConfig(featureRegistry),
     ),
     routeAccessDecisionProvider.overrideWith((ref) {

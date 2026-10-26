@@ -1,13 +1,13 @@
 # Router 模块
 
-`core/router` 是业务层与 GoRouter 之间的隔离层。业务代码通过项目路由抽象和 `BaseNavigator` 导航，不直接 import `go_router`。
+`core/router` 面向业务提供框架无关的路由协议；GoRouter 是当前默认 runtime，封装在 `adapters/go_router/`。业务代码通过 `router.dart` 和 `BaseNavigator` 导航，不直接 import `go_router`。
 
 ## 当前职责
 
 - 对业务层暴露框架无关的路由定义：`AppPageRoute`、`AppRouteTarget`、`AppRedirectRoute`、`AppShellRoute`。
 - 对业务层暴露导航接口：`BaseNavigator` 与 `appRouterProvider`。
 - 在基础设施层把 `AppRouteNode` 转换为 GoRouter 的 `RouteBase`。
-- 通过 `AppRouterConfig` 接收 App 组合层注入的路由图、公开路由模板、NavigatorObserver 和错误页。
+- 通过 `AppRouterDefinition` 接收 App 组合层注入的路由图、公开路由模板、NavigatorObserver 和错误页。
 - 通过 GoRouter Guard adapter 执行 App 组合层注入的 `RouteAccessDecision`，不枚举登录、升级、租户等业务状态。
 - App Shell 的 Tab 入口由 Feature 显式声明，Shell 只做装配。
 
@@ -28,15 +28,18 @@
 | `definitions/app_route_state.dart` | `AppRouteState` 框架无关路由状态 | ❌ |
 | `definitions/app_route_error.dart` | `AppRouteError` 框架无关路由错误上下文 | ❌ |
 | `navigation/base_navigator.dart` | `BaseNavigator` 导航抽象接口 | ❌ |
+| `navigation/router_provider.dart` | 框架无关的 `appRouterProvider` 与 runtime binding | ❌ |
+| `config/app_router_definition.dart` | App 提供的中立路由图与访问决策 Provider | ❌ |
+| `config/router_runtime.dart` | 默认 Router runtime 的中立 overrides 工厂 | ❌ |
 | `adapters/router_navigator.dart` | 对外稳定的 `RouterNavigator` 门面 | ❌ |
 | `adapters/go_router/router_navigator.dart` | `RouterNavigator` 的 GoRouter 导航实现 | ✅ |
 | `adapters/go_router/route_transform.dart` | `AppRouteNode` 到 `RouteBase` 的适配器 | ✅ |
 | `adapters/go_router/access_guard.dart` | GoRouter 状态到访问请求及 redirect 的适配器 | ✅ |
-| `config/router_provider.dart` | `AppRouterConfig`、GoRouter、导航接口 Provider | ✅ |
+| `adapters/go_router/router_provider.dart` | GoRouter runtime Provider 与默认实现装配 | ✅ |
 | `guards/route_access_decision.dart` | `AllowRoute` / `RedirectRoute` 最终访问决策 | ❌ |
 | `guards/app_route_guard.dart` | `AppRouteGuard` / `AppRouteGuardChain` | ❌ |
 | `guards/app_route_request.dart` | Guard 判断当前访问时的路由上下文 | ❌ |
-| `guards/router_guard.dart` | 框架无关的访问决策与重定向计算 | ❌ |
+| `guards/route_redirect_resolver.dart` | 框架无关的访问决策与重定向计算 | ❌ |
 | `guards/internal_route_location.dart` | 应用内 location 校验，供导航与重定向共用 | ❌ |
 
 ## 分层关系
@@ -59,7 +62,7 @@ GoRouter
   GoRoute / StatefulShellRoute / GoRouterState
 ```
 
-`core/router` 不 import `app/`、`features/` 或具体 UI 组件。Toast 这类 NavigatorObserver 由 App 组合层通过 `AppRouterConfig.observers` 注入。GoRouter adapter 不经 `router.dart` 导出；Router 配置实现通过具体文件路径引用它们。
+`core/router` 不 import `app/`、`features/` 或具体业务 UI。Toast 这类 NavigatorObserver 由 App 组合层通过 `AppRouterDefinition.observers` 注入。GoRouter adapter/runtime 不经 `router.dart` 导出；App 组合层只通过 `createRouterRuntimeOverrides()` 和 `routerConfigProvider` 使用默认 runtime，不直接创建或引用 GoRouter。
 
 业务代码通过 `BaseNavigator` 的类型化 `AppRouteTarget` 方法导航。对外稳定门面 `adapters/router_navigator.dart` 中的 `RouterNavigator` 委托给具体实现；GoRouter 的同名实现位于 `adapters/go_router/router_navigator.dart`，不经 `router.dart` 公共 barrel 导出。组合层负责选择并注入实现，通用访问决策与内部 location 校验仍位于 `guards/`。
 
@@ -235,10 +238,10 @@ class AppRouteState {
 
 ### 路由错误页面
 
-未知路径、路由解析失败等错误由 `core/router` 转换为框架无关的 `AppRouteError`。App 组合层可以通过 `AppRouterConfig.errorBuilder` 注入业务错误页：
+未知路径、路由解析失败等错误由 runtime 转换为框架无关的 `AppRouteError`。App 组合层可以通过 `AppRouterDefinition.errorBuilder` 注入业务错误页：
 
 ```dart
-AppRouterConfig(
+AppRouterDefinition(
   routeNodes: routes,
   initialLocation: const SplashTarget().location,
   errorBuilder: (context, error) => AppRouteErrorPage(
@@ -289,11 +292,11 @@ class RootShellPage extends BasePage {
 
 ## 路由注册流程
 
-`core/router` 不维护具体应用路由表；应用总路由图由 `lib/app/navigation/app_router_config.dart` 在 App 组合层创建，并通过 `appRouterConfigProvider` 注入：
+`core/router` 不维护具体应用路由表；应用总路由图由 `lib/app/navigation/app_router_config.dart` 在 App 组合层创建，并通过 `appRouterDefinitionProvider` 注入：
 
 ```dart
-AppRouterConfig createAppRouterConfig(AppFeatureRegistry featureRegistry) {
-  return AppRouterConfig(
+AppRouterDefinition createAppRouterConfig(AppFeatureRegistry featureRegistry) {
+  return AppRouterDefinition(
     routeNodes: <AppRouteNode>[
       const SplashRoute(),
       ...buildRootRouteNodes(tabs: featureRegistry.tabs),
@@ -339,7 +342,7 @@ buildRootRouteNodes(tabs: featureRegistry.tabs);
 - 通过 `guards` 声明 Feature 级运行态访问规则。
 - 由 App Shell 统一决定展示顺序，而不是把业务页面写死在 Shell 内部。
 
-`Application.run()` 会按当前环境构建一次 `AppFeatureRegistry`，把其中的 routes、tabs、externalRoutes、guards、routePolicies、providerOverrides 分别交给 App 路由、外部入口适配层和根 `ProviderScope`。这些能力因此始终来自同一批启用 Feature。`goRouterProvider` 只消费注入后的 `AppRouterConfig` 创建 GoRouter；`appRouterProvider` 对外暴露 `BaseNavigator`。
+`Application.run()` 会按当前环境构建一次 `AppFeatureRegistry`，把其中的 routes、tabs、externalRoutes、guards、routePolicies、providerOverrides 分别交给 App 路由、外部入口适配层和根 `ProviderScope`。App 组合层只提供 `AppRouterDefinition` 和访问决策；`createRouterRuntimeOverrides()` 在 Router 模块内部装配默认 GoRouter runtime。根组件读取中立的 `routerConfigProvider`，业务导航使用 `appRouterProvider`。
 
 ## 导航用法
 
@@ -530,7 +533,7 @@ lib/app/navigation/
 - 有 Tab 时，`/` 由 `RootRoute` 重定向到默认 Feature Tab。
 - `RootShellRoute` 从当前环境 `AppFeatureRegistry.tabs` 自动装配底部 Tab 分支。
 - 没有 Tab 时，不注册 `RootRoute` 和 `RootShellRoute`，避免 `/` 自重定向；模板使用者应提供明确的首页路由或自定义启动后的目标页。
-- `app_router_config.dart` 负责把 Splash、Root/Shell、Feature 路由与 App 公共路由组合成 `AppRouterConfig` 并注入 core/router。
+- `app_router_config.dart` 负责把 Splash、Root/Shell、Feature 路由与 App 公共路由组合成 `AppRouterDefinition`。
 - GoRouter 的 `StatefulShellRoute` 只存在于 `route_transform.dart`，不会暴露给业务 Feature。
 
 ## 访问决策守卫
@@ -616,7 +619,7 @@ List<AppRoutePolicy> get routePolicies => const [
 - 业务层不直接 import `go_router`，统一通过 `AppPageRoute`、`AppRouteTarget`、`AppRouteState`、`BaseNavigator` 解耦。
 - Feature 只暴露稳定 route class 和 Target，不让一个 Feature 的 presentation 直接依赖另一个 Feature 的 presentation。
 - App Shell、Splash、Root redirect 放在 `lib/app/navigation/`，由 App 层组合 Feature 入口；无 Tab 时不注册 Root redirect。
-- `core/router` 不 import `app/`、`features/` 或 Toast；应用路由图、公开策略、observers 只能通过 `AppRouterConfig` 注入。
+- `core/router` 不 import `app/`、`features/` 或 Toast；应用路由图、公开策略、observers 通过中立 `AppRouterDefinition` 注入。
 - `features/features.dart` 是 App 注册表，`features/exports.dart` 是业务公共导出入口；不要让 `header.dart` 间接导出 Feature 默认 data 装配。
 - `header.dart` 只服务业务页面便捷导入，App/Core/Shared 内部使用精确 import，避免形成 `shared -> header -> features`。
 - `RouterNavigator` 是唯一调用 GoRouter 导航 API 的类。

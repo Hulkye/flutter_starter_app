@@ -1,8 +1,6 @@
 import '../definitions/app_route_target.dart';
-import 'route_access_decision.dart';
 import 'internal_route_location.dart';
-
-export 'internal_route_location.dart';
+import 'route_access_decision.dart';
 
 /// 根据当前 location 和最终访问决策计算重定向目标。
 String? resolveAccessRedirect({
@@ -23,23 +21,21 @@ String? resolveAccessRedirect({
       :final target,
       :final preserveTarget,
       :final appliesToPublicRoutes,
-    ) =>
-      _resolveRequiredRedirect(
-        currentUri: currentUri,
-        matchedRoutePath: matchedRoutePath,
-        targetLocation: target.location,
-        preserveTarget: preserveTarget,
-        appliesToPublicRoutes: appliesToPublicRoutes,
-        publicPaths: publicPaths,
-        redirectQueryParameter: redirectQueryParameter,
-      ),
+    ) => _resolveRequiredRedirect(
+      currentUri: currentUri,
+      matchedRoutePath: matchedRoutePath,
+      targetLocation: target.location,
+      preserveTarget: preserveTarget,
+      appliesToPublicRoutes: appliesToPublicRoutes,
+      publicPaths: publicPaths,
+      redirectQueryParameter: redirectQueryParameter,
+    ),
   };
 }
 
 /// 只允许回跳到当前应用内的根路径。
 String? readInternalRedirect(String? value) {
-  if (value == null || value.isEmpty) return null;
-  if (!isInternalLocation(value)) return null;
+  if (value == null || value.isEmpty || !isInternalLocation(value)) return null;
   return Uri.parse(requireInternalLocation(value)).toString();
 }
 
@@ -50,9 +46,7 @@ String? _resolveAllowedRedirect(
   for (final entry in redirects.entries) {
     requireInternalLocation(entry.key);
     requireInternalLocation(entry.value.location);
-    if (entry.key == matchedRoutePath) {
-      return entry.value.location;
-    }
+    if (entry.key == matchedRoutePath) return entry.value.location;
   }
   return null;
 }
@@ -72,8 +66,8 @@ String? _resolveRequiredRedirect({
 
   final isPublic = publicPaths.contains(matchedRoutePath);
   if (isPublic && !appliesToPublicRoutes) return null;
-
   if (!preserveTarget) return targetLocation;
+
   return targetUri
       .replace(
         queryParameters: <String, String>{

@@ -24,7 +24,7 @@ class App extends ConsumerWidget {
       locale: appLocale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      routerConfig: ref.watch(goRouterProvider),
+      routerConfig: ref.watch(routerConfigProvider),
       builder: (BuildContext context, Widget? child) {
         return ToastUtil.initBuilder(context, child);
       },

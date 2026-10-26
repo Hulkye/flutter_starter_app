@@ -9,7 +9,7 @@ import '../../definitions/app_route_state.dart';
 import '../../definitions/app_shell_route.dart';
 import '../../guards/app_route_request.dart';
 import '../../guards/route_access_decision.dart';
-import '../../guards/router_guard.dart';
+import '../../guards/route_redirect_resolver.dart';
 
 /// GoRouter redirect 回调与项目访问决策之间的适配器。
 GoRouterRedirect createGoRouterAccessGuard({

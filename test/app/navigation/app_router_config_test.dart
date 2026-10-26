@@ -7,6 +7,8 @@ import 'package:flutter_starter_app/core/feature/app_feature.dart';
 import 'package:flutter_starter_app/core/feature/app_feature_registry.dart';
 import 'package:flutter_starter_app/core/feature/app_feature_metadata.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
+import 'package:flutter_starter_app/core/router/adapters/go_router/router_provider.dart'
+    as go_router;
 import 'package:flutter_starter_app/features/features.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
@@ -26,8 +28,11 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    expect(container.read(appRouterConfigProvider), isA<AppRouterConfig>());
-    final config = container.read(appRouterConfigProvider);
+    expect(
+      container.read(appRouterDefinitionProvider),
+      isA<AppRouterDefinition>(),
+    );
+    final config = container.read(appRouterDefinitionProvider);
     expect(
       config.publicRoutePatterns,
       containsAll(<String>['/login', '/todo', '/splash', '/web']),
@@ -99,39 +104,34 @@ void main() {
     expect((decision as RedirectRoute).target.location, '/upgrade');
   });
 
-  test(
-    'unauthenticated access redirects to login before feature guards',
-    () {
-      final registry = AppFeatureRegistry(
-        environment: EnvTag.dev,
-        candidates: <AppFeature>[...appFeatures, const _GuardedFeature()],
-      );
-      final container = ProviderContainer(
-        overrides: [
-          ...createAppRouterOverrides(registry),
-          appBootstrapCompletedProvider.overrideWith((ref) => true),
-          authSessionProvider.overrideWith(
-            () => _TestAuthSessionNotifier(null),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
+  test('unauthenticated access redirects to login before feature guards', () {
+    final registry = AppFeatureRegistry(
+      environment: EnvTag.dev,
+      candidates: <AppFeature>[...appFeatures, const _GuardedFeature()],
+    );
+    final container = ProviderContainer(
+      overrides: [
+        ...createAppRouterOverrides(registry),
+        appBootstrapCompletedProvider.overrideWith((ref) => true),
+        authSessionProvider.overrideWith(() => _TestAuthSessionNotifier(null)),
+      ],
+    );
+    addTearDown(container.dispose);
 
-      final decision = container.read(routeAccessDecisionProvider)(
-        const AppRouteRequest(
-          location: '/guarded',
-          routeKey: '/guarded',
-          metadata: AppRouteMetadata(key: '/guarded', path: '/guarded'),
-          state: AppRouteState(location: '/guarded'),
-        ),
-      );
+    final decision = container.read(routeAccessDecisionProvider)(
+      const AppRouteRequest(
+        location: '/guarded',
+        routeKey: '/guarded',
+        metadata: AppRouteMetadata(key: '/guarded', path: '/guarded'),
+        state: AppRouteState(location: '/guarded'),
+      ),
+    );
 
-      expect(decision, isA<RedirectRoute>());
-      final redirect = decision as RedirectRoute;
-      expect(redirect.target.location, '/login');
-      expect(redirect.preserveTarget, isTrue);
-    },
-  );
+    expect(decision, isA<RedirectRoute>());
+    final redirect = decision as RedirectRoute;
+    expect(redirect.target.location, '/login');
+    expect(redirect.preserveTarget, isTrue);
+  });
 
   testWidgets('router provider mounts the injected route error builder', (
     tester,
@@ -139,8 +139,8 @@ void main() {
     var renderedErrorLocation = '';
     final container = ProviderContainer(
       overrides: [
-        appRouterConfigProvider.overrideWith(
-          (ref) => AppRouterConfig(
+        appRouterDefinitionProvider.overrideWith(
+          (ref) => AppRouterDefinition(
             routeNodes: const <AppRouteNode>[_GuardedRoute()],
             initialLocation: '/guarded',
             errorBuilder: (context, error) {
@@ -157,7 +157,7 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final router = container.read(goRouterProvider);
+    final router = container.read(go_router.goRouterProvider);
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     router.go('/missing');
     await tester.pumpAndSettle();
@@ -172,8 +172,8 @@ void main() {
     AppRouteRequest? capturedRequest;
     final container = ProviderContainer(
       overrides: [
-        appRouterConfigProvider.overrideWith(
-          (ref) => const AppRouterConfig(
+        appRouterDefinitionProvider.overrideWith(
+          (ref) => const AppRouterDefinition(
             routeNodes: <AppRouteNode>[_DynamicRoute()],
             initialLocation: '/member/42',
           ),
@@ -188,7 +188,7 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final router = container.read(goRouterProvider);
+    final router = container.read(go_router.goRouterProvider);
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pumpAndSettle();
 
@@ -204,7 +204,10 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      expect(() => container.read(appRouterConfigProvider), throwsStateError);
+      expect(
+        () => container.read(appRouterDefinitionProvider),
+        throwsStateError,
+      );
       expect(
         () => container.read(routeAccessDecisionProvider),
         throwsStateError,
