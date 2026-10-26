@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,7 +39,7 @@ final appLocaleValueProvider = Provider<Locale?>((ref) {
   }
   return resolveAppLocale(
     preference,
-    WidgetsBinding.instance.platformDispatcher.locales,
+    ui.PlatformDispatcher.instance.locales,
     AppLocalizations.supportedLocales,
   );
 });
@@ -46,7 +47,7 @@ final appLocaleValueProvider = Provider<Locale?>((ref) {
 final appLocalizationsProvider = Provider<AppLocalizations>((ref) {
   final locale = resolveAppLocale(
     ref.watch(appLocaleProvider),
-    WidgetsBinding.instance.platformDispatcher.locales,
+    ui.PlatformDispatcher.instance.locales,
     AppLocalizations.supportedLocales,
   );
   return lookupAppLocalizations(locale);
