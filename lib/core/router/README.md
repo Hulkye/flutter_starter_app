@@ -101,9 +101,31 @@ final class SettingTarget extends AppRouteTargetBase {
 - `parse()`：把 `AppRouteState` 解析成类型化参数。
 - `buildPage()`：只接收 `BuildContext` 和已解析的 `TArgs`。
 
-带参数路由由 Target 生成 location，由 `parse()` 读取真实参数：
+页面入参通过类型化 Target 传递。Route 声明匹配路径并在 `parse()` 中从
+`AppRouteState` 读取参数，最后把解析后的 Args 交给 `buildPage()`。多个参数应收敛到
+一个 Args 类型中，避免页面构建接口随着参数增加而膨胀。
+
+参数位置建议按用途选择：
+
+- 必需的资源标识、层级关系放在 path，例如 `/members/:memberId`。
+- 可选筛选、分页、展示状态等可分享参数放在 query，例如 `?tab=posts&page=2`。
+- 仅当前进程内使用、无需深链或冷启动恢复的对象可通过 `extra` 传递；恢复所需数据不要只放在 `extra` 中。
+
+下面示例展示多个 path/query 参数的完整传递：
 
 ```dart
+final class MemberDetailArgs {
+  const MemberDetailArgs({
+    required this.memberId,
+    required this.from,
+    this.tab,
+  });
+
+  final String memberId;
+  final String from;
+  final String? tab;
+}
+
 final class MemberDetailRoute extends AppPageRoute<MemberDetailArgs> {
   const MemberDetailRoute();
 
@@ -120,31 +142,76 @@ final class MemberDetailRoute extends AppPageRoute<MemberDetailArgs> {
   @override
   MemberDetailArgs parse(AppRouteState state) => MemberDetailArgs(
     memberId: state.requiredPathParameter('memberId'),
+    from: state.requiredQueryParameter('from'),
+    tab: state.queryParameter('tab'),
   );
 
   @override
   Widget buildPage(BuildContext context, MemberDetailArgs args) {
-    return MemberDetailPage(memberId: args.memberId);
+    return MemberDetailPage(args: args);
   }
 }
 
-final class MemberDetailArgs {
-  const MemberDetailArgs({required this.memberId});
-  final String memberId;
-}
-
 final class MemberDetailTarget extends AppRouteTargetBase {
-  const MemberDetailTarget({required this.memberId});
+  const MemberDetailTarget({
+    required this.memberId,
+    required this.from,
+    this.tab,
+  });
 
   final String memberId;
+  final String from;
+  final String? tab;
 
   @override
-  String get location => AppRouteLocation.withPathParameters(
-    MemberDetailRoute.pathValue,
-    {'memberId': memberId},
-  );
+  String get location {
+    final path = AppRouteLocation.withPathParameters(
+      MemberDetailRoute.pathValue,
+      {'memberId': memberId},
+    );
+    return AppRouteLocation.withQuery(path, {
+      'from': from,
+      if (tab != null) 'tab': tab!,
+    });
+  }
 }
 ```
+
+页面或 ViewModel 通过统一导航接口跳转：
+
+```dart
+ref.read(appRouterProvider).push(
+  const MemberDetailTarget(
+    memberId: '42',
+    from: 'search',
+    tab: 'posts',
+  ),
+);
+```
+
+`AppRouteState` 提供 `pathParameter()` / `requiredPathParameter()` 和
+`queryParameter()` / `requiredQueryParameter()`；必需参数缺失或为空时会显式抛出
+`FormatException`。Target 侧使用 `AppRouteLocation.withPathParameters()` 编码 path 参数，
+使用 `AppRouteLocation.withQuery()` 编码 query 参数，避免手动拼接和遗漏 URI 编码。
+
+对于只在当前进程内传递的附加对象，可在 Target 中覆写 `extra`：
+
+```dart
+final class EditMemberTarget extends AppRouteTargetBase {
+  const EditMemberTarget({required this.member});
+
+  final Member member;
+
+  @override
+  String get location => '/members/${member.id}/edit';
+
+  @override
+  Object get extra => member;
+}
+```
+
+Route 可通过 `state.extra` 读取该对象，并应在 `parse()` 中校验类型。由于 `extra` 不适合作为
+可分享 URL 或冷启动恢复数据的唯一来源，编辑页若可从成员 ID 重新加载数据，应仍将 ID 放在 path 中。
 
 公开路由不在 `AppPageRoute` 上标记。Feature 通过 `AppRoutePolicy(requiresAuthentication: false)` 声明，再由 `AppFeatureRegistry.publicRoutePatterns` 派生匹配模板。
 
