@@ -103,11 +103,6 @@ final class _TestAuthSessionNotifier extends AuthSessionNotifier {
   Future<void> setSession(AuthSession session) async {
     state = session;
   }
-
-  @override
-  Future<void> clear() async {
-    state = null;
-  }
 }
 
 final class _RecordingNavigator implements BaseNavigator {
@@ -124,42 +119,19 @@ final class _RecordingNavigator implements BaseNavigator {
   bool canBack() => false;
 
   @override
-  void go(AppRouteTarget target) {
-    goLocation(target.location, extra: target.extra);
-  }
+  void go(AppRouteTarget target) {}
 
   @override
-  void goLocation(String location, {Object? extra}) {}
-
-  @override
-  Future<T?> push<T extends Object?>(AppRouteTarget target) {
-    return pushLocation<T>(target.location, extra: target.extra);
-  }
-
-  @override
-  Future<T?> pushLocation<T extends Object?>(
-    String location, {
-    Object? extra,
-  }) async {
+  Future<T?> push<T extends Object?>(AppRouteTarget target) async {
     return null;
   }
 
   @override
-  void replace(AppRouteTarget target) {
-    replaceLocation(target.location, extra: target.extra);
-  }
-
-  @override
-  void replaceLocation(String location, {Object? extra}) {}
+  void replace(AppRouteTarget target) {}
 
   @override
   void replaceAll(AppRouteTarget target) {
-    replaceAllLocation(target.location, extra: target.extra);
-  }
-
-  @override
-  void replaceAllLocation(String location, {Object? extra}) {
     replaceAllCount++;
-    lastReplaceAllLocation = location;
+    lastReplaceAllLocation = target.location;
   }
 }

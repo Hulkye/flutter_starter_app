@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../adapters/app_router_transform.dart';
+import '../adapters/go_router_access_guard.dart';
 import '../adapters/router_navigator.dart';
 import '../definitions/router_definitions.dart';
 import '../guards/route_access_decision.dart';
 import '../guards/app_route_request.dart';
-import '../guards/router_guard.dart';
 import '../navigation/base_navigator.dart';
 
 // =============================================================================
@@ -90,7 +90,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: routerConfig.initialLocation,
     observers: routerConfig.observers,
     refreshListenable: refreshNotifier,
-    redirect: createAccessGuard(
+    redirect: createGoRouterAccessGuard(
       accessDecision: (request) =>
           ref.read(routeAccessDecisionProvider)(request),
       routeNodes: routerConfig.routeNodes,

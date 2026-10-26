@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 
 import '../navigation/base_navigator.dart';
 import '../definitions/app_route_target.dart';
+import '../guards/internal_route_location.dart';
 
 /// [BaseNavigator] 的 GoRouter 实现。
 ///
@@ -16,42 +17,28 @@ final class RouterNavigator implements BaseNavigator {
 
   @override
   void go(AppRouteTarget target) {
-    goLocation(target.location, extra: target.extra);
-  }
-
-  @override
-  void goLocation(String location, {Object? extra}) {
-    _router.go(location, extra: extra);
+    _router.go(requireInternalLocation(target.location), extra: target.extra);
   }
 
   @override
   Future<T?> push<T extends Object?>(AppRouteTarget target) {
-    return pushLocation<T>(target.location, extra: target.extra);
-  }
-
-  @override
-  Future<T?> pushLocation<T extends Object?>(String location, {Object? extra}) {
-    return _router.push<T>(location, extra: extra);
+    return _router.push<T>(
+      requireInternalLocation(target.location),
+      extra: target.extra,
+    );
   }
 
   @override
   void replace(AppRouteTarget target) {
-    replaceLocation(target.location, extra: target.extra);
-  }
-
-  @override
-  void replaceLocation(String location, {Object? extra}) {
-    _router.replace(location, extra: extra);
+    _router.replace(
+      requireInternalLocation(target.location),
+      extra: target.extra,
+    );
   }
 
   @override
   void replaceAll(AppRouteTarget target) {
-    replaceAllLocation(target.location, extra: target.extra);
-  }
-
-  @override
-  void replaceAllLocation(String location, {Object? extra}) {
-    _router.go(location, extra: extra);
+    _router.go(requireInternalLocation(target.location), extra: target.extra);
   }
 
   @override

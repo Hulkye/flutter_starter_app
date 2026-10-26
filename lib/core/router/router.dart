@@ -35,6 +35,7 @@ library;
 
 export 'navigation/base_navigator.dart';
 export 'adapters/app_router_transform.dart';
+export 'adapters/go_router_access_guard.dart';
 export 'definitions/router_definitions.dart';
 export 'config/router_provider.dart';
 export 'adapters/router_navigator.dart';

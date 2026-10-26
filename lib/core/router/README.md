@@ -8,7 +8,7 @@
 - 对业务层暴露导航接口：`BaseNavigator` 与 `appRouterProvider`。
 - 在基础设施层把 `AppRouteNode` 转换为 GoRouter 的 `RouteBase`。
 - 通过 `AppRouterConfig` 接收 App 组合层注入的路由图、公开路由模板、NavigatorObserver 和错误页。
-- 通过 `createAccessGuard` 执行 App 组合层注入的 `RouteAccessDecision`，不枚举登录、升级、租户等业务状态。
+- 通过 GoRouter Guard adapter 执行 App 组合层注入的 `RouteAccessDecision`，不枚举登录、升级、租户等业务状态。
 - App Shell 的 Tab 入口由 Feature 显式声明，Shell 只做装配。
 
 ## 文件清单
@@ -30,11 +30,13 @@
 | `navigation/base_navigator.dart` | `BaseNavigator` 导航抽象接口 | ❌ |
 | `adapters/router_navigator.dart` | `RouterNavigator` 的 GoRouter 导航实现 | ✅ |
 | `adapters/app_router_transform.dart` | `AppRouteNode` 到 `RouteBase` 的适配器 | ✅ |
+| `adapters/go_router_access_guard.dart` | GoRouter 状态到访问请求及 redirect 的适配器 | ✅ |
 | `config/router_provider.dart` | `AppRouterConfig`、GoRouter、导航接口 Provider | ✅ |
 | `guards/route_access_decision.dart` | `AllowRoute` / `RedirectRoute` 最终访问决策 | ❌ |
 | `guards/app_route_guard.dart` | `AppRouteGuard` / `AppRouteGuardChain` | ❌ |
 | `guards/app_route_request.dart` | Guard 判断当前访问时的路由上下文 | ❌ |
-| `guards/router_guard.dart` | `createAccessGuard` 与重定向目标安全校验 | ✅ |
+| `guards/router_guard.dart` | 框架无关的访问决策与重定向计算 | ❌ |
+| `guards/internal_route_location.dart` | 应用内 location 校验，供导航与重定向共用 | ❌ |
 
 ## 分层关系
 
@@ -49,7 +51,7 @@ core/router definitions
         │
         ▼
 core/router adapters
-  toRouteBase() / RouterNavigator / createAccessGuard()
+  toRouteBase() / RouterNavigator / createGoRouterAccessGuard()
         │
         ▼
 GoRouter
@@ -57,6 +59,8 @@ GoRouter
 ```
 
 `core/router` 不 import `app/`、`features/` 或具体 UI 组件。Toast 这类 NavigatorObserver 由 App 组合层通过 `AppRouterConfig.observers` 注入。
+
+业务导航只通过 `BaseNavigator` 的类型化 `AppRouteTarget` 方法完成；不要在业务层拼接 location，也不要调用字符串导航入口。GoRouter 专属的状态转换、Navigator 和 redirect callback 保留在 `adapters/`，通用访问决策与内部 location 校验保留在 `guards/`。
 
 ## 定义类型
 

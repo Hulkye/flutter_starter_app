@@ -57,6 +57,29 @@ void main() {
       reason: 'core/router must stay decoupled from app, features, and toast.',
     );
   });
+
+  test('features use typed navigation and do not import GoRouter', () {
+    final offenders = <String>[];
+    final stringNavigationPattern = RegExp(
+      r'\.(goLocation|pushLocation|replaceLocation|replaceAllLocation)\s*\(',
+    );
+
+    for (final file in _featureDartFiles()) {
+      final content = file.readAsStringSync();
+      if (content.contains('package:go_router/go_router.dart')) {
+        offenders.add('${file.path}: GoRouter import');
+      }
+      if (stringNavigationPattern.hasMatch(content)) {
+        offenders.add('${file.path}: string navigation API');
+      }
+    }
+
+    expect(
+      offenders,
+      isEmpty,
+      reason: 'Features must use typed targets through the router contract.',
+    );
+  });
 }
 
 Iterable<File> _presentationDartFiles() {
@@ -71,6 +94,14 @@ Iterable<File> _presentationDartFiles() {
 Iterable<File> _coreRouterDartFiles() {
   return Directory(
     'lib/core/router',
+  ).listSync(recursive: true).whereType<File>().where((file) {
+    return file.path.replaceAll('\\', '/').endsWith('.dart');
+  });
+}
+
+Iterable<File> _featureDartFiles() {
+  return Directory(
+    'lib/features',
   ).listSync(recursive: true).whereType<File>().where((file) {
     return file.path.replaceAll('\\', '/').endsWith('.dart');
   });

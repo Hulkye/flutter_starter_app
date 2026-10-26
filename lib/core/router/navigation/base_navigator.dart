@@ -20,18 +20,6 @@ abstract interface class BaseNavigator {
   /// 使用类型化目标清空当前栈并跳转。
   void replaceAll(AppRouteTarget target);
 
-  /// 兼容期字符串跳转 API。
-  void goLocation(String location, {Object? extra});
-
-  /// 兼容期字符串压栈 API。
-  Future<T?> pushLocation<T extends Object?>(String location, {Object? extra});
-
-  /// 兼容期字符串替换 API。
-  void replaceLocation(String location, {Object? extra});
-
-  /// 兼容期字符串清栈跳转 API。
-  void replaceAllLocation(String location, {Object? extra});
-
   /// 返回上一页。
   void back<T extends Object?>([T? result]);
 
