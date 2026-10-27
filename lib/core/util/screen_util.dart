@@ -4,7 +4,20 @@ export 'package:flutter/material.dart' hide EdgeInsets, Alignment;
 ///屏幕适配
 import 'package:flutter_screenutil/flutter_screenutil.dart' as flutter_screen;
 
+enum AppScreenSizeClass {
+  /// 紧凑布局：屏幕宽度小于 600 逻辑像素。
+  compact,
+
+  /// 中等布局：屏幕宽度为 600 至 840 逻辑像素。
+  medium,
+
+  /// 扩展布局：屏幕宽度不小于 840 逻辑像素。
+  expanded,
+}
+
 class ScreenUtil {
+  static double _maxScaleFactor = 1.04;
+
   static double _paddingTop = 0;
 
   ///竖屏情况，顶部安全间隔
@@ -18,36 +31,37 @@ class ScreenUtil {
   static double get paddingTop => _paddingTop;
   static double get paddingBottom => _paddingBottom;
   static Size? uiSize;
+  static double get maxScaleFactor => _maxScaleFactor;
 
   ///获取竖屏情况的上下安全间距
   static void _getPaddingTopAndBottom(BuildContext context) {
-    if (_screenUtil.orientation == Orientation.portrait) {
-      MediaQueryData mqData = MediaQuery.of(context);
-      _paddingTop = mqData.padding.top;
-      _paddingBottom = mqData.padding.bottom;
-    }
+    final mqData = MediaQuery.of(context);
+    _paddingTop = mqData.padding.top;
+    _paddingBottom = mqData.padding.bottom;
   }
 
   ///启动app，需要先进行初始化
-  static Widget screenInit(Widget appWidget, Size initSize) {
+  static Widget screenInit(
+    Widget appWidget,
+    Size initSize, {
+    double maxScaleFactor = 1.04,
+  }) {
+    if (!maxScaleFactor.isFinite || maxScaleFactor < 1) {
+      throw ArgumentError.value(
+        maxScaleFactor,
+        'maxScaleFactor',
+        'Must be a finite number greater than or equal to 1.',
+      );
+    }
     uiSize = initSize;
+    _maxScaleFactor = maxScaleFactor;
     Widget child = flutter_screen.ScreenUtilInit(
       designSize: initSize,
       minTextAdapt: true,
-      splitScreenMode: true,
+      splitScreenMode: false,
       builder: (context, child) {
         _getPaddingTopAndBottom(context);
-        Widget newChild = appWidget;
-        if (textScaleFactor != null) {
-          newChild = MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(textScaler: TextScaler.linear(textScaleFactor!)),
-            child: newChild,
-          );
-        }
-
-        return newChild;
+        return appWidget;
       },
     );
     return child;
@@ -71,11 +85,22 @@ class ScreenUtil {
   ///状态栏高度 刘海屏会更高
   static double get statusBarHeight => _screenUtil.statusBarHeight;
 
-  ///系统字体缩放比例,固定比例
-  static double? get textScaleFactor => 1.0; //_screenUtil.textScaleFactor;
+  ///系统文字缩放比例，由系统辅助功能设置决定。
+  static double get textScaleFactor => _screenUtil.textScaleFactor;
 
   ///屏幕方向
   static Orientation get orientation => _screenUtil.orientation;
+
+  /// Material 断点：compact < 600，medium < 840，expanded >= 840 逻辑像素。
+  static AppScreenSizeClass get sizeClass {
+    if (screenWidth < 600) return AppScreenSizeClass.compact;
+    if (screenWidth < 840) return AppScreenSizeClass.medium;
+    return AppScreenSizeClass.expanded;
+  }
+
+  static bool get isCompact => sizeClass == AppScreenSizeClass.compact;
+  static bool get isMedium => sizeClass == AppScreenSizeClass.medium;
+  static bool get isExpanded => sizeClass == AppScreenSizeClass.expanded;
 
   static double get pageHeight => screenHeight - statusBarHeight - appBarHeight;
 
@@ -93,31 +118,40 @@ class ScreenUtil {
 }
 
 extension AppSizeExtension on num {
-  ///适配字体
-  double get sp {
-    double value;
-    value = ScreenUtil._screenUtil.setSp(this);
-    // 调整为根据缩放系数进行适配
-    // value = this * ScreenUtil._screenUtil.textScaleFactor * 1.04;
-    return value;
+  double _limitScale(double value) {
+    final maxMagnitude = toDouble().abs() * ScreenUtil.maxScaleFactor;
+    final scaledMagnitude = value.abs();
+    final magnitude = scaledMagnitude < maxMagnitude
+        ? scaledMagnitude
+        : maxMagnitude;
+    return isNegative ? -magnitude : magnitude;
   }
 
-  /// 根据宽度进行调整
-  double get w {
-    return ScreenUtil._screenUtil.setWidth(this);
-    // return this * 1.0;
-  }
+  /// 系统字体缩放适配
+  double get sp => ScreenUtil._screenUtil.setSp(this);
 
-  /// 根据屏幕高度适配尺寸(一般根据宽度适配即可)
-  double get h {
-    return ScreenUtil._screenUtil.setHeight(this);
-    // return this * 1.0;
-  }
+  /// 基于 [sp]，并限制大屏放大比例
+  double get spm => _limitScale(sp);
+
+  /// 按屏幕宽度适配，。
+  double get w => ScreenUtil._screenUtil.setWidth(this);
+
+  /// 基于 [w]，并限制大屏放大比例
+  double get wm => _limitScale(w);
+
+  /// 按屏幕高度适配，
+  double get h => ScreenUtil._screenUtil.setHeight(this);
+
+  /// 基于 [h]，并限制大屏放大比例。
+  double get hm => _limitScale(h);
+
+  /// 屏幕宽度的比例，例如 0.2.sw 表示屏幕宽度的 20%。
+  double get sw => ScreenUtil.screenWidth * this;
+
+  /// 屏幕高度的比例，例如 0.5.sh 表示屏幕高度的 50%。
+  double get sh => ScreenUtil.screenHeight * this;
 
   ///横屏情况，需要用高度来进行换算
-  double get hw {
-    return (ScreenUtil._screenUtil.screenHeight / ScreenUtil.uiSize!.width) *
-        this;
-    // return this * 1.0;
-  }
+  double get hw =>
+      (ScreenUtil._screenUtil.screenHeight / ScreenUtil.uiSize!.width) * this;
 }
