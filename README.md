@@ -43,6 +43,7 @@
   - [网络层](#-网络层)
   - [路由系统](#-路由系统)
   - [登录会话](#-登录会话)
+  - [Deep Link 与外部入口](#-deep-link-与外部入口)
   - [通用 WebView 页面](#-通用-webview-页面)
   - [主题与资源](#-主题与资源)
   - [国际化](#-国际化)
@@ -109,13 +110,17 @@ lib/
 ├── app/                           # 应用启动、根组件、App 路由装配
 │   ├── app.dart                   # MaterialApp.router 根组件
 │   ├── application.dart           # Application.run 启动入口
-│   ├── host/                      # 启动协调、会话协调、AppHost
+│   ├── capabilities/              # App 级可选能力生命周期注册表
+│   ├── host/                      # 启动协调、会话协调、生命周期协调、AppHost
 │   ├── navigation/                # App 路由图组合、Splash、Root/Shell 导航骨架
 │   │   ├── app_router_config.dart # AppRouterConfig 注入
 │   │   ├── shell/                 # RootRoute / RootShellRoute / 底部 Tab 容器
 │   │   └── splash/                # 启动展示页
+├── integrations/                  # 外部 package 与 App/core 能力的宿主适配
+│   └── deep_link_host/            # 可选 Deep Link 的引擎与导航适配
 ├── core/                          # 全局基础设施，不承载具体业务
 │   ├── config/                    # EnvConfig / EnvTag / appConfig
+│   ├── capability/                # AppCapability 可选能力协议
 │   ├── constant/                  # 常量
 │   ├── exception/                 # 全局异常捕获
 │   ├── feature/                   # AppFeature 模块协议
@@ -437,6 +442,12 @@ Router Guard / AuthInterceptor / UI
 ```
 
 `AuthSession` 以 `token`、`refreshToken` 与可扩展 payload 为核心，适配不同后端登录协议。`authSessionProvider` 是 App 内唯一响应式登录态状态源，负责守卫判断、HTTP token 注入与 UI 订阅；`AuthSessionController` 是语义化写入口，统一保存、清空和更新会话；`AuthStore` 只作为其安全存储后端。登录 Feature 中提供了完整示例：页面表单、ViewModel、Repository、DataSource、会话落盘与退出登录，其中 `AuthRepositoryImpl` 只返回 `AuthSession`，不直接写全局会话。
+
+### 🔗 Deep Link 与外部入口
+
+外部链接解析由独立的 `app_deep_link` package 提供。App 通过 `AppCapability` 生命周期协议与 `AppCapabilityRegistry` 管理可选能力；`lib/integrations/deep_link_host/` 负责把 package 的匹配结果转换为统一的 `AppNavigationCommand`。业务 Feature 只通过 `AppExternalRoute` 声明可被外部访问的路由，App 从当前环境的 `AppFeatureRegistry.externalRoutes` 汇总注册，不在 integration 中硬编码业务路由。
+
+Deep Link 默认关闭。启用方式、Android App Links / iOS Universal Links 原生关联和配置脚本见[模板使用说明中的深链配置](docs/template_usage.md#配置深链和外链)。不需要此能力的项目可移除对应 package 与宿主适配；普通路由不依赖它。
 
 ### 🌐 通用 WebView 页面
 

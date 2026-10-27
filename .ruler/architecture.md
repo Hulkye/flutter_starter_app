@@ -6,6 +6,9 @@
 - 复杂 Feature 内部优先保持 `data / domain / presentation` 三层结构；简单展示页或设置页可以只保留实际需要的 `presentation`、路由与 Feature 声明，不创建空分层。
 - Clean Architecture 依赖方向为：`presentation -> domain <- data`。
 - `core` 提供全局基础设施，不依赖具体 Feature。
+- `core/capability/` 定义 App 可选能力的稳定生命周期协议；`app/capabilities/` 在组合层装配并管理已启用能力，不让 core 依赖具体集成。
+- `integrations/` 放置外部 package 与 App/core 抽象之间的宿主适配，不承载业务 Feature，也不应硬编码 Feature 路由。
+- 可选外部能力的业务入口由 Feature 声明稳定元数据（例如 `AppExternalRoute`），由 App 组合层按当前环境注册；集成适配层消费组合结果并转换为统一 App 命令。
 - `core/config` 承载 App 环境配置，供 `main_*`、`app`、`core/network` 与业务页面读取；避免 `core` 反向依赖 `app`。
 - `core/router` 不装配具体 App/Feature 路由，也不绑定 Toast 等 UI 组件；App 层通过 `AppRouterConfig` 注入路由图、公开策略和 observers。
 - `shared` 提供跨 Feature 可复用能力，不承载具体业务流程；较完整的通用能力可按能力名建目录，例如 `shared/webview/`；跨页面、跨模块的低频业务通知使用 `shared/services/event_bus`。

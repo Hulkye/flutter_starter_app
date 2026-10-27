@@ -15,11 +15,16 @@
 ## 重要目录
 
 - `lib/app/`：应用启动、根组件与 App 路由装配。
-- `lib/app/navigation/`：App 路由图组合、Splash、Root/Shell 导航骨架与 `AppRouterConfig` 注入。
+- `lib/app/capabilities/`：App 级可选能力的生命周期注册表与装配入口。
+- `lib/app/host/`：启动、会话与生命周期协调。
+- `lib/app/navigation/`：App 路由图组合、外部路由汇总、Splash、Root/Shell 导航骨架与 `AppRouterConfig` 注入。
+- `lib/integrations/`：外部 package 与 App/core 能力的宿主适配；可选集成不应成为业务 Feature 依赖。
 - `lib/core/`：全局基础设施，不承载具体业务。
+- `lib/core/capability/`：App 可选能力生命周期协议。
 - `lib/core/config/`：环境配置 `EnvConfig` / `EnvTag` / `appConfig`。
 - `lib/core/feature/`：`AppFeature` 模块协议、元数据与环境注册表。
 - `lib/core/router/`：路由抽象、GoRouter 适配、Provider、守卫；不装配具体 App/Feature 路由。
+- `lib/core/l10n/`：语言偏好、locale 解析与本地化 Provider。
 - `lib/features/`：业务功能模块，按 Feature 聚合。
 - `lib/features/features.dart`：App Feature 候选注册入口，按环境构建 `AppFeatureRegistry`。
 - `lib/features/exports.dart`：业务页面可用的 Route class 与公开类型统一导出入口。
