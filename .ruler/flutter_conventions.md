@@ -33,6 +33,8 @@
 - 暗色资源放在 `assets/images/dark/`。
 - 不需要单独维护 `assets/images/light/`。
 - 修改资源目录规范时同步检查 `assets/images/README.md`。
+- 跨 Feature 共用的颜色、图片 token 与主题扩展放在 `lib/shared/design_system/`；应用级主题偏好类型及持久化放在 `lib/app/preferences/`。
+- 本地化运行时与生成入口放在 `lib/shared/localization/`；语言偏好及持久化放在 `lib/app/preferences/`。Feature 可维护自己的 ARB 和资源映射，但不得让 shared 依赖 Feature。
 
 ## 导出规范
 

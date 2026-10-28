@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
-import 'package:flutter_starter_app/core/theme/app_theme_mode.dart';
-import 'package:flutter_starter_app/core/theme/theme_provider.dart';
+import 'package:flutter_starter_app/app/preferences/theme_preference.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

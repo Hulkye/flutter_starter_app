@@ -1,11 +1,12 @@
-import 'package:flutter_starter_app/core/l10n/app_locale.dart';
-import 'package:flutter_starter_app/core/l10n/l10n_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_starter_app/app/preferences/locale_preference.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_starter_app/features/auth/domain/exceptions/auth_exception.dart';
 import 'package:flutter_starter_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_starter_app/features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_provider.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth_session.dart';
+import 'package:flutter_starter_app/shared/localization/localization.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,6 +26,9 @@ void main() {
           overrides: [
             appLocaleProvider.overrideWith(
               () => _FixedLocaleNotifier(AppLocale.en),
+            ),
+            sharedLocalizationLocaleProvider.overrideWith(
+              (ref) => const Locale('en', 'US'),
             ),
             authRepositoryProvider.overrideWith(
               (ref) => const _ThrowingAuthRepository(
@@ -51,6 +55,9 @@ void main() {
         overrides: [
           appLocaleProvider.overrideWith(
             () => _FixedLocaleNotifier(AppLocale.zh),
+          ),
+          sharedLocalizationLocaleProvider.overrideWith(
+            (ref) => const Locale('zh', 'CN'),
           ),
           authRepositoryProvider.overrideWith(
             (ref) => const _ThrowingAuthRepository(

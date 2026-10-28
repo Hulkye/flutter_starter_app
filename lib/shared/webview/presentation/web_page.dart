@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_starter_app/core/l10n/l10n.dart';
+import 'package:flutter_starter_app/shared/localization/localization.dart';
 import 'package:flutter_starter_app/core/router/export.dart';
-import 'package:flutter_starter_app/core/theme/theme.dart';
+import 'package:flutter_starter_app/shared/design_system/design_system.dart';
 import 'package:flutter_starter_app/core/util/screen_util.dart';
 import 'package:flutter_starter_app/shared/presentation/presentation.dart';
 import 'package:flutter_starter_app/shared/widgets/button/primary_round_button.dart';

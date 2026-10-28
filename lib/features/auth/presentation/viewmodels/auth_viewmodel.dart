@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/l10n/l10n.dart';
+import '../../../../shared/localization/localization.dart';
 import '../../../../shared/presentation/presentation.dart';
 import '../../../../shared/services/auth/auth_session_controller.dart';
 import '../../domain/exceptions/auth_exception.dart';

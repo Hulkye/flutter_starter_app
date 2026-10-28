@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/l10n/l10n_context_ext.dart';
-import '../../../core/theme/theme_context_ext.dart';
+import '../../../shared/localization/localization.dart';
+import '../../../shared/design_system/design_system.dart';
 import '../../../core/util/screen_util.dart';
 import '../../../shared/widgets/image_view/image_view.dart';
 

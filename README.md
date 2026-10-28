@@ -112,6 +112,7 @@ lib/
 │   ├── application.dart           # Application.run 启动入口
 │   ├── capabilities/              # App 级可选能力生命周期注册表
 │   ├── host/                      # 启动协调、会话协调、生命周期协调、AppHost
+│   ├── preferences/               # 应用级语言、主题等用户偏好及其持久化
 │   ├── navigation/                # App 路由图组合、Splash、Root/Shell 导航骨架
 │   │   ├── app_router_config.dart # AppRouterConfig 注入
 │   │   ├── shell/                 # RootRoute / RootShellRoute / 底部 Tab 容器
@@ -124,12 +125,10 @@ lib/
 │   ├── constant/                  # 常量
 │   ├── exception/                 # 全局异常捕获
 │   ├── feature/                   # AppFeature 模块协议
-│   ├── l10n/                      # 国际化
 │   ├── network/                   # 网络、连接状态、HTTP 客户端
 │   ├── router/                    # GoRouter 封装、守卫、导航抽象
 │   ├── service/                   # 日志等全局基础服务
 │   ├── storage/                   # SharedPreferences / SecureStorage 封装
-│   ├── theme/                     # 主题、色值、主题资源
 │   └── util/                      # 工具类
 ├── features/                      # 业务功能模块
 │   ├── exports.dart               # 业务页面可用的 Route / 公开类型导出
@@ -138,6 +137,8 @@ lib/
 │   ├── profile/                   # 个人中心与主题/退出登录示例
 │   └── todo/                      # 默认根 Tab 与完整分层示例
 ├── shared/                        # 跨 Feature 共享能力
+│   ├── design_system/             # 主题构建、颜色/图片 token、ThemeExtension
+│   ├── localization/              # ARB、生成代码、本地化运行时与文案访问 API
 │   ├── presentation/              # BasePage / PageLogic / BaseVM / BaseAutoDisposeVM / BaseState / PresentationFeedbackService
 │   ├── services/                  # AuthSession / AuthStore / AppEventBus
 │   ├── widgets/                   # Toast、Loading、Button、Dialog 等组件
@@ -222,8 +223,11 @@ Presentation  ──────▶  Domain  ◀──────  Data
 | 模块 | 职责 | 依赖规则 |
 | --- | --- | --- |
 | `app/` | 应用启动、环境注入、根组件挂载 | 可组合全局能力 |
-| `core/` | 网络、路由、存储、主题、DI、异常、工具 | 不依赖具体 Feature |
+| `app/preferences/` | 应用级语言、主题偏好状态与持久化 | 由 App 组合层使用，不被 shared 反向依赖 |
+| `core/` | 网络、路由、存储、DI、异常、工具等全局基础设施 | 不依赖具体 Feature 或 App 组合层 |
 | `features/` | 业务模块 | 可依赖 `core` 与 `shared` |
+| `shared/design_system/` | 跨 Feature 的主题构建、设计 token、图片映射与 ThemeExtension | 不读取或持久化 App 偏好 |
+| `shared/localization/` | ARB、生成代码、本地化运行时与共享文案访问 API | 不依赖 `app/` 或具体 Feature |
 | `shared/` | BasePage、PageLogic、BaseVM、BaseAutoDisposeVM、PresentationFeedbackService、认证服务、事件总线、通用组件、通用 WebView 等跨 Feature 能力 | 提供跨业务复用能力，不承载具体业务流程 |
 
 ---
@@ -495,6 +499,7 @@ ref.read(appRouterProvider).push(
 ### 🎨 主题与资源
 
 主题系统支持亮/暗模式，并通过 Riverpod 持久化主题选择。
+共享主题实现与设计 token 位于 `lib/shared/design_system/`，应用级主题偏好类型及持久化位于 `lib/app/preferences/theme_preference.dart`。
 
 能力包括：
 
@@ -515,10 +520,12 @@ context.appAsset.logo
 
 国际化使用 Flutter 官方 `gen-l10n`：
 
-- 源文件：`lib/l10n/arb/app_en.arb`
-- 源文件：`lib/l10n/arb/app_zh.arb`
+- 源文件：`lib/shared/localization/arb/app_en.arb`
+- 源文件：`lib/shared/localization/arb/app_zh.arb`
 - 配置文件：`l10n.yaml`
 - 生成脚本：`./script/gen_l10n.sh`
+
+语言偏好及持久化位于 `lib/app/preferences/locale_preference.dart`；共享本地化运行时与生成代码位于 `lib/shared/localization/`。Feature 可在自身目录维护专属颜色、图片映射和 ARB，跨模块能力由 App 组合层装配。
 
 切换语言示例：
 

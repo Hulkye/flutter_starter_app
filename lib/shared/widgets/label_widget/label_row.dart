@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../core/theme/theme_context_ext.dart';
+import '../../../shared/design_system/design_system.dart';
 import '../../../core/util/screen_util.dart';
 import '../image_view/image_view.dart';
 

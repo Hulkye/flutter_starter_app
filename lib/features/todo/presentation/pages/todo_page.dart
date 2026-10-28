@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_starter_app/shared/widgets/input/base_text_field.dart';
 
-import '../../../../core/l10n/l10n.dart';
-import '../../../../core/theme/theme.dart';
+import '../../../../shared/localization/localization.dart';
+import '../../../../shared/design_system/design_system.dart';
 import '../../../../core/util/screen_util.dart';
 import '../../../../shared/presentation/presentation.dart';
 import '../../../../shared/widgets/button/primary_round_button.dart';

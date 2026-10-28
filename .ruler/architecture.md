@@ -12,6 +12,10 @@
 - `core/config` 承载 App 环境配置，供 `main_*`、`app`、`core/network` 与业务页面读取；避免 `core` 反向依赖 `app`。
 - `core/router` 不装配具体 App/Feature 路由，也不绑定 Toast 等 UI 组件；App 层通过 `AppRouterConfig` 注入路由图、公开策略和 observers。
 - `shared` 提供跨 Feature 可复用能力，不承载具体业务流程；较完整的通用能力可按能力名建目录，例如 `shared/webview/`；跨页面、跨模块的低频业务通知使用 `shared/services/event_bus`。
+- `shared/design_system` 承载跨 Feature 共用的主题构建、设计 token、图片映射与 ThemeExtension；不定义或持久化用户主题偏好。
+- `shared/localization` 承载共享本地化运行时、生成 API 与当前模板的 ARB 资源；不依赖 `app/` 或具体 Feature。
+- `app/preferences` 管理应用级语言/主题偏好类型、状态及持久化；由 App 组合层把 locale 注入本地化运行时，并选择 `MaterialApp` 的主题。
+- Feature 可在自身模块维护专属颜色、图片映射和 ARB；需要加入全局主题或本地化生成时，由 App 组合层明确装配，不允许 shared 反向依赖 Feature。
 
 ## Feature 内部分层
 

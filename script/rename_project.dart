@@ -13,7 +13,7 @@ const _defaultExcludedDirectories = {
   '.cursor',
 };
 
-const _generatedL10nDirectory = 'lib/l10n/gen';
+const _generatedL10nDirectory = 'lib/shared/localization/generated';
 const _vscodeLaunchPath = '.vscode/launch.json';
 
 const _packageImportDirectories = {'docs', 'lib', 'script', 'test'};
@@ -90,14 +90,14 @@ void main(List<String> args) {
     _updateWindows(root, appName, newName, options, report);
     _updateArbAppTitle(
       root,
-      'lib/l10n/arb/app_zh.arb',
+      'lib/shared/localization/arb/app_zh.arb',
       appName,
       options,
       report,
     );
     _updateArbAppTitle(
       root,
-      'lib/l10n/arb/app_en.arb',
+      'lib/shared/localization/arb/app_en.arb',
       enAppName,
       options,
       report,

@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/env_config.dart';
 import '../../constant/duration_const.dart';
-import '../../l10n/l10n.dart';
+import '../../../shared/localization/localization.dart';
 import 'config/http_auth_config.dart';
 import 'config/http_config.dart';
 import 'config/http_hint_config.dart';

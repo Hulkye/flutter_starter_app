@@ -108,7 +108,7 @@ dart run script/rename_project.dart my_app \
 - Flutter：`pubspec.yaml` 包名、`package:` imports、ARB 的 `appTitle`。
 - VS Code：如果 `.vscode/launch.json` 已存在，自动更新启动配置名；脚本不会主动创建本地 IDE 配置。
 
-脚本默认不直接修改 `lib/l10n/gen/` 下的国际化生成物。修改 ARB 后需要重新生成：
+脚本默认不直接修改 `lib/shared/localization/generated/` 下的国际化生成物。修改 ARB 后需要重新生成：
 
 ```bash
 ./script/gen_l10n.sh
@@ -656,16 +656,16 @@ await ref.read(authSessionControllerProvider).clearSession();
 主题相关代码位于：
 
 ```text
-lib/core/theme/
+lib/shared/design_system/
 ```
 
 常见修改点：
 
 | 需求 | 修改位置 |
 | --- | --- |
-| 修改品牌色 | `lib/core/theme/theme.dart` 或具体色值定义文件 |
+| 修改品牌色 | `lib/shared/design_system/theme/` 下主题与颜色定义 |
 | 增加语义化颜色 | ThemeExtension 对应类 |
-| 修改亮暗主题资源 | `lib/core/theme/asset/` |
+| 修改亮暗主题资源 | `lib/shared/design_system/theme/asset/` |
 | 替换图片资源 | `assets/images/`、`assets/images/dark/` |
 
 页面中推荐通过 `BuildContext` 扩展访问主题资源：
@@ -688,8 +688,8 @@ context.appAsset.logo
 国际化源文件：
 
 ```text
-lib/l10n/arb/app_en.arb
-lib/l10n/arb/app_zh.arb
+lib/shared/localization/arb/app_en.arb
+lib/shared/localization/arb/app_zh.arb
 ```
 
 修改或新增文案后执行：
@@ -703,6 +703,10 @@ lib/l10n/arb/app_zh.arb
 ```dart
 ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 ```
+
+应用级主题与语言偏好类型及其持久化位于 `lib/app/preferences/`。跨 Feature 通用的设计 token 与本地化生成入口分别位于 `lib/shared/design_system/` 和 `lib/shared/localization/`。
+
+后续 Feature 可以在自身目录中维护模块专属颜色、图片资源映射和 ARB 文案；App 组合层负责把需要全局生效的 ThemeExtension 或本地化 delegate 接入根组件，shared 模块不依赖具体 Feature。
 
 页面中读取文案时，优先使用项目内已经封装好的 l10n Provider 或 BuildContext 扩展，保持调用方式统一。
 

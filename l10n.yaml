@@ -1,4 +1,4 @@
-arb-dir: lib/l10n/arb
+arb-dir: lib/shared/localization/arb
 template-arb-file: app_zh.arb
-output-dir: lib/l10n/gen
+output-dir: lib/shared/localization/generated
 output-localization-file: app_localizations.dart

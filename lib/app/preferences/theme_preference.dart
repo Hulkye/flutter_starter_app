@@ -3,8 +3,29 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../storage/storage.dart';
-import 'app_theme_mode.dart';
+import '../../core/storage/storage.dart';
+
+enum AppThemeMode { light, dark, system }
+
+extension AppThemeModeX on AppThemeMode {
+  int get storageValue => switch (this) {
+    AppThemeMode.light => 0,
+    AppThemeMode.dark => 1,
+    AppThemeMode.system => 2,
+  };
+
+  ThemeMode get toThemeMode => switch (this) {
+    AppThemeMode.light => ThemeMode.light,
+    AppThemeMode.dark => ThemeMode.dark,
+    AppThemeMode.system => ThemeMode.system,
+  };
+
+  static AppThemeMode fromStorageValue(int? value) => switch (value) {
+    0 => AppThemeMode.light,
+    1 => AppThemeMode.dark,
+    _ => AppThemeMode.system,
+  };
+}
 
 const String _themeModeKey = 'app_theme_mode';
 

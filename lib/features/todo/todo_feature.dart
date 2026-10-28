@@ -2,9 +2,9 @@ import 'package:flutter/widgets.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_starter_app/core/feature/app_tab_entry.dart';
-import 'package:flutter_starter_app/core/l10n/l10n.dart';
+import 'package:flutter_starter_app/shared/localization/localization.dart';
 import 'package:flutter_starter_app/core/router/export.dart';
-import 'package:flutter_starter_app/core/theme/theme.dart';
+import 'package:flutter_starter_app/shared/design_system/design_system.dart';
 import 'package:flutter_starter_app/core/feature/app_route_policy.dart';
 
 import '../../core/feature/app_feature.dart';

@@ -1,5 +1,4 @@
-import 'package:flutter_starter_app/core/l10n/app_locale.dart';
-import 'package:flutter_starter_app/core/l10n/l10n_provider.dart';
+import 'package:flutter_starter_app/app/preferences/locale_preference.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';

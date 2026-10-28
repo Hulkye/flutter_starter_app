@@ -4,9 +4,9 @@ import '../../core/feature/app_feature.dart';
 import '../../core/feature/app_external_route.dart';
 import '../../core/feature/app_feature_metadata.dart';
 import '../../core/feature/app_tab_entry.dart';
-import '../../core/l10n/l10n.dart';
+import '../../shared/localization/localization.dart';
 import 'package:flutter_starter_app/core/router/export.dart';
-import '../../core/theme/theme.dart';
+import '../../shared/design_system/design_system.dart';
 import 'presentation/profile_routes.dart';
 
 final class ProfileFeature extends AppFeature {
