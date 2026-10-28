@@ -2,20 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../data/color_data.dart';
 
-class ColorExtension extends ThemeExtension<ColorExtension> {
-  final ColorData colorData;
+abstract class ColorExtension<
+  TData extends ColorData,
+  TExtension extends ColorExtension<TData, TExtension>
+>
+    extends ThemeExtension<TExtension> {
+  final TData colorData;
 
   const ColorExtension({required this.colorData});
 
   @override
-  ColorExtension copyWith({ColorData? colors}) {
-    return ColorExtension(colorData: colors ?? colorData);
-  }
+  TExtension copyWith({TData? colorData});
 
   @override
-  ColorExtension lerp(ThemeExtension<ColorExtension>? other, double t) {
-    if (other is! ColorExtension) return this;
-    ColorData newColorData = colorData.lerp(other.colorData, t);
-    return ColorExtension(colorData: newColorData);
-  }
+  TExtension lerp(covariant TExtension? other, double t);
 }

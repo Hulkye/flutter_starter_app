@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../data/asset_data.dart';
 
-class AssetExtension extends ThemeExtension<AssetExtension> {
-  final AssetData assetData;
+abstract class AssetExtension<
+  TData extends AssetData,
+  TExtension extends AssetExtension<TData, TExtension>
+>
+    extends ThemeExtension<TExtension> {
+  final TData assetData;
 
   const AssetExtension({required this.assetData});
 
   @override
-  AssetExtension copyWith({AssetData? assets}) {
-    return AssetExtension(assetData: assets ?? assetData);
-  }
+  TExtension copyWith({TData? assetData});
 
   @override
-  AssetExtension lerp(ThemeExtension<AssetExtension>? other, double t) {
-    if (other is! AssetExtension) return this;
-    return this; // 图片资源通常不需要插值
-  }
+  TExtension lerp(covariant TExtension? other, double t);
 }

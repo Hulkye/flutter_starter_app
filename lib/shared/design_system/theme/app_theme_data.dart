@@ -4,8 +4,8 @@ import 'asset/app_asset.dart';
 import 'asset/app_dark_asset.dart';
 import 'color/app_color.dart';
 import 'color/app_dark_color.dart';
-import 'extension/asset_extension.dart';
-import 'extension/color_extension.dart';
+import 'extension/app_asset_extension.dart';
+import 'extension/app_color_extension.dart';
 
 abstract final class AppThemeData {
   static ThemeData get light {
@@ -19,8 +19,8 @@ abstract final class AppThemeData {
       splashFactory: NoSplash.splashFactory, //移除水波纹
       highlightColor: Colors.transparent, //移除水波纹
       extensions: <ThemeExtension<dynamic>>[
-        ColorExtension(colorData: appColor),
-        AssetExtension(assetData: appAsset),
+        AppColorExtension(colorData: appColor),
+        AppAssetExtension(assetData: appAsset),
       ],
       appBarTheme: AppBarTheme(
         backgroundColor: appColor.backgroundSecondary,
@@ -42,8 +42,8 @@ abstract final class AppThemeData {
       splashFactory: NoSplash.splashFactory, //移除水波纹
       highlightColor: Colors.transparent, //移除水波纹
       extensions: <ThemeExtension<dynamic>>[
-        ColorExtension(colorData: appColor),
-        AssetExtension(assetData: appAsset),
+        AppColorExtension(colorData: appColor),
+        AppAssetExtension(assetData: appAsset),
       ],
       appBarTheme: AppBarTheme(
         backgroundColor: appColor.backgroundSecondary,
