@@ -274,6 +274,41 @@ lib/features/order/
     └── viewmodels/order_viewmodel.dart
 ```
 
+如果 Feature 需要跨页面复用、并随亮暗主题切换的颜色或图片，可以增加 `design/`：
+
+```text
+lib/features/order/
+├── design/
+│   ├── order_color.dart
+│   ├── order_asset.dart
+│   └── order_design.dart
+└── localization/
+    ├── arb/                  # 仅独立维护文案时创建
+    └── generated/            # gen_feature_l10n.sh 生成
+```
+
+`design/` 中定义 Feature 自己的 `ColorData` / `AssetData`、`ThemeExtension` 和
+`BuildContext` 扩展，在 `OrderFeature.lightThemeExtensions` 与
+`darkThemeExtensions` 中返回对应的扩展对象。图片资源放在
+`assets/features/order/`，暗色资源放在 `assets/features/order/dark/`，并在
+`pubspec.yaml` 中声明对应目录。只在一个页面使用的颜色或资源不需要创建
+`ThemeExtension`。
+
+Feature 文案有两种维护方式：
+
+- 默认使用共享 ARB：在 `lib/shared/localization/arb/app_en.arb` 和
+  `app_zh.arb` 中维护带 Feature 前缀的 key，例如 `orderTitle`，执行
+  `./script/gen_l10n.sh` 生成代码。适合与 App 共用文案或不需要独立发布的 Feature。
+- 独立维护 ARB：在 `lib/features/order/localization/arb/` 中创建
+  `order_en.arb`、`order_zh.arb` 等与 App locale 一一对应的文件，执行
+  `./script/gen_feature_l10n.sh` 生成到 `localization/generated/`。Feature 通过
+  `localizationDelegates` 暴露生成的 delegate，注册表会按当前环境汇总并注入根
+  `MaterialApp`。独立 ARB 必须覆盖 App 的全部 locale。
+
+页面读取 Feature 专属主题和文案时，使用 Feature 自己的 context 扩展，例如
+`context.orderColor.primary`、`context.orderAsset.emptyState` 和
+`context.orderL10n.title`，不要让 `shared` 反向依赖具体 Feature。
+
 分层职责：
 
 | 层级 | 职责 |
@@ -708,7 +743,7 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 
 后续 Feature 可以在自身目录中维护模块专属颜色、图片资源映射和 ARB 文案；App 组合层负责把需要全局生效的 ThemeExtension 或本地化 delegate 接入根组件，shared 模块不依赖具体 Feature。
 
-Feature 内需要跨页面使用、且随亮暗主题变化的颜色或图片，可在 `lib/features/<feature>/design/` 定义 `ColorData` / `AssetData` 子类及对应的 `ColorExtension<TData, TExtension>` / `AssetExtension<TData, TExtension>` 子类，并实现 `BuildContext` 扩展，例如 `context.todoColor.completed`、`context.todoAsset.emptyState`。在 `<Feature>Feature.lightThemeExtensions` 和 `darkThemeExtensions` 声明 `AppThemeContribution(featureKey: key, value: extension)`，App 会按当前环境的 Feature 注册表汇总并注入主题；同一主题中扩展的具体 runtimeType 必须唯一。
+Feature 内需要跨页面使用、且随亮暗主题变化的颜色或图片，可在 `lib/features/<feature>/design/` 定义 `ColorData` / `AssetData` 子类及对应的 `ColorExtension<TData, TExtension>` / `AssetExtension<TData, TExtension>` 子类，并实现 `BuildContext` 扩展，例如 `context.todoColor.completed`、`context.todoAsset.emptyState`。在 `<Feature>Feature.lightThemeExtensions` 和 `darkThemeExtensions` 返回扩展对象，AppFeatureRegistry 会自动附加 Feature key、按当前环境汇总并注入主题；同一主题中扩展的具体 runtimeType 必须唯一。
 
 仅在单个页面使用的常量颜色或资源无需注册 ThemeExtension。Feature 图片放在 `assets/features/<feature>/` 并在 `pubspec.yaml` 声明。当前 ARB 仍由 `shared/localization/arb` 统一生成，Feature 文案使用带模块前缀的 key；文案由所属 Feature 维护。只有需要独立翻译、复用或发布时，才增加独立 ARB 生成与 delegate 注册流程。
 

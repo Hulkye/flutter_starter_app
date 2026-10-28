@@ -186,6 +186,40 @@ lib/features/<feature>/
     └── <feature>_routes.dart      # Feature 路由定义
 ```
 
+如果 Feature 需要跨页面复用、并随亮暗主题切换的颜色或图片，可以增加 `design/`：
+
+```text
+lib/features/order/
+├── design/
+│   ├── order_color.dart
+│   ├── order_asset.dart
+│   └── order_design.dart
+└── localization/
+    ├── arb/                  # 仅独立维护文案时创建
+    └── generated/            # gen_feature_l10n.sh 生成
+```
+
+`design/` 中定义 Feature 自己的 `ColorData` / `AssetData`、`ThemeExtension` 和
+`BuildContext` 扩展，在 `OrderFeature.lightThemeExtensions` 与
+`darkThemeExtensions` 中注册。图片资源放在 `assets/features/order/`，暗色资源放在
+`assets/features/order/dark/`，并在 `pubspec.yaml` 中声明对应目录。只在一个页面使用
+的颜色或资源不需要创建 ThemeExtension。
+
+Feature 文案有两种维护方式：
+
+- 默认使用共享 ARB：在 `lib/shared/localization/arb/app_en.arb` 和
+  `app_zh.arb` 中维护带 Feature 前缀的 key，例如 `orderTitle`，执行
+  `./script/gen_l10n.sh` 生成代码。适合与 App 共用文案或不需要独立发布的 Feature。
+- 独立维护 ARB：在 `lib/features/order/localization/arb/` 中创建
+  `order_en.arb`、`order_zh.arb` 等与 App locale 一一对应的文件，执行
+  `./script/gen_feature_l10n.sh` 生成到 `localization/generated/`。Feature 通过
+  `localizationDelegates` 暴露生成的 delegate，注册表会按当前环境汇总并注入根
+  `MaterialApp`。独立 ARB 必须覆盖 App 的全部 locale。
+
+页面读取 Feature 专属主题和文案时，使用 Feature 自己的 context 扩展，例如
+`context.orderColor.primary`、`context.orderAsset.emptyState` 和
+`context.orderL10n.title`，不要让 `shared` 反向依赖具体 Feature。
+
 该结构适用于 Todo、订单、登录等有业务状态、Repository 或接口编排的复杂 Feature。需要把 Repository 返回结果写入 App 级状态源时，优先通过 `shared/services` 中的稳定 Controller 或 Service 编排。纯展示页、设置页、Profile 这类只读取少量全局 Provider 或只有简单点击回调的页面，可以只保留 `presentation/pages` 与路由文件，不需要为了形式统一创建空 `ViewModel`、空 `State`、空 `data` 或空 `domain` 目录。
 
 ---
@@ -650,6 +684,7 @@ lib/features/profile/
 | 脚本 | 用途 |
 | --- | --- |
 | `./script/gen_l10n.sh` | 生成国际化代码 |
+| `./script/gen_feature_l10n.sh` | 扫描并生成独立 Feature 国际化代码 |
 | `./script/gen_app_icon.sh` | 根据 `assets/app_icon.png` 生成 App 图标 |
 | `./script/build_android.sh [apk\|aab]` | 构建 Android release 包，并收集混淆符号与 R8 mapping |
 | `./script/build_ios.sh` | 构建 iOS release IPA，并收集混淆符号与 dSYM |
