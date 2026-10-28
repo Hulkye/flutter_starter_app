@@ -110,6 +110,7 @@ lib/
 ├── app/                           # 应用启动、根组件、App 路由装配
 │   ├── app.dart                   # MaterialApp.router 根组件
 │   ├── application.dart           # Application.run 启动入口
+│   ├── app_startup.dart            # 环境、Feature、Capability、Provider、Runtime 启动阶段
 │   ├── capabilities/              # App 级可选能力生命周期注册表
 │   ├── host/                      # 启动协调、会话协调、生命周期协调、AppHost
 │   ├── preferences/               # 应用级语言、主题等用户偏好及其持久化
@@ -372,23 +373,24 @@ DataSource / HttpClient 负责具体数据来源
 
 ### 🧩 启动引导与依赖注入
 
-应用统一从 `Application.run()` 启动，启动前初始化集中在 `Application.bootstrap()` 中，启动后的首跳由 `AppHost` 协调：
+应用统一从 `Application.run()` 启动。`Application` 只负责异常保护、基础存储初始化和阶段串联，具体装配由 `app_startup.dart` 中的启动阶段对象完成；启动后的首跳由 `AppHost` 协调：
 
 ```text
 main()
   → Application.run(envConfig)
       → WidgetsFlutterBinding.ensureInitialized()
-      → 初始化普通存储与安全存储
-      → 恢复 AuthSession 到 authSessionProvider
-      → appFeatureProviderOverrides 注入 Feature 默认 data 实现
-      → createAppRouterOverrides() 注入 AppRouterConfig
+      → AppEnvironmentResolver 解析环境配置与 Deep Link 配置
+      → 初始化普通存储、安全存储与 AuthStore
+      → AppFeatureComposer 构建当前环境的 AppFeatureRegistry
+      → AppCapabilityComposer 装配可选能力与生命周期注册表
+      → AppProviderComposer 汇聚 Feature、Capability、主题、本地化和路由 overrides
+      → AppRuntime 挂载 ProviderScope 与 App
   → AppExceptionCatcher.runAppGuarded()
-  → ProviderScope(overrides: overrides)
   → MaterialApp.router
   → AppHost 在 Splash 后根据登录态跳转 RootRoute 或 LoginRoute
 ```
 
-这样可以保证存储、登录会话、环境配置在应用挂载前完成初始化，同时把启动页停留与登录态首跳从业务 Feature 中解耦出来。
+这样可以保证存储、登录会话、环境配置在应用挂载前完成初始化，同时让环境解析、模块组合、能力装配、Provider 汇聚和运行时挂载各自拥有明确边界，并把启动页停留与登录态首跳从业务 Feature 中解耦出来。
 
 ### 🌍 多环境配置
 

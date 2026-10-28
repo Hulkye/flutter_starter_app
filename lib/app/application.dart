@@ -1,153 +1,53 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:app_deep_link/app_deep_link.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
-import 'package:flutter_starter_app/features/features.dart';
 import 'package:flutter_starter_app/shared/services/auth/auth.dart';
 
 import '../core/exception/app_exception_catcher.dart';
-import '../core/capability/app_capability.dart';
-import '../core/feature/app_feature_registry.dart';
-import '../core/network/http/http.dart';
-import '../core/router/export.dart';
-import '../features/auth/presentation/auth_routes.dart';
-import '../integrations/deep_link_host/deep_link_app_capability.dart';
-import 'app.dart';
-import 'providers/theme_extensions_provider.dart';
-import 'providers/localization_delegates_provider.dart';
-import 'capabilities/app_capability_registry.dart';
-import 'navigation/app_router_config.dart';
-import 'navigation/pending_navigation_coordinator.dart';
+import 'app_startup.dart';
 
 class Application {
+  /// 解析入口传入的环境配置及其可选运行时配置。
+  static const _environmentResolver = AppEnvironmentResolver();
+
+  /// 根据当前环境组合可用的业务 Feature 注册表。
+  static const _featureComposer = AppFeatureComposer();
+
+  /// 汇聚 Feature、Capability、App 服务和路由所需的 Provider overrides。
+  static const _providerComposer = AppProviderComposer();
+
+  /// 使用完成装配的 overrides 挂载 Flutter 根组件。
+  static const _runtime = AppRuntime();
+
+  /// 在根 ProviderScope 创建前初始化全局存储和登录会话。
+  ///
+  /// 这些对象会被后续 Provider 和 AppHost 读取，因此必须在 [run] 挂载
+  /// Widget 树前完成。
   static Future<void> bootstrap() async {
-    // Pre-ProviderScope 初始化
     await prefsStorage.init();
     await secureStorage.init();
     await authStore.init();
   }
 
-  /// 运行应用。
+  /// 执行受异常保护的 App 启动流程。
+  ///
+  /// 启动顺序固定为：Flutter binding、环境解析、全局存储初始化、Feature
+  /// 注册、Provider 装配，最后交给 AppRuntime 挂载 Widget 树。
   static Future<void> run({required EnvConfig envConfig}) async {
-    // 启动应用
     await AppExceptionCatcher.runAppGuarded(
       appRunner: () async {
         WidgetsFlutterBinding.ensureInitialized();
-        final resolvedConfig = await _createResolvedConfig(envConfig);
-        // 配置在 binding 初始化和异常捕获 Zone 内完成，供 Provider 创建使用。
+        final resolvedConfig = await _environmentResolver.resolve(envConfig);
+        // 配置必须在 Provider 创建前写入，并且位于异常捕获 Zone 内。
         appConfig = resolvedConfig;
         await bootstrap();
-        final featureRegistry = createAppFeatureRegistry(resolvedConfig.envTag);
-        final overrides = _createProviderOverrides(
+        final featureRegistry = _featureComposer.compose(resolvedConfig.envTag);
+        final overrides = _providerComposer.compose(
           resolvedConfig,
           featureRegistry,
         );
-        runApp(ProviderScope(overrides: overrides, child: const App()));
+        _runtime.run(overrides);
       },
     );
-  }
-
-  /// 生成处理后的EnvConfig
-  static Future<EnvConfig> _createResolvedConfig(EnvConfig envConfig) async {
-    final deepLinkConfig = await tryLoadDeepLinkConfig(
-      environment: envConfig.envTag.name,
-    );
-    return envConfig.copyWith(deepLinkConfig: deepLinkConfig);
-  }
-
-  /// 组装 ProviderScope 所需的全部 overrides。
-  ///
-  /// 装配顺序保持为：Feature 依赖、待处理导航、可选能力、能力生命周期
-  /// 注册表和 App 路由。具体能力的创建细节由对应的私有方法负责。
-  static List<Override> _createProviderOverrides(
-    EnvConfig envConfig,
-    AppFeatureRegistry featureRegistry,
-  ) {
-    return <Override>[
-      ...featureRegistry.providerOverrides,
-      appLightThemeExtensionsProvider.overrideWithValue(
-        featureRegistry.lightThemeExtensions,
-      ),
-      appDarkThemeExtensionsProvider.overrideWithValue(
-        featureRegistry.darkThemeExtensions,
-      ),
-      appLocalizationDelegatesProvider.overrideWithValue(
-        featureRegistry.localizationDelegates,
-      ),
-      _createHttpAuthSessionOverride(),
-      _createPendingNavigationOverride(),
-      ..._createOptionalCapabilityOverrides(envConfig, featureRegistry),
-      _createCapabilityRegistryOverride(envConfig),
-      ...createAppRouterOverrides(featureRegistry),
-    ];
-  }
-
-  /// 将 Shared Auth 适配为 HTTP 层所需的最小认证能力。
-  static Override _createHttpAuthSessionOverride() {
-    return httpAuthSessionAccessProvider.overrideWith(
-      (ref) => _AppHttpAuthSessionAccess(ref),
-    );
-  }
-
-  /// 注入认证失败时的统一登录跳转策略。
-  ///
-  /// 待处理导航协调器只负责判断何时需要认证，不直接决定登录页位置，
-  /// 具体目标由 App 组合层提供。
-  static Override _createPendingNavigationOverride() {
-    return createPendingNavigationOverride(
-      requestAuthentication: (ref) {
-        final router = ref.read(appRouterProvider);
-        const loginTarget = LoginTarget();
-        final loginLocation = loginTarget.location;
-        if (router.location != loginLocation) {
-          router.replaceAll(loginTarget);
-        }
-      },
-    );
-  }
-
-  /// 创建当前环境启用的可选能力 overrides。
-  ///
-  /// Deep Link 配置不存在时返回空列表，确保不会创建解析 engine 或订阅
-  /// 平台 URI；其他可选能力可以在这里按同样方式扩展。
-  static List<Override> _createOptionalCapabilityOverrides(
-    EnvConfig envConfig,
-    AppFeatureRegistry featureRegistry,
-  ) {
-    // Deep Link 未配置时，不创建 engine，也不开始平台 URI 监听。
-    if (envConfig.deepLinkConfig == null) return const <Override>[];
-    return createDeepLinkAppOverrides(featureRegistry);
-  }
-
-  /// 注册当前环境已启用的 App 能力生命周期实例。
-  ///
-  /// 注册表只管理能力的启动、生命周期通知和释放，不包含 Deep Link 的
-  /// 业务判断；是否加入 Deep Link capability 由环境配置决定。
-  static Override _createCapabilityRegistryOverride(EnvConfig envConfig) {
-    return appCapabilityRegistryProvider.overrideWith(
-      (ref) => AppCapabilityRegistry(
-        capabilities: envConfig.deepLinkConfig == null
-            ? const <AppCapability>[]
-            : <AppCapability>[ref.read(deepLinkAppCapabilityProvider)],
-      ),
-    );
-  }
-}
-
-final class _AppHttpAuthSessionAccess implements HttpAuthSessionAccess {
-  const _AppHttpAuthSessionAccess(this._ref);
-
-  final Ref _ref;
-
-  @override
-  String? get authorization {
-    final session = _ref.read(authSessionProvider);
-    return session?.isValid == true ? session!.bearerToken : null;
-  }
-
-  @override
-  Future<void> clearSession() {
-    return _ref.read(authSessionControllerProvider).clearSession();
   }
 }
