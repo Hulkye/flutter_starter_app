@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/feature/app_feature.dart';
@@ -11,6 +11,7 @@ import 'package:flutter_starter_app/core/router/router.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final _bindingProvider = Provider<String>((ref) => 'default');
+const _testLocalizationDelegate = _TestLocalizationDelegate();
 
 void main() {
   group('AppFeatureRegistry', () {
@@ -31,6 +32,7 @@ void main() {
             providerOverrides: <Override>[
               _bindingProvider.overrideWithValue('dev'),
             ],
+            lightThemeExtensions: const <Object>[_TestThemeExtension('dev')],
           ),
           _TestFeature(
             metadata: const AppFeatureMetadata(key: 'prod'),
@@ -46,6 +48,10 @@ void main() {
             providerOverrides: <Override>[
               _bindingProvider.overrideWithValue('prod'),
             ],
+            lightThemeExtensions: const <Object>[_TestThemeExtension('prod')],
+            localizationDelegates: const <LocalizationsDelegate<dynamic>>[
+              _testLocalizationDelegate,
+            ],
           ),
         ],
       );
@@ -60,6 +66,17 @@ void main() {
       ]);
       expect(registry.providerOverrides, hasLength(1));
       expect(registry.guards, hasLength(1));
+      expect(registry.localizationDelegates, hasLength(1));
+      expect(
+        registry.localizationDelegates.single,
+        same(_testLocalizationDelegate),
+      );
+      expect(registry.lightThemeExtensions, hasLength(1));
+      expect(registry.lightThemeExtensions.single.featureKey, 'prod');
+      expect(
+        registry.lightThemeExtensions.single.value,
+        const _TestThemeExtension('prod'),
+      );
       expect(registry.routesByKey['/prod'], isA<_TestRoute>());
       expect(registry.routesByPath['/prod/detail'], isA<_TestRoute>());
       expect(registry.routesByPath, isNot(contains('/dev')));
@@ -96,6 +113,40 @@ void main() {
             (error) => error.message,
             'message',
             contains('Feature key conflict "duplicate"'),
+          ),
+        ),
+      );
+    });
+
+    test('rejects duplicate localization delegate types', () {
+      expect(
+        () => AppFeatureRegistry(
+          environment: EnvTag.dev,
+          candidates: <AppFeature>[
+            _TestFeature(
+              metadata: const AppFeatureMetadata(key: 'first'),
+              routes: const <AppPageRoute>[_TestRoute('/first')],
+              localizationDelegates: const <LocalizationsDelegate<dynamic>>[
+                _TestLocalizationDelegate(),
+              ],
+            ),
+            _TestFeature(
+              metadata: const AppFeatureMetadata(key: 'second'),
+              routes: const <AppPageRoute>[_TestRoute('/second')],
+              localizationDelegates: const <LocalizationsDelegate<dynamic>>[
+                _TestLocalizationDelegate(),
+              ],
+            ),
+          ],
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            allOf(
+              contains('_TestLocalizationDelegate'),
+              contains('first and second'),
+            ),
           ),
         ),
       );
@@ -280,6 +331,8 @@ final class _TestFeature extends AppFeature {
     this.guards = const <AppRouteGuard>[],
     this.routePolicies = const <AppRoutePolicy>[],
     this.providerOverrides = const <Override>[],
+    this.lightThemeExtensions = const <Object>[],
+    this.localizationDelegates = const <LocalizationsDelegate<dynamic>>[],
   });
 
   @override
@@ -302,6 +355,41 @@ final class _TestFeature extends AppFeature {
 
   @override
   final List<Override> providerOverrides;
+
+  @override
+  final List<Object> lightThemeExtensions;
+
+  @override
+  final List<LocalizationsDelegate<dynamic>> localizationDelegates;
+}
+
+final class _TestLocalizationDelegate extends LocalizationsDelegate<dynamic> {
+  const _TestLocalizationDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<dynamic> load(Locale locale) async => Object();
+
+  @override
+  bool shouldReload(covariant _TestLocalizationDelegate old) => false;
+}
+
+final class _TestThemeExtension extends ThemeExtension<_TestThemeExtension> {
+  const _TestThemeExtension(this.value);
+
+  final String value;
+
+  @override
+  _TestThemeExtension copyWith({String? value}) {
+    return _TestThemeExtension(value ?? this.value);
+  }
+
+  @override
+  _TestThemeExtension lerp(covariant _TestThemeExtension? other, double t) {
+    return other ?? this;
+  }
 }
 
 final class _TestRoute extends AppPageRoute<void> {

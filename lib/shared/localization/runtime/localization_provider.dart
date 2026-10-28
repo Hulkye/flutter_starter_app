@@ -18,4 +18,4 @@ final appLocalizationsProvider = Provider<AppLocalizations>((ref) {
       AppLocalizations.supportedLocales,
     ),
   );
-});
+}, dependencies: [sharedLocalizationLocaleProvider]);

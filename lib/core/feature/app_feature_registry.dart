@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
@@ -6,6 +7,7 @@ import 'app_feature.dart';
 import 'app_external_route.dart';
 import 'app_tab_entry.dart';
 import 'app_route_policy.dart';
+import 'app_theme_contribution.dart';
 
 /// 当前环境下的 Feature 注册结果。
 ///
@@ -17,6 +19,9 @@ final class AppFeatureRegistry {
     required this.environment,
   }) : features = _prepare(candidates, environment) {
     _validate(features);
+    lightThemeExtensions;
+    darkThemeExtensions;
+    localizationDelegates;
   }
 
   /// 当前注册表使用的环境。
@@ -86,6 +91,51 @@ final class AppFeatureRegistry {
   late final List<Override> providerOverrides = [
     for (final feature in features) ...feature.providerOverrides,
   ];
+
+  /// 当前环境启用的 Feature 浅色主题扩展。
+  late final List<AppThemeContribution> lightThemeExtensions =
+      _collectThemeExtensions((feature) => feature.lightThemeExtensions);
+
+  /// 当前环境启用的 Feature 深色主题扩展。
+  late final List<AppThemeContribution> darkThemeExtensions =
+      _collectThemeExtensions((feature) => feature.darkThemeExtensions);
+
+  /// 当前环境启用的 Feature 独立本地化 delegate。
+  late final List<LocalizationsDelegate<dynamic>> localizationDelegates =
+      _collectLocalizationDelegates();
+
+  List<LocalizationsDelegate<dynamic>> _collectLocalizationDelegates() {
+    final delegates = <LocalizationsDelegate<dynamic>>[];
+    final owners = <Type, String>{};
+    for (final feature in features) {
+      for (final delegate in feature.localizationDelegates) {
+        final previousOwner = owners[delegate.runtimeType];
+        if (previousOwner != null) {
+          throw StateError(
+            'localization delegate conflict "${delegate.runtimeType}": '
+            '$previousOwner and ${feature.key}',
+          );
+        }
+        owners[delegate.runtimeType] = feature.key;
+        delegates.add(delegate);
+      }
+    }
+    return List.unmodifiable(delegates);
+  }
+
+  List<AppThemeContribution> _collectThemeExtensions(
+    List<Object> Function(AppFeature) selectExtensions,
+  ) {
+    final extensions = <AppThemeContribution>[];
+    for (final feature in features) {
+      for (final value in selectExtensions(feature)) {
+        extensions.add(
+          AppThemeContribution(featureKey: feature.key, value: value),
+        );
+      }
+    }
+    return List.unmodifiable(extensions);
+  }
 
   Set<String> get _tabRoutePaths => {for (final tab in tabs) tab.route.path};
 

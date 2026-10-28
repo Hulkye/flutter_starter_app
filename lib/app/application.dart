@@ -14,6 +14,8 @@ import '../core/router/export.dart';
 import '../features/auth/presentation/auth_routes.dart';
 import '../integrations/deep_link_host/deep_link_app_capability.dart';
 import 'app.dart';
+import 'providers/theme_extensions_provider.dart';
+import 'providers/localization_delegates_provider.dart';
 import 'capabilities/app_capability_registry.dart';
 import 'navigation/app_router_config.dart';
 import 'navigation/pending_navigation_coordinator.dart';
@@ -64,6 +66,15 @@ class Application {
   ) {
     return <Override>[
       ...featureRegistry.providerOverrides,
+      appLightThemeExtensionsProvider.overrideWithValue(
+        featureRegistry.lightThemeExtensions,
+      ),
+      appDarkThemeExtensionsProvider.overrideWithValue(
+        featureRegistry.darkThemeExtensions,
+      ),
+      appLocalizationDelegatesProvider.overrideWithValue(
+        featureRegistry.localizationDelegates,
+      ),
       _createHttpAuthSessionOverride(),
       _createPendingNavigationOverride(),
       ..._createOptionalCapabilityOverrides(envConfig, featureRegistry),

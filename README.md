@@ -113,6 +113,7 @@ lib/
 │   ├── capabilities/              # App 级可选能力生命周期注册表
 │   ├── host/                      # 启动协调、会话协调、生命周期协调、AppHost
 │   ├── preferences/               # 应用级语言、主题等用户偏好及其持久化
+│   ├── providers/                  # App 组合层 Provider
 │   ├── navigation/                # App 路由图组合、Splash、Root/Shell 导航骨架
 │   │   ├── app_router_config.dart # AppRouterConfig 注入
 │   │   ├── shell/                 # RootRoute / RootShellRoute / 底部 Tab 容器
@@ -526,6 +527,10 @@ context.appAsset.logo
 - 生成脚本：`./script/gen_l10n.sh`
 
 语言偏好及持久化位于 `lib/app/preferences/locale_preference.dart`；共享本地化运行时与生成代码位于 `lib/shared/localization/`。Feature 可在自身目录维护专属颜色、图片映射和 ARB，跨模块能力由 App 组合层装配。
+
+Feature 的主题私有资源可实现 `ThemeExtension`，并通过 `XxxFeature.lightThemeExtensions` / `darkThemeExtensions` 声明；页面可经 Feature 自己的 context 扩展读取，例如 `context.todoColor.completed`。
+
+需要独立维护文案的 Feature 可以在 `lib/features/<feature>/localization/arb/` 维护自己的 ARB，并通过 `./script/gen_feature_l10n.sh` 生成所有存在 ARB 的 Feature；脚本直接使用 Feature 的 ARB 生成代码，不需要额外 package。每个 Feature 必须提供与 `shared/localization/arb/app_<locale>.arb` 对应的 `<feature>_<locale>.arb`，与 App 共用语言集合。Feature 通过 `localizationDelegates` 暴露生成的 delegate，由 `AppFeatureRegistry` 按环境汇总并接入 App。无需独立维护的 Feature 继续使用共享 ARB 和 Feature 前缀 key。
 
 切换语言示例：
 

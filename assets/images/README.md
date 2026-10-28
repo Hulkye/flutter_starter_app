@@ -16,3 +16,5 @@ Suggested filenames:
 
 Both light and dark resources should keep the same filenames to make runtime mapping simple.
 Light assets are placed directly in `assets/images/`; no separate `light/` directory is required.
+
+Feature-owned assets may live under `assets/features/<feature>/`, with matching dark variants under `assets/features/<feature>/dark/`. Declare each Feature asset directory in `pubspec.yaml`; keep the path mapping in that Feature's `AssetData` subclass instead of adding Feature fields to the global `AppAsset`.

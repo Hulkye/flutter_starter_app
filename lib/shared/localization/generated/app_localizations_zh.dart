@@ -119,9 +119,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get todoTitle => 'Todo 示例';
-
-  @override
   String get todoCreateTitle => '创建 Todo';
 
   @override
@@ -144,9 +141,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get todoDeleteConfirmContent => '确认删除这条待办事项吗？';
-
-  @override
-  String get todoEmpty => '暂无待办，添加一条试试吧';
 
   @override
   String get loginFailed => '登录失败';

@@ -708,6 +708,12 @@ ref.read(appLocaleProvider.notifier).setLocale(AppLocale.zh);
 
 后续 Feature 可以在自身目录中维护模块专属颜色、图片资源映射和 ARB 文案；App 组合层负责把需要全局生效的 ThemeExtension 或本地化 delegate 接入根组件，shared 模块不依赖具体 Feature。
 
+Feature 内需要跨页面使用、且随亮暗主题变化的颜色或图片，可在 `lib/features/<feature>/design/` 定义 `ColorData` / `AssetData` 子类及对应的 `ColorExtension<TData, TExtension>` / `AssetExtension<TData, TExtension>` 子类，并实现 `BuildContext` 扩展，例如 `context.todoColor.completed`、`context.todoAsset.emptyState`。在 `<Feature>Feature.lightThemeExtensions` 和 `darkThemeExtensions` 声明 `AppThemeContribution(featureKey: key, value: extension)`，App 会按当前环境的 Feature 注册表汇总并注入主题；同一主题中扩展的具体 runtimeType 必须唯一。
+
+仅在单个页面使用的常量颜色或资源无需注册 ThemeExtension。Feature 图片放在 `assets/features/<feature>/` 并在 `pubspec.yaml` 声明。当前 ARB 仍由 `shared/localization/arb` 统一生成，Feature 文案使用带模块前缀的 key；文案由所属 Feature 维护。只有需要独立翻译、复用或发布时，才增加独立 ARB 生成与 delegate 注册流程。
+
+需要 Feature 独立维护 ARB 时，可在 `lib/features/<feature>/localization/arb/` 放置该 Feature 的 ARB，并将生成代码输出到同目录下的 `generated/`。主工程通过 `./script/gen_feature_l10n.sh` 扫描并生成所有存在 ARB 的 Feature；脚本使用临时 Flutter 配置，不要求为 Feature 创建 package 或修改主工程的 `l10n.yaml`，并直接选择该 Feature 对应的现存 ARB 作为 gen-l10n 模板，不要求特定中文模板。所有 Feature 必须与 App 共用语言集合；脚本从 `shared/localization/arb/app_<locale>.arb` 推导 App locale，并校验每个独立 ARB Feature 都恰好提供对应的 `<feature>_<locale>.arb`。Feature 通过 `localizationDelegates` 暴露生成的 delegate，`AppFeatureRegistry` 按环境汇总，App 根组件追加到共享 `AppLocalizations` delegates。Feature 可提供自己的 `BuildContext` 扩展，例如 `context.todoL10n.empty`。不需要独立维护的 Feature 不必创建 ARB，继续使用共享 ARB 的 Feature 前缀 key。
+
 页面中读取文案时，优先使用项目内已经封装好的 l10n Provider 或 BuildContext 扩展，保持调用方式统一。
 
 ---

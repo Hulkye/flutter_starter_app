@@ -16,6 +16,8 @@
 - `shared/localization` 承载共享本地化运行时、生成 API 与当前模板的 ARB 资源；不依赖 `app/` 或具体 Feature。
 - `app/preferences` 管理应用级语言/主题偏好类型、状态及持久化；由 App 组合层把 locale 注入本地化运行时，并选择 `MaterialApp` 的主题。
 - Feature 可在自身模块维护专属颜色、图片映射和 ARB；需要加入全局主题或本地化生成时，由 App 组合层明确装配，不允许 shared 反向依赖 Feature。
+- Feature 的主题私有颜色/图片可使用独立 `ThemeExtension` 和 `BuildContext` 扩展；由所属 `AppFeature` 声明 light/dark extensions，经当前环境的 `AppFeatureRegistry` 汇总并校验 runtimeType 唯一，再由 App 根主题装配。不要把 Feature 字段添加到全局 AppColor/AppAsset。
+- 当前默认 ARB 使用共享 gen-l10n 入口并按 Feature 前缀组织 key；需要独立维护、复用或发布的 Feature 可在自身目录维护 ARB 与生成配置，由 AppFeature 声明 delegate、AppFeatureRegistry 按环境汇总；生成脚本使用临时配置，不要求 Feature 建立 Flutter package。shared 不依赖具体 Feature。
 
 ## Feature 内部分层
 

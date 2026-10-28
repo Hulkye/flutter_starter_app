@@ -43,16 +43,38 @@
       }
     }
   },
-  "todoTitle": "Todo Example",
   "todoCreateTitle": "Create Todo",
+  "@todoCreateTitle": {
+    "description": "Title of the Todo Feature create-item form."
+  },
   "todoInputHint": "Enter a todo item",
+  "@todoInputHint": {
+    "description": "Hint for the Todo Feature item title field."
+  },
   "todoEmptyTitleHint": "Please enter a todo item",
+  "@todoEmptyTitleHint": {
+    "description": "Shown when the Todo Feature form is submitted empty."
+  },
   "todoTotalCount": "Total",
+  "@todoTotalCount": {
+    "description": "Total item count label in the Todo Feature statistics."
+  },
   "todoCompletedCount": "Completed",
+  "@todoCompletedCount": {
+    "description": "Completed item count label in Todo Feature statistics."
+  },
   "todoRemainingCount": "Remaining",
+  "@todoRemainingCount": {
+    "description": "Remaining item count label in Todo Feature statistics."
+  },
   "todoDeleteConfirmTitle": "Delete todo",
+  "@todoDeleteConfirmTitle": {
+    "description": "Title of the Todo Feature delete confirmation dialog."
+  },
   "todoDeleteConfirmContent": "Are you sure you want to delete this todo item?",
-  "todoEmpty": "No todos yet. Add one to get started.",
+  "@todoDeleteConfirmContent": {
+    "description": "Body of the Todo Feature delete confirmation dialog."
+  },
   "loginFailed": "Login failed",
   "accountHint": "Please enter your account",
   "passwordHint": "Please enter your password",

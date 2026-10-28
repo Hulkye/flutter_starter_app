@@ -10,7 +10,9 @@ import '../../../../shared/presentation/presentation.dart';
 import '../../../../shared/widgets/button/primary_round_button.dart';
 import '../../../../shared/widgets/sheet/common_confirm_sheet.dart';
 import '../../domain/entities/todo_item.dart';
+import '../../localization/todo_localization.dart';
 import '../viewmodels/todo_viewmodel.dart';
+import '../../design/todo_design.dart';
 
 final class TodoPage extends BasePage {
   const TodoPage({super.key});
@@ -20,7 +22,7 @@ final class TodoPage extends BasePage {
 
   @override
   PreferredSizeWidget? appBar(PageScope scope) {
-    return AppBar(title: Text(scope.context.i18n.todoTitle));
+    return AppBar(title: Text(scope.context.todoL10n.createTitle));
   }
 
   @override
@@ -43,10 +45,16 @@ final class TodoPage extends BasePage {
             onAdd: () => unawaited(logic.addTodo()),
           ),
           SizedBox(height: 18.w),
-          _TodoStats(state: state),
+          _TodoStats(state: state, todoColor: scope.context.todoColor),
+          SizedBox(height: 18.w),
+          Image.asset(
+            scope.context.todoAsset.emptyState,
+            width: 48.w,
+            height: 48.w,
+          ),
           SizedBox(height: 18.w),
           if (state.todos.isEmpty)
-            _TodoEmptyState()
+            _TodoEmptyState(label: scope.context.todoL10n.empty)
           else
             ...state.todos.map(
               (todo) => Padding(
@@ -180,9 +188,10 @@ final class _TodoInputCardState extends State<_TodoInputCard> {
 }
 
 final class _TodoStats extends StatelessWidget {
-  const _TodoStats({required this.state});
+  const _TodoStats({required this.state, required this.todoColor});
 
   final TodoState state;
+  final TodoColor todoColor;
 
   @override
   Widget build(BuildContext context) {
@@ -200,7 +209,7 @@ final class _TodoStats extends StatelessWidget {
           child: _TodoStatItem(
             label: context.i18n.todoCompletedCount,
             value: '${state.completedCount}',
-            color: context.appColor.confirm,
+            color: todoColor.completed,
           ),
         ),
         SizedBox(width: 10.w),
@@ -331,6 +340,10 @@ final class _TodoListItem extends StatelessWidget {
 }
 
 final class _TodoEmptyState extends StatelessWidget {
+  const _TodoEmptyState({required this.label});
+
+  final String label;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -344,7 +357,7 @@ final class _TodoEmptyState extends StatelessWidget {
           ),
           SizedBox(height: 12.w),
           Text(
-            context.i18n.todoEmpty,
+            label,
             style: TextStyle(
               color: context.appColor.fontSecondary,
               fontSize: 15.sp,

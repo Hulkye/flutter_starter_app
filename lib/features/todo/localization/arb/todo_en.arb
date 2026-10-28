@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "empty": "No todos yet. Add one to get started.",
+  "@empty": {
+    "description": "Empty-state text shown when the Todo Feature has no items."
+  },
+  "createTitle": "Create Todo",
+  "@createTitle": {
+    "description": "Title of the Todo Feature create-item form."
+  }
+}

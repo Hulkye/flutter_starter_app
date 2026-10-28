@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_starter_app/core/router/router.dart';
 
 import 'app_tab_entry.dart';
@@ -36,6 +37,17 @@ abstract class AppFeature {
   /// App 组合层会按 Feature 注册顺序汇聚这些 Guard。最终链顺序为：
   /// Bootstrap（最先短路）→ Authentication → Feature Guards。
   List<AppRouteGuard> get guards => const [];
+
+  /// Feature 专属浅色主题扩展。
+  List<Object> get lightThemeExtensions => const [];
+
+  /// Feature 专属深色主题扩展。
+  List<Object> get darkThemeExtensions => const [];
+
+  /// Feature 可选的独立本地化 delegate。
+  ///
+  /// 默认为空，因此未启用独立 ARB 的 Feature 不增加任何运行时成本。
+  List<LocalizationsDelegate<dynamic>> get localizationDelegates => const [];
 
   /// 模块默认 Provider 覆盖项。
   ///

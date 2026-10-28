@@ -34,7 +34,8 @@
 - 不需要单独维护 `assets/images/light/`。
 - 修改资源目录规范时同步检查 `assets/images/README.md`。
 - 跨 Feature 共用的颜色、图片 token 与主题扩展放在 `lib/shared/design_system/`；应用级主题偏好类型及持久化放在 `lib/app/preferences/`。
-- 本地化运行时与生成入口放在 `lib/shared/localization/`；语言偏好及持久化放在 `lib/app/preferences/`。Feature 可维护自己的 ARB 和资源映射，但不得让 shared 依赖 Feature。
+- 本地化运行时与共享生成入口放在 `lib/shared/localization/`；语言偏好及持久化放在 `lib/app/preferences/`。默认使用共享 ARB、Feature 前缀 key，文案由所属 Feature 维护；需要独立翻译/复用/发布时，Feature 可在模块目录维护独立 ARB 和生成物，通过 Feature delegate 由 App 组合层按注册表装配，无需建立 Flutter package。不得让 shared 依赖 Feature。
+- Feature 主题私有颜色和图片使用 Feature 自有 `ThemeExtension` / context extension，并通过 `XxxFeature.lightThemeExtensions`、`darkThemeExtensions` 注册；单页面静态资源不强制使用 ThemeExtension。当前 ARB 统一生成，key 使用 Feature 前缀。
 
 ## 导出规范
 

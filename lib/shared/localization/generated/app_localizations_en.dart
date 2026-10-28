@@ -119,9 +119,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get todoTitle => 'Todo Example';
-
-  @override
   String get todoCreateTitle => 'Create Todo';
 
   @override
@@ -145,9 +142,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get todoDeleteConfirmContent =>
       'Are you sure you want to delete this todo item?';
-
-  @override
-  String get todoEmpty => 'No todos yet. Add one to get started.';
 
   @override
   String get loginFailed => 'Login failed';

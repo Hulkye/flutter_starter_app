@@ -43,16 +43,38 @@
       }
     }
   },
-  "todoTitle": "Todo 示例",
   "todoCreateTitle": "创建 Todo",
+  "@todoCreateTitle": {
+    "description": "Todo Feature 新建待办表单标题。"
+  },
   "todoInputHint": "输入待办事项",
+  "@todoInputHint": {
+    "description": "Todo Feature 待办标题输入提示。"
+  },
   "todoEmptyTitleHint": "请输入待办事项",
+  "@todoEmptyTitleHint": {
+    "description": "Todo Feature 提交空标题时显示的提示。"
+  },
   "todoTotalCount": "总数",
+  "@todoTotalCount": {
+    "description": "Todo Feature 统计区的总待办数量标签。"
+  },
   "todoCompletedCount": "已完成",
+  "@todoCompletedCount": {
+    "description": "Todo Feature 统计区的已完成数量标签。"
+  },
   "todoRemainingCount": "待完成",
+  "@todoRemainingCount": {
+    "description": "Todo Feature 统计区的待完成数量标签。"
+  },
   "todoDeleteConfirmTitle": "删除待办",
+  "@todoDeleteConfirmTitle": {
+    "description": "Todo Feature 删除确认弹窗标题。"
+  },
   "todoDeleteConfirmContent": "确认删除这条待办事项吗？",
-  "todoEmpty": "暂无待办，添加一条试试吧",
+  "@todoDeleteConfirmContent": {
+    "description": "Todo Feature 删除确认弹窗内容。"
+  },
   "loginFailed": "登录失败",
   "accountHint": "请输入账号",
   "passwordHint": "请输入密码",

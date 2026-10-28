@@ -314,65 +314,53 @@ abstract class AppLocalizations {
   /// **'欢迎，{username}'**
   String welcomeUser(String username);
 
-  /// No description provided for @todoTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'Todo 示例'**
-  String get todoTitle;
-
-  /// No description provided for @todoCreateTitle.
+  /// Todo Feature 新建待办表单标题。
   ///
   /// In zh, this message translates to:
   /// **'创建 Todo'**
   String get todoCreateTitle;
 
-  /// No description provided for @todoInputHint.
+  /// Todo Feature 待办标题输入提示。
   ///
   /// In zh, this message translates to:
   /// **'输入待办事项'**
   String get todoInputHint;
 
-  /// No description provided for @todoEmptyTitleHint.
+  /// Todo Feature 提交空标题时显示的提示。
   ///
   /// In zh, this message translates to:
   /// **'请输入待办事项'**
   String get todoEmptyTitleHint;
 
-  /// No description provided for @todoTotalCount.
+  /// Todo Feature 统计区的总待办数量标签。
   ///
   /// In zh, this message translates to:
   /// **'总数'**
   String get todoTotalCount;
 
-  /// No description provided for @todoCompletedCount.
+  /// Todo Feature 统计区的已完成数量标签。
   ///
   /// In zh, this message translates to:
   /// **'已完成'**
   String get todoCompletedCount;
 
-  /// No description provided for @todoRemainingCount.
+  /// Todo Feature 统计区的待完成数量标签。
   ///
   /// In zh, this message translates to:
   /// **'待完成'**
   String get todoRemainingCount;
 
-  /// No description provided for @todoDeleteConfirmTitle.
+  /// Todo Feature 删除确认弹窗标题。
   ///
   /// In zh, this message translates to:
   /// **'删除待办'**
   String get todoDeleteConfirmTitle;
 
-  /// No description provided for @todoDeleteConfirmContent.
+  /// Todo Feature 删除确认弹窗内容。
   ///
   /// In zh, this message translates to:
   /// **'确认删除这条待办事项吗？'**
   String get todoDeleteConfirmContent;
-
-  /// No description provided for @todoEmpty.
-  ///
-  /// In zh, this message translates to:
-  /// **'暂无待办，添加一条试试吧'**
-  String get todoEmpty;
 
   /// No description provided for @loginFailed.
   ///

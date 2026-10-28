@@ -1,0 +1,11 @@
+{
+  "@@locale": "zh",
+  "empty": "暂无待办，添加一条试试吧",
+  "@empty": {
+    "description": "Todo Feature 列表为空时的空状态文案。"
+  },
+  "createTitle": "创建 Todo",
+  "@createTitle": {
+    "description": "Todo Feature 新建待办表单标题。"
+  }
+}
