@@ -17,19 +17,19 @@ class ProfilePage extends BasePage {
   String _themeModeLabel(BuildContext context, AppThemeMode mode) {
     switch (mode) {
       case AppThemeMode.light:
-        return context.i18n.lightMode;
+        return context.l10n.lightMode;
       case AppThemeMode.dark:
-        return context.i18n.darkMode;
+        return context.l10n.darkMode;
       case AppThemeMode.system:
-        return context.i18n.systemMode;
+        return context.l10n.systemMode;
     }
   }
 
   Future<void> _confirmLogout(PageScope scope) {
     return showCommonConfirmSheet(
       scope.context,
-      title: scope.context.i18n.logout,
-      content: scope.context.i18n.logout,
+      title: scope.context.l10n.logout,
+      content: scope.context.l10n.logout,
       onConfirm: () {
         scope.ref.read(authSessionControllerProvider).clearSession();
       },
@@ -42,7 +42,7 @@ class ProfilePage extends BasePage {
     required String title,
   }) {
     if (WebPageConfig.normalizeWebUri(url) == null) {
-      scope.presentation.emitHint(scope.context.i18n.webInvalidUrl);
+      scope.presentation.emitHint(scope.context.l10n.webInvalidUrl);
       return;
     }
     scope.ref
@@ -54,7 +54,7 @@ class ProfilePage extends BasePage {
 
   @override
   PreferredSizeWidget? appBar(PageScope scope) {
-    return AppBar(title: Text(scope.context.i18n.profileTitle));
+    return AppBar(title: Text(scope.context.l10n.profileTitle));
   }
 
   // ── 页面 ──
@@ -83,7 +83,7 @@ class ProfilePage extends BasePage {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    context.i18n.profileTitle,
+                    context.l10n.profileTitle,
                     style: TextStyle(
                       color: appColor.fontPrimary,
                       fontSize: 22,
@@ -92,7 +92,7 @@ class ProfilePage extends BasePage {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${context.i18n.currentThemeMode}: ${_themeModeLabel(context, themeMode)}',
+                    '${context.l10n.currentThemeMode}: ${_themeModeLabel(context, themeMode)}',
                     style: TextStyle(color: appColor.fontSecondary),
                   ),
                   const SizedBox(height: 20),
@@ -101,7 +101,7 @@ class ProfilePage extends BasePage {
                     child: ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.brightness_6_outlined),
-                      title: Text(context.i18n.switchThemeMode),
+                      title: Text(context.l10n.switchThemeMode),
                       subtitle: Text(_themeModeLabel(context, themeMode)),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
@@ -128,13 +128,13 @@ class ProfilePage extends BasePage {
                 children: [
                   ListTile(
                     leading: const Icon(Icons.privacy_tip_outlined),
-                    title: Text(context.i18n.privacyPolicy),
+                    title: Text(context.l10n.privacyPolicy),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       _openWebPage(
                         scope,
                         url: appConfig.privacyPolicyUrl,
-                        title: context.i18n.privacyPolicy,
+                        title: context.l10n.privacyPolicy,
                       );
                     },
                   ),
@@ -146,13 +146,13 @@ class ProfilePage extends BasePage {
                   ),
                   ListTile(
                     leading: const Icon(Icons.description_outlined),
-                    title: Text(context.i18n.serviceAgreement),
+                    title: Text(context.l10n.serviceAgreement),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       _openWebPage(
                         scope,
                         url: appConfig.userAgreementUrl,
-                        title: context.i18n.serviceAgreement,
+                        title: context.l10n.serviceAgreement,
                       );
                     },
                   ),
@@ -163,7 +163,7 @@ class ProfilePage extends BasePage {
           const SizedBox(height: 24),
           PrimaryRoundButton(
             context: context,
-            label: context.i18n.logout,
+            label: context.l10n.logout,
             onPressed: () => _confirmLogout(scope),
             expand: true,
           ),

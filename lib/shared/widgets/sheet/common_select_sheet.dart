@@ -73,7 +73,7 @@ class CommonSelectSheet extends StatelessWidget {
   Widget createCancelBtn(BuildContext context) {
     Widget child = NormalRoundButton(
       context: context,
-      label: context.i18n.cancel,
+      label: context.l10n.cancel,
       height: 44.w,
       onPressed: () {
         _onCancel(context);

@@ -35,7 +35,7 @@ final class _ProfileTabEntry extends AppTabEntry {
   String get key => 'profile.root';
 
   @override
-  String label(BuildContext context) => context.i18n.profileTitle;
+  String label(BuildContext context) => context.l10n.profileTitle;
 
   @override
   String icon(BuildContext context) => context.appAsset.tabProfile;

@@ -160,7 +160,7 @@ final class _TodoInputCardState extends State<_TodoInputCard> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              context.i18n.todoCreateTitle,
+              context.l10n.todoCreateTitle,
               style: TextStyle(
                 color: context.appColor.fontPrimary,
                 fontSize: 18.sp,
@@ -170,13 +170,13 @@ final class _TodoInputCardState extends State<_TodoInputCard> {
             SizedBox(height: 12.w),
             BaseTextField(
               controller: _controller,
-              hintText: context.i18n.todoInputHint,
+              hintText: context.l10n.todoInputHint,
               onChanged: widget.onDraftChanged,
             ),
             SizedBox(height: 16.w),
             PrimaryRoundButton(
               context: context,
-              label: context.i18n.add,
+              label: context.l10n.add,
               onPressed: widget.onAdd,
               height: 44.w,
             ),
@@ -199,7 +199,7 @@ final class _TodoStats extends StatelessWidget {
       children: [
         Expanded(
           child: _TodoStatItem(
-            label: context.i18n.todoTotalCount,
+            label: context.l10n.todoTotalCount,
             value: '${state.todos.length}',
             color: context.appColor.brand,
           ),
@@ -207,7 +207,7 @@ final class _TodoStats extends StatelessWidget {
         SizedBox(width: 10.w),
         Expanded(
           child: _TodoStatItem(
-            label: context.i18n.todoCompletedCount,
+            label: context.l10n.todoCompletedCount,
             value: '${state.completedCount}',
             color: todoColor.completed,
           ),
@@ -215,7 +215,7 @@ final class _TodoStats extends StatelessWidget {
         SizedBox(width: 10.w),
         Expanded(
           child: _TodoStatItem(
-            label: context.i18n.todoRemainingCount,
+            label: context.l10n.todoRemainingCount,
             value: '${state.remainingCount}',
             color: context.appColor.alert,
           ),
@@ -331,9 +331,9 @@ final class _TodoListItem extends StatelessWidget {
   void _confirmDelete(BuildContext context) {
     showCommonConfirmSheet(
       context,
-      title: context.i18n.todoDeleteConfirmTitle,
-      content: context.i18n.todoDeleteConfirmContent,
-      confirmLabel: context.i18n.delete,
+      title: context.l10n.todoDeleteConfirmTitle,
+      content: context.l10n.todoDeleteConfirmContent,
+      confirmLabel: context.l10n.delete,
       onConfirm: onDelete,
     );
   }

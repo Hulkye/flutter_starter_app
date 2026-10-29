@@ -19,7 +19,7 @@ final class WebPage extends BasePage {
   PageLogic createPageLogic() => _WebPageLogic(config);
 
   @override
-  String title(BuildContext context) => config.title ?? context.i18n.webPage;
+  String title(BuildContext context) => config.title ?? context.l10n.webPage;
 
   @override
   bool get canPop => false;
@@ -74,39 +74,39 @@ final class WebPage extends BasePage {
     return [
       if (config.showCloseButton && logic.canGoBackInWeb)
         IconButton(
-          tooltip: scope.context.i18n.close,
+          tooltip: scope.context.l10n.close,
           icon: const Icon(Icons.close),
           color: appBarBackButtonColor(scope.context),
           onPressed: logic.closePage,
         ),
       if (config.showToolbarActions)
         PopupMenuButton<_WebPageMenuAction>(
-          tooltip: scope.context.i18n.more,
+          tooltip: scope.context.l10n.more,
           iconColor: appBarBackButtonColor(scope.context),
           onSelected: logic.handleMenuAction,
           itemBuilder: (context) {
             return [
               PopupMenuItem(
                 value: _WebPageMenuAction.reload,
-                child: Text(context.i18n.reload),
+                child: Text(context.l10n.reload),
               ),
               PopupMenuItem(
                 value: _WebPageMenuAction.back,
                 enabled: logic.canGoBackInWeb,
-                child: Text(context.i18n.back),
+                child: Text(context.l10n.back),
               ),
               PopupMenuItem(
                 value: _WebPageMenuAction.forward,
                 enabled: logic.canGoForwardInWeb,
-                child: Text(context.i18n.forward),
+                child: Text(context.l10n.forward),
               ),
               PopupMenuItem(
                 value: _WebPageMenuAction.copyLink,
-                child: Text(context.i18n.copyLink),
+                child: Text(context.l10n.copyLink),
               ),
               PopupMenuItem(
                 value: _WebPageMenuAction.clearCache,
-                child: Text(context.i18n.clearWebCache),
+                child: Text(context.l10n.clearWebCache),
               ),
             ];
           },
@@ -132,7 +132,7 @@ final class WebPage extends BasePage {
           if (logic.hasError)
             Positioned.fill(
               child: _WebPageErrorView(
-                message: logic.errorMessage ?? scope.context.i18n.webLoadFailed,
+                message: logic.errorMessage ?? scope.context.l10n.webLoadFailed,
                 onRetry: logic.reloadInitialUrl,
               ),
             ),
@@ -187,14 +187,14 @@ final class _WebPageLogic extends PageLogic {
     if (title != null && title.isNotEmpty) {
       return title;
     }
-    return context.i18n.webPage;
+    return context.l10n.webPage;
   }
 
   String validationMessage(BuildContext context) {
     return switch (_validation) {
-      WebPageValidationResult.ok => errorMessage ?? context.i18n.webLoadFailed,
-      WebPageValidationResult.invalidUrl => context.i18n.webInvalidUrl,
-      WebPageValidationResult.blockedHost => context.i18n.webBlockedUrl,
+      WebPageValidationResult.ok => errorMessage ?? context.l10n.webLoadFailed,
+      WebPageValidationResult.invalidUrl => context.l10n.webInvalidUrl,
+      WebPageValidationResult.blockedHost => context.l10n.webBlockedUrl,
     };
   }
 
@@ -391,7 +391,7 @@ final class _WebPageErrorView extends StatelessWidget {
               SizedBox(height: 24.w),
               PrimaryRoundButton(
                 context: context,
-                label: context.i18n.reload,
+                label: context.l10n.reload,
                 height: 44.w,
                 expand: false,
                 onPressed: onRetry,

@@ -62,7 +62,7 @@ class LoginPage extends BasePage {
       scope,
       ctrl: logic.accountCtrl,
       icon: Icons.person_outline,
-      hintText: scope.context.i18n.accountHint,
+      hintText: scope.context.l10n.accountHint,
       onChanged: scope.ref.read(authViewModelProvider.notifier).updateAccount,
     );
     return child;
@@ -75,7 +75,7 @@ class LoginPage extends BasePage {
       ctrl: logic.passwordCtrl,
       icon: Icons.lock_outline,
       obscureText: true,
-      hintText: scope.context.i18n.passwordHint,
+      hintText: scope.context.l10n.passwordHint,
       onChanged: scope.ref.read(authViewModelProvider.notifier).updatePassword,
       onSubmitted: (_) => logic.login(),
     );
@@ -113,14 +113,14 @@ class LoginPage extends BasePage {
                     PrimaryRoundButton(
                       context: context,
                       label: state.isLoading
-                          ? context.i18n.requesting
-                          : context.i18n.login,
+                          ? context.l10n.requesting
+                          : context.l10n.login,
                       onPressed: state.isLoading ? null : logic.login,
                       expand: true,
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      context.i18n.appTitle,
+                      context.l10n.appTitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: appColor.fontTertiary,
@@ -217,7 +217,7 @@ class _LogoSection extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
-          context.i18n.login,
+          context.l10n.login,
           style: TextStyle(
             color: appColor.fontPrimary,
             fontSize: 28,

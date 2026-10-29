@@ -166,7 +166,7 @@ class DialogMainBar extends StatelessWidget {
     return DialogBtn(
       btnType: confirmBtnType,
       height: 44.w,
-      label: confirmText ?? context.i18n.confirm,
+      label: confirmText ?? context.l10n.confirm,
       onTap: onConfirm,
     );
   }
@@ -175,7 +175,7 @@ class DialogMainBar extends StatelessWidget {
     return DialogBtn(
       btnType: cancelBtnType,
       height: 44.w,
-      label: cancelText ?? context.i18n.cancel,
+      label: cancelText ?? context.l10n.cancel,
       onTap: onCancel,
     );
   }

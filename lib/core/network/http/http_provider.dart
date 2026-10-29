@@ -31,7 +31,7 @@ import 'http_auth_session.dart';
 final httpConfigProvider = Provider<HttpConfig>((ref) {
   final baseUrl = appConfig.apiBaseUrl.trim();
   final proxyHost = _resolveProxyHost();
-  final i18n = ref.watch(appLocalizationsProvider);
+  final l10n = ref.watch(appLocalizationsProvider);
 
   return HttpConfig(
     baseUrl: baseUrl,
@@ -56,12 +56,12 @@ final httpConfigProvider = Provider<HttpConfig>((ref) {
       enableBusinessStatusCheck: appConfig.httpBusinessStatusCheckEnable,
     ),
     hintConfig: HttpHintConfig(
-      networkErrorHint: i18n.networkErrorHint,
-      serverErrorHint: i18n.serverErrorHint,
-      unknownHint: i18n.unknownHint,
-      timeoutHint: i18n.timeoutHint,
-      reqErrorHint: i18n.reqErrorHint,
-      dataParseHint: i18n.dataParseHint,
+      networkErrorHint: l10n.networkErrorHint,
+      serverErrorHint: l10n.serverErrorHint,
+      unknownHint: l10n.unknownHint,
+      timeoutHint: l10n.timeoutHint,
+      reqErrorHint: l10n.reqErrorHint,
+      dataParseHint: l10n.dataParseHint,
     ),
     authConfig: HttpAuthConfig(
       headerMapProvider: () async {

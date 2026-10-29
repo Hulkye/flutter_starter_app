@@ -65,11 +65,11 @@ final class AuthViewModel extends BaseVM<AuthState> {
   }
 
   String _resolveLoginErrorMessage(Object error) {
-    final i18n = ref.read(appLocalizationsProvider);
+    final l10n = ref.read(appLocalizationsProvider);
     return switch (error) {
-      AuthLoginRejectedException() => i18n.loginFailed,
-      AuthInvalidResponseException() => i18n.loginFailed,
-      _ => i18n.loginFailed,
+      AuthLoginRejectedException() => l10n.loginFailed,
+      AuthInvalidResponseException() => l10n.loginFailed,
+      _ => l10n.loginFailed,
     };
   }
 

@@ -22,7 +22,7 @@ class SplashPage extends StatelessWidget {
                 ImageView(assetPath: context.appAsset.logo, width: 160.w),
                 SizedBox(height: 20.w),
                 Text(
-                  context.i18n.appTitle,
+                  context.l10n.appTitle,
                   style: TextStyle(
                     color: context.appColor.fontPrimary,
                     fontSize: 24.sp,

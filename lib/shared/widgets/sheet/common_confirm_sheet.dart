@@ -114,7 +114,7 @@ class CommonConfirmSheet extends StatelessWidget {
       children: [
         Expanded(
           child: SheetCancelBtn(
-            label: cancelLabel ?? context.i18n.cancel,
+            label: cancelLabel ?? context.l10n.cancel,
             onPressed: () {
               _close(context);
               onCancel?.call();
@@ -124,7 +124,7 @@ class CommonConfirmSheet extends StatelessWidget {
         SizedBox(width: 17.w),
         Expanded(
           child: SheetConfirmBtn(
-            label: confirmLabel ?? context.i18n.confirm,
+            label: confirmLabel ?? context.l10n.confirm,
             onPressed: () {
               _close(context);
               onConfirm?.call();
