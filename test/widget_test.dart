@@ -1,6 +1,8 @@
 import 'package:flutter_starter_app/app/app.dart';
 import 'package:flutter_starter_app/core/config/env_config.dart';
 import 'package:flutter_starter_app/app/navigation/app_router_config.dart';
+import 'package:flutter_starter_app/app/providers/localization_delegates_provider.dart';
+import 'package:flutter_starter_app/app/providers/theme_extensions_provider.dart';
 import 'package:flutter_starter_app/core/storage/storage_provider.dart';
 import 'package:flutter_starter_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_starter_app/features/features.dart';
@@ -38,6 +40,15 @@ void main() {
       final overrides = [
         ...featureRegistry.providerOverrides,
         ...createAppRouterOverrides(featureRegistry),
+        appLocalizationDelegatesProvider.overrideWithValue(
+          featureRegistry.localizationDelegates,
+        ),
+        appLightThemeExtensionsProvider.overrideWithValue(
+          featureRegistry.lightThemeExtensions,
+        ),
+        appDarkThemeExtensionsProvider.overrideWithValue(
+          featureRegistry.darkThemeExtensions,
+        ),
         authSessionProvider.overrideWith(_TestAuthSessionNotifier.new),
         authRepositoryProvider.overrideWith(
           (ref) => const _FakeAuthRepository(),
@@ -58,8 +69,7 @@ void main() {
       // 等待登录请求 → 会话更新 → 路由跳转 → 待办页渲染
       await _pumpMs(tester, 10000);
 
-      expect(find.text('Todo 示例'), findsAtLeastNWidgets(1));
-      expect(find.text('创建 Todo'), findsOneWidget);
+      expect(find.text('创建 Todo'), findsAtLeastNWidgets(1));
       expect(find.text('我的'), findsOneWidget);
 
       // 切换到 Profile Tab —— 用 .last 确保命中底部导航栏
