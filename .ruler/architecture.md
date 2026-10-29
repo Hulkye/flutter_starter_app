@@ -35,6 +35,29 @@
 - `lib/features/exports.dart`：业务页面公共导出入口，只导出 route class 和明确需要跨模块使用的公开类型，避免通过 `header.dart` 暴露默认 data 装配。
 - 简单页面不要为了保持目录形式统一而创建空 ViewModel、空 State、空 Repository、空 DataSource 或空目录。
 
+## 页面开发路径
+
+先按页面所需的业务职责选择路径；页面文件数量或控件数量本身不是复杂度标准。页面出现可观察业务状态、多个业务动作的编排、领域规则或数据读写时，使用复杂业务路径；否则使用简单页面路径。需求增长后按职责升级，不预先搭建未使用的层。
+
+### 简单页面路径
+
+适用于静态展示、只读内容、简单设置项或少量点击回调，且没有独立业务状态与跨层业务编排的页面。
+
+1. 将页面放在所属 Feature 的 `presentation/pages/`，只实现实际需要的 `BasePage` 页面与布局。
+2. 如需可访问路由，在 Feature 的 `presentation/<feature>_routes.dart` 定义 Route，并由 Feature 声明；按路由规则提供对应 Target 和注册入口。
+3. 页面可直接使用已有稳定 Provider 展示状态或触发简单动作；只在有页面私有 controller、FocusNode、临时交互状态或生命周期需求时添加 `PageLogic`。
+4. 不创建空 ViewModel、State、Repository、DataSource 或分层目录。需要复用的子组件按 Feature 页面组件约定放在 `presentation/widgets/`。
+
+### 复杂业务路径
+
+适用于页面有可观察业务状态、异步数据读写、多个动作编排、领域校验或需要跨页面复用的业务能力。
+
+1. 先界定 Feature 业务边界与页面状态/动作，再按需建立 `presentation/viewmodels/`；ViewModel 使用项目的 `BaseVM` / `BaseAutoDisposeVM` 范式，不持有 `BuildContext`。
+2. 将业务规则放在 domain；需要获取或持久化业务数据时，在 domain 定义 Repository 抽象及 Provider，在 data 实现 DataSource 和 Repository，并由 Feature 的 `providerOverrides` 装配默认实现。
+3. ViewModel 只依赖 domain 抽象、shared/core 服务或稳定 Provider；Page 负责 UI 组合，PageLogic 仅处理页面私有交互与生命周期。
+4. 按职责添加实体、异常、数据源和仓储，不为凑齐目录而建立空层；跨 Feature 能力通过稳定服务、抽象或 Provider 暴露，不依赖其他 Feature 的表现层对象。
+5. 通过 Feature 声明路由和依赖装配，并在 App 组合层注册 Feature。新增路由时遵循 `.ruler/routing.md` 的“新增路由流程”。
+
 ## 跨 Feature 依赖边界
 
 - 一个 Feature 的 `presentation` 不应直接依赖另一个 Feature 的 `presentation`、Page、Widget 或 ViewModel。
