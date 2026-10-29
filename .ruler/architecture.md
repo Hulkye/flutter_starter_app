@@ -70,3 +70,17 @@
 - Repository 负责业务数据获取与持久化抽象。
 - DataSource 负责具体 API、本地缓存或 Mock 数据来源。
 - 一次性 UI 反馈使用注入式 `PresentationFeedbackService`（`presentationFeedbackProvider`、`PageScope.presentation`、`PageLogic.presentation`）或专门事件机制，不污染长期可渲染状态。
+
+## 状态管理边界
+
+- Riverpod 是统一的状态管理和依赖注入方案；Provider 暴露状态、服务、Repository 或基础设施能力，UI 使用 `ref.watch` 订阅、`ref.read` 触发动作。
+- State 表达可预测、语义明确的可渲染状态；一次性 UI 事件不长期保存在 State 中。
+- 认证会话、主题、语言、网络状态等 App 级状态由 `core` 或 `shared` 的稳定 Provider/Service 持有；Data Repository 不直接写入 App 级状态源。
+- 跨模块共享状态通过 Service、Repository、Controller 或语义明确的 Provider 暴露，避免依赖其他 Feature 的表现层对象。
+
+## 资源与本地化边界
+
+- 跨 Feature 共用的主题构建、颜色/图片 token 与 ThemeExtension 放在 `lib/shared/design_system/`；应用级主题/语言偏好放在 `lib/app/preferences/`。
+- 本地化运行时与共享 ARB 放在 `lib/shared/localization/`；默认使用 Feature 前缀 key。独立 Feature 本地化由 App 组合层显式装配，不允许 shared 依赖 Feature。
+- Feature 私有主题资源由 Feature 自有 ThemeExtension 管理；不要将 Feature 专属字段加入全局 AppColor/AppAsset。
+- 图片资源默认/亮色放在 `assets/images/`，暗色放在 `assets/images/dark/`。

@@ -12,14 +12,10 @@ Ruler 的目标是把 Copilot、Cursor、Claude Code、Codex 等工具的项目�
 .ruler/
 ├── AGENTS.md                         # 项目 AI 指令总入口
 ├── ruler.toml                        # Ruler 配置
-├── project_overview.md               # 项目概览
 ├── project_profile.md                # 用户业务项目插槽
 ├── architecture.md                   # 架构规则
-├── flutter_conventions.md            # Flutter / Dart 约定
 ├── routing.md                        # 路由规则
-├── state_management.md               # 状态管理规则
 ├── testing.md                        # 测试与质量规则
-├── documentation.md                  # 文档维护规则
 └── skills/
     ├── flutter-feature/
     │   └── SKILL.md                  # 新增/重构 Feature 工作流
@@ -28,6 +24,20 @@ Ruler 的目标是把 Copilot、Cursor、Claude Code、Codex 等工具的项目�
 ```
 
 `.ruler/` 是人工维护的唯一源头，应纳入版本控制。
+
+## 📐 规则分层与唯一来源
+
+每类规则只在一个源文件维护，避免同一条约束在多个文件复制后逐渐不一致：
+
+| 文件 | 唯一职责 |
+| --- | --- |
+| `.ruler/AGENTS.md` | 强制协作规则、修改工作流、生成与验证要求 |
+| `.ruler/architecture.md` | 模块边界、分层、状态管理及共享能力边界 |
+| `.ruler/routing.md` | 路由定义、Feature 路由汇聚、导航与守卫 |
+| `.ruler/testing.md` | 质量门禁、测试分层与验证要求 |
+| `.ruler/project_profile.md` | 项目业务背景、术语和区别于模板的约束 |
+
+状态管理约束归入架构规则；Flutter/Dart 编码习惯按需放入其所属架构边界或质量门禁，不另设重复规则文件。项目概览由 README 承担，文档同步只遵循 `.ruler/AGENTS.md` 中的工作流，不另维护一套规则。`AGENTS.md`、`CLAUDE.md` 等是生成目标，不是规则源。
 
 ## 🧩 Clone 后定制项目业务信息
 
@@ -42,10 +52,7 @@ Ruler 的目标是把 Copilot、Cursor、Claude Code、Codex 等工具的项目�
 ```text
 .ruler/architecture.md
 .ruler/routing.md
-.ruler/state_management.md
 .ruler/testing.md
-.ruler/flutter_conventions.md
-.ruler/documentation.md
 ```
 
 推荐定制流程：
@@ -55,7 +62,7 @@ Ruler 的目标是把 Copilot、Cursor、Claude Code、Codex 等工具的项目�
 3. 运行 `ruler apply --dry-run --verbose` 预览生成结果。
 4. 预览无误后运行 `ruler apply`。
 
-规则优先级：
+业务背景冲突处理顺序：
 
 ```text
 用户当前请求
@@ -67,8 +74,8 @@ Ruler 的目标是把 Copilot、Cursor、Claude Code、Codex 等工具的项目�
 
 注意事项：
 
-- `.ruler/project_profile.md` 用于补充业务背景，不替代模板架构规则。
-- 如果业务项目确实改变目录结构、路由机制、状态管理或质量门禁，再同步调整对应模板规则文件。
+- `.ruler/project_profile.md` 仅记录业务背景和项目差异；通用架构、路由、质量规则分别在各自权威文件维护。
+- 如果业务项目确实改变架构边界、路由机制或质量门禁，只调整对应的单一规则源。
 - 不要在 `.ruler/project_profile.md` 或 `.ruler/local_profile.md` 中记录密钥、Token、账号密码、生产环境地址等敏感信息。
 
 ## 🎯 当前支持的 AI 工具
@@ -138,6 +145,7 @@ git status --short --ignored
 - 不手动修改 `AGENTS.md`、`CLAUDE.md`、`.claude/skills/`、`.cursor/skills/`、`.codex/` 等生成文件。
 - 修改 `.ruler/` 后，先运行 `ruler apply --dry-run --verbose` 预览。
 - 预览无误后再运行 `ruler apply`。
+- 内部规则整理不要求复制到 README、模板使用说明或路由 README；只有用户可见的用法、命令、结构或契约改变时才更新对应文档。
 - 提交时包含 `.ruler/` 源文件与 `.gitignore` 的 Ruler 管理块。
 - 不提交 Ruler 生成文件。
 

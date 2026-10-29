@@ -83,5 +83,5 @@ ref.read(appRouterProvider).push(
 
 ## 文档同步
 
-- 修改路由核心规则时，同步检查 `lib/core/router/README.md`。
-- 修改新增 Feature 的路由流程时，同步检查 `README.md` 和 `docs/template_usage.md`。
+- 仅当路由使用方式或对外契约变化时，更新 `lib/core/router/README.md`、`README.md` 或 `docs/template_usage.md` 中直接受影响的说明。
+- 路由实现或规则内部调整但不改变使用方式时，不要求在多份文档重复维护规则。
