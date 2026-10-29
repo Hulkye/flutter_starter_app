@@ -65,6 +65,18 @@ GoRouter
 
 ## 定义类型
 
+### 路由决策表
+
+| 要做什么 | 使用什么 | 说明 |
+|:---|:---|:---|
+| 声明页面可匹配的地址并解析入参 | `AppPageRoute` | 定义 `path`、`parse()` 和 `buildPage()`，不用于发起跳转 |
+| 发起一次页面导航 | `AppRouteTarget` | 描述目标地址与可选 `extra`，由 `BaseNavigator` 接收 |
+| 选择导航栈行为 | `go` / `push` / `replace` / `replaceAll` | 分别为跳转、压栈、替换当前页、清空栈后跳转 |
+| 传递必需资源标识 | path 参数 | 放入路径，例如 `/members/:memberId` |
+| 传递可选筛选或展示状态 | query 参数 | 放入查询串，例如 `?tab=posts&page=2` |
+| 传递仅当前进程使用的对象 | `extra` | 不作为深链或冷启动恢复数据的唯一来源 |
+| 声明登录要求 | `AppRoutePolicy` | 在 Feature 中声明公开策略，不在 Route 上标记 |
+
 ### AppRouteNode
 
 `AppRouteNode` 是路由注册表的统一节点类型，目前包含三类实现：
