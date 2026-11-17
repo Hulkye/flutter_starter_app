@@ -55,16 +55,16 @@ class AuthStore {
     }
   }
 
-  /// 保存会话并持久化。
+  /// 持久化成功后更新内存会话；失败时保留原会话并向调用方抛出异常。
   Future<void> setSession(AuthSession session) async {
-    _current = session;
     await secureStorage.setString(_storageKey, session.toJsonString());
+    _current = session;
   }
 
-  /// 清除会话。
+  /// 持久化删除成功后清除内存会话；失败时保留原会话并向调用方抛出异常。
   Future<void> clear() async {
-    _current = null;
     await secureStorage.remove(_storageKey);
+    _current = null;
   }
 }
 
